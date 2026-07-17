@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" prefHeight="300" prefWidth="400">
+    <children>
+        <Label text="Dashboard" layoutX="170" layoutY="80"/>
+    </children>
+</AnchorPane>

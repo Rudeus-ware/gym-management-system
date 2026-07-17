@@ -1,0 +1,13 @@
+@startuml
+class Membership
+class Basic
+class Premium
+class Family
+class User
+class Trainer
+class Admin
+class GymClass
+class Booking
+class Attendance
+class Payment
+@enduml

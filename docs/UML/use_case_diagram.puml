@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+actor Member
+actor Admin
+rectangle GymSystem {
+  Member --> (View memberships)
+  Member --> (Book class)
+  Admin --> (Manage memberships)
+  Admin --> (Manage classes)
+}
+@enduml
