@@ -1,0 +1,49 @@
+[
+  {
+    "yogaStyle": "Hatha",
+    "difficulty": "Beginner",
+    "classId": 101,
+    "className": "Morning Yoga",
+    "schedule": "Mon/Wed/Fri 7:00 AM",
+    "capacity": 15,
+    "trainer": "Sarah Johnson",
+    "bookedMembers": [
+      "John Doe",
+      "Alice Wonder",
+      "Charlie Brown"
+    ],
+    "currentBookings": 3
+  },
+  {
+    "intensity": "Medium",
+    "durationMinutes": 45,
+    "musicType": "EDM",
+    "classId": 102,
+    "className": "Evening Spin",
+    "schedule": "Tue/Thu 6:00 PM",
+    "capacity": 20,
+    "trainer": "Mike Trainer",
+    "bookedMembers": [
+      "Sarah Smith"
+    ],
+    "currentBookings": 1
+  },
+  {
+    "focusArea": "Full body",
+    "equipment": [
+      "Dumbbells",
+      "Resistance Bands",
+      "Weight Machines"
+    ],
+    "intensityLevel": "Intermediate",
+    "classId": 103,
+    "className": "Full Body Strength",
+    "schedule": "Mon/Wed 5:00 PM",
+    "capacity": 12,
+    "trainer": "Bob Strong",
+    "bookedMembers": [
+      "The Johnson Family"
+    ],
+    "currentBookings": 1
+  }
+]

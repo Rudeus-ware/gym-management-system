@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/19" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gym.view.controllers.MainController"
+            prefHeight="700" prefWidth="1000">
+    
+    <!-- TOP: Header -->
+    <top>
+        <VBox styleClass="header" spacing="5">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Text styleClass="header-label" text="🏋️ Gym Management System" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label text="Welcome, Admin" styleClass="sub-header" />
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+    
+    <!-- LEFT: Navigation -->
+    <left>
+        <VBox spacing="5" style="-fx-background-color: #2c3e50; -fx-padding: 10px;">
+            <children>
+                <!-- Navigation Buttons -->
+                <Button text="📊 Dashboard" styleClass="nav-button" 
+                        onAction="#showDashboard" />
+                <Button text="👤 Members" styleClass="nav-button" 
+                        onAction="#showProfiles" />
+                <Button text="📚 Classes" styleClass="nav-button" 
+                        onAction="#showClasses" />
+                <Button text="📅 Sessions" styleClass="nav-button" 
+                        onAction="#showSessions" />
+                <Button text="📋 Bookings" styleClass="nav-button" 
+                        onAction="#showBookings" />
+                <Button text="✅ Attendance" styleClass="nav-button" 
+                        onAction="#showAttendance" />
+                <Button text="💰 Reports" styleClass="nav-button" 
+                        onAction="#showReports" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Button text="🚪 Logout" styleClass="nav-button" 
+                        onAction="#handleLogout" />
+            </children>
+        </VBox>
+    </left>
+    
+    <!-- CENTER: Content Area -->
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-background-color: #f4f6f9; -fx-padding: 20px;">
+            <!-- Content will be dynamically swapped -->
+        </StackPane>
+    </center>
+    
+    <!-- BOTTOM: Status Bar -->
+    <bottom>
+        <HBox style="-fx-background-color: #ecf0f1; -fx-padding: 10px;" spacing="20">
+            <Label text="Connected to database" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="statusLabel" text="Ready" />
+        </HBox>
+    </bottom>
+</BorderPane>

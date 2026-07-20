@@ -3,7 +3,7 @@ package com.gym.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gym.model.classess.GymClass;
+import com.gym.model.classes.GymClass;
 
 public class ClassRepository {
     private final List<GymClass> classes = new ArrayList<>();

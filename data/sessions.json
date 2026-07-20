@@ -1,0 +1,46 @@
+[
+  {
+    "sessionId": 1,
+    "classId": 101,
+    "sessionDate": "2026-07-20",
+    "startTime": "07:00",
+    "expiryTime": "08:00",
+    "duration": "1 hour",
+    "trainerId": 1,
+    "currentAttendees": 0,
+    "isActive": true
+  },
+  {
+    "sessionId": 2,
+    "classId": 102,
+    "sessionDate": "2026-07-21",
+    "startTime": "18:00",
+    "expiryTime": "18:45",
+    "duration": "45 minutes",
+    "trainerId": 2,
+    "currentAttendees": 0,
+    "isActive": true
+  },
+  {
+    "sessionId": 3,
+    "classId": 103,
+    "sessionDate": "2026-07-22",
+    "startTime": "17:00",
+    "expiryTime": "18:00",
+    "duration": "1 hour",
+    "trainerId": 3,
+    "currentAttendees": 0,
+    "isActive": true
+  },
+  {
+    "sessionId": 4,
+    "classId": 101,
+    "sessionDate": "2026-07-22",
+    "startTime": "07:00",
+    "expiryTime": "08:00",
+    "duration": "1 hour",
+    "trainerId": 1,
+    "currentAttendees": 0,
+    "isActive": true
+  }
+]

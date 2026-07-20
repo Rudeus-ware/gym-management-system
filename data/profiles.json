@@ -1,0 +1,86 @@
+[
+  {
+    "profileId": 1,
+    "name": "John Doe",
+    "email": "john@email.com",
+    "phone": "555-123-4567",
+    "address": "123 Main St",
+    "membership": {
+      "membershipId": 1001,
+      "fee": 49.99,
+      "startDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "Active"
+    }
+  },
+  {
+    "profileId": 2,
+    "name": "Sarah Smith",
+    "email": "sarah@email.com",
+    "phone": "555-987-6543",
+    "address": "456 Oak Ave",
+    "membership": {
+      "benefits": "VIP Access",
+      "extraBenefits": [
+        "Free guest passes (2 per month)",
+        "Access to premium classes",
+        "Free towel service",
+        "Priority booking"
+      ],
+      "membershipId": 2001,
+      "fee": 99.99,
+      "startDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "Active"
+    }
+  },
+  {
+    "profileId": 3,
+    "name": "The Johnson Family",
+    "email": "johnson@email.com",
+    "phone": "555-444-3333",
+    "address": "789 Family Lane",
+    "membership": {
+      "numberOfMembers": 4,
+      "familyMembers": [
+        "Family Member 1",
+        "Family Member 2",
+        "Family Member 3",
+        "Family Member 4"
+      ],
+      "membershipId": 3001,
+      "fee": 69.99,
+      "startDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "Active"
+    }
+  },
+  {
+    "profileId": 4,
+    "name": "Alice Wonder",
+    "email": "alice@email.com",
+    "phone": "555-222-1111",
+    "address": "321 Dream St",
+    "membership": {
+      "membershipId": 1002,
+      "fee": 49.99,
+      "startDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "Active"
+    }
+  },
+  {
+    "profileId": 5,
+    "name": "Charlie Brown",
+    "email": "charlie@email.com",
+    "phone": "555-333-2222",
+    "address": "654 Peanut Lane",
+    "membership": {
+      "membershipId": 1003,
+      "fee": 49.99,
+      "startDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "Active"
+    }
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "specialization": "Yoga",
+    "assignedClasses": [],
+    "userId": "T001",
+    "password": "trainerPass",
+    "isActive": true,
+    "profileId": 1,
+    "name": "Sarah Johnson",
+    "email": "sarah@gym.com",
+    "phone": "555-111-2222",
+    "address": "789 Yoga Lane"
+  },
+  {
+    "specialization": "Spin",
+    "assignedClasses": [],
+    "userId": "T002",
+    "password": "trainerPass",
+    "isActive": true,
+    "profileId": 2,
+    "name": "Mike Trainer",
+    "email": "mike@gym.com",
+    "phone": "555-333-4444",
+    "address": "456 Spin St"
+  },
+  {
+    "specialization": "Strength",
+    "assignedClasses": [],
+    "userId": "T003",
+    "password": "trainerPass",
+    "isActive": true,
+    "profileId": 3,
+    "name": "Bob Strong",
+    "email": "bob@gym.com",
+    "phone": "555-555-6666",
+    "address": "123 Weight Ave"
+  }
+]

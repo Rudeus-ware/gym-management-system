@@ -1,0 +1,42 @@
+[
+  {
+    "bookingId": 1,
+    "profileId": 1,
+    "classId": 101,
+    "sessionId": 1,
+    "bookingDate": "2026-07-15",
+    "status": "Confirmed"
+  },
+  {
+    "bookingId": 2,
+    "profileId": 2,
+    "classId": 102,
+    "sessionId": 2,
+    "bookingDate": "2026-07-16",
+    "status": "Confirmed"
+  },
+  {
+    "bookingId": 3,
+    "profileId": 4,
+    "classId": 101,
+    "sessionId": 1,
+    "bookingDate": "2026-07-17",
+    "status": "Confirmed"
+  },
+  {
+    "bookingId": 4,
+    "profileId": 5,
+    "classId": 101,
+    "sessionId": 1,
+    "bookingDate": "2026-07-17",
+    "status": "Pending"
+  },
+  {
+    "bookingId": 5,
+    "profileId": 3,
+    "classId": 103,
+    "sessionId": 3,
+    "bookingDate": "2026-07-18",
+    "status": "Confirmed"
+  }
+]

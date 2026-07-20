@@ -1,0 +1,37 @@
+[
+  {
+    "attendanceId": 1,
+    "profileId": 1,
+    "sessionId": 1,
+    "attendanceDate": "2026-07-20",
+    "status": "Present"
+  },
+  {
+    "attendanceId": 2,
+    "profileId": 2,
+    "sessionId": 2,
+    "attendanceDate": "2026-07-21",
+    "status": "Present"
+  },
+  {
+    "attendanceId": 3,
+    "profileId": 4,
+    "sessionId": 1,
+    "attendanceDate": "2026-07-20",
+    "status": "Late"
+  },
+  {
+    "attendanceId": 4,
+    "profileId": 5,
+    "sessionId": 1,
+    "attendanceDate": "2026-07-20",
+    "status": "Absent"
+  },
+  {
+    "attendanceId": 5,
+    "profileId": 1,
+    "sessionId": 4,
+    "attendanceDate": "2026-07-22",
+    "status": "Present"
+  }
+]

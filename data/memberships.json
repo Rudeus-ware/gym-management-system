@@ -1,0 +1,51 @@
+[
+  {
+    "membershipId": 1001,
+    "fee": 49.99,
+    "startDate": "2026-01-01",
+    "expiryDate": "2026-12-31",
+    "status": "Active"
+  },
+  {
+    "benefits": "VIP Access",
+    "extraBenefits": [
+      "Free guest passes (2 per month)",
+      "Access to premium classes",
+      "Free towel service",
+      "Priority booking"
+    ],
+    "membershipId": 2001,
+    "fee": 99.99,
+    "startDate": "2026-01-01",
+    "expiryDate": "2026-12-31",
+    "status": "Active"
+  },
+  {
+    "numberOfMembers": 4,
+    "familyMembers": [
+      "Family Member 1",
+      "Family Member 2",
+      "Family Member 3",
+      "Family Member 4"
+    ],
+    "membershipId": 3001,
+    "fee": 69.99,
+    "startDate": "2026-01-01",
+    "expiryDate": "2026-12-31",
+    "status": "Active"
+  },
+  {
+    "membershipId": 1002,
+    "fee": 49.99,
+    "startDate": "2026-01-01",
+    "expiryDate": "2026-12-31",
+    "status": "Active"
+  },
+  {
+    "membershipId": 1003,
+    "fee": 49.99,
+    "startDate": "2026-01-01",
+    "expiryDate": "2026-12-31",
+    "status": "Active"
+  }
+]

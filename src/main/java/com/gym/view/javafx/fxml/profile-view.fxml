@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.controllers.ProfileController"
+      spacing="20" style="-fx-padding: 20px;">
+    
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="👤 Member Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="➕ Add Member" styleClass="button-success" onAction="#handleAddMember" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+    
+    <!-- Search Bar -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+        <TextField fx:id="searchField" promptText="Search members..." HBox.hgrow="ALWAYS" />
+        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
+        <Button text="Clear" styleClass="button-warning" onAction="#handleClearSearch" />
+    </HBox>
+    
+    <!-- Members Table -->
+    <TableView fx:id="profileTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="profileId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Name" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Email" prefWidth="200">
+                <cellValueFactory><PropertyValueFactory property="email" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Phone" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="phone" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Address" prefWidth="200">
+                <cellValueFactory><PropertyValueFactory property="address" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Membership" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="membership" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Actions" prefWidth="200">
+                <cellValueFactory><PropertyValueFactory property="actions" /></cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+    
+    <!-- Stats -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Members" />
+            <Text fx:id="totalMembers" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Active Members" />
+            <Text fx:id="activeMembers" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Inactive Members" />
+            <Text fx:id="inactiveMembers" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+    </HBox>
+</VBox>
