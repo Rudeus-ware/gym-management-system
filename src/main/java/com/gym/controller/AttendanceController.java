@@ -1,20 +1,20 @@
 package com.gym.controller;
 
-import com.gym.model.Profile;
-import com.gym.model.booking.Attendance;
-import com.gym.model.booking.Session;
-import com.gym.persistence.DataManager;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.gym.model.Profile;
+import com.gym.model.attendance.Attendance;
+import com.gym.model.booking.Session;
+import com.gym.persistence.DataManager;
 
 /**
  * Controller for Attendance operations
  */
 public class AttendanceController {
     
-    private DataManager dataManager;
+    private final DataManager dataManager;
     
     public AttendanceController(DataManager dataManager) {
         this.dataManager = dataManager;

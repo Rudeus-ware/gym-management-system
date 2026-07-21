@@ -1,16 +1,16 @@
-package com.gym.view.controllers;
+package com.gym.view.javafx.controllers;
 
+import java.io.IOException;
+
+import com.gym.controller.SessionController;
 import com.gym.persistence.DataManager;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class MainController {
     @FXML private StackPane contentArea;
@@ -36,7 +36,7 @@ public class MainController {
     // Navigation Methods
     @FXML
     public void showDashboard() {
-        loadView("dashboard-view.fxml");
+        loadView("dashboard.fxml");
         updateStatus("Dashboard loaded");
     }
     
@@ -54,7 +54,7 @@ public class MainController {
     public void showClasses() {
         FXMLLoader loader = loadView("class-view.fxml");
         if (loader != null) {
-            ClassController controller = loader.getController();
+            JavaFxClassController controller = loader.getController();
             controller.setDataManager(dataManager);
         }
         updateStatus("Classes loaded");
@@ -74,7 +74,7 @@ public class MainController {
     public void showBookings() {
         FXMLLoader loader = loadView("booking-view.fxml");
         if (loader != null) {
-            BookingController controller = loader.getController();
+            com.gym.view.javafx.controllers.BookingController controller = loader.getController();
             controller.setDataManager(dataManager);
         }
         updateStatus("Bookings loaded");
@@ -84,7 +84,7 @@ public class MainController {
     public void showAttendance() {
         FXMLLoader loader = loadView("attendance-view.fxml");
         if (loader != null) {
-            AttendanceController controller = loader.getController();
+            com.gym.view.javafx.controllers.AttendanceController controller = loader.getController();
             controller.setDataManager(dataManager);
         }
         updateStatus("Attendance loaded");

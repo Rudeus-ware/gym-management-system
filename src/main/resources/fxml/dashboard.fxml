@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml" prefHeight="300" prefWidth="400">
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefHeight="300" prefWidth="400">
     <children>
-        <Label text="Dashboard" layoutX="170" layoutY="80"/>
+        <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+            <children>
+                <Label text="Dashboard" />
+                <Label text="Gym management dashboard is ready." />
+            </children>
+        </VBox>
     </children>
 </AnchorPane>

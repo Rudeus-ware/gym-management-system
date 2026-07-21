@@ -1,12 +1,11 @@
-package com.gym;
+package com.gym.view.javafx.controllers;
 
-import com.gym.persistence.DataManager;
 import com.gym.persistence.DataInitializer;
-import com.gym.view.controllers.MainController;
+import com.gym.persistence.DataManager;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class GymApplication extends Application {
@@ -24,11 +23,11 @@ public class GymApplication extends Application {
         }
         
         // Load the main FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gym/view/fxml/main-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main-view.fxml"));
         Scene scene = new Scene(loader.load(), 1200, 800);
         
         // Load CSS
-        scene.getStylesheets().add(getClass().getResource("/com/gym/view/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
         
         // Get controller and pass data
         MainController controller = loader.getController();

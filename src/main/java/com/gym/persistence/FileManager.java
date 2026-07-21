@@ -1,13 +1,30 @@
 package com.gym.persistence;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.gym.model.classes.GymClass;
+import com.gym.model.classes.Spin;
+import com.gym.model.classes.Strength;
+import com.gym.model.classes.Yoga;
+import com.gym.model.membership.Basic;
+import com.gym.model.membership.Family;
+import com.gym.model.membership.Membership;
+import com.gym.model.membership.Premium;
 
 public class FileManager {
     private static final String DATA_DIR = "data/";
@@ -20,8 +37,39 @@ public class FileManager {
             dataDir.mkdirs();
         }
         
-        // Configure GSON for pretty printing
+        // Configure GSON for pretty printing and polymorphic membership deserialization
         this.gson = new GsonBuilder()
+            .registerTypeAdapter(Membership.class, new JsonDeserializer<Membership>() {
+                @Override
+                public Membership deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                        throws JsonParseException {
+                    JsonObject object = json.getAsJsonObject();
+                    if (object.has("numberOfMembers") || object.has("familyMembers")) {
+                        return context.deserialize(json, Family.class);
+                    }
+                    if (object.has("benefits") || object.has("extraBenefits")) {
+                        return context.deserialize(json, Premium.class);
+                    }
+                    return context.deserialize(json, Basic.class);
+                }
+            })
+            .registerTypeAdapter(GymClass.class, new JsonDeserializer<GymClass>() {
+                @Override
+                public GymClass deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                        throws JsonParseException {
+                    JsonObject object = json.getAsJsonObject();
+                    if (object.has("yogaStyle") || object.has("difficulty")) {
+                        return context.deserialize(json, Yoga.class);
+                    }
+                    if (object.has("intensity") || object.has("durationMinutes") || object.has("musicType")) {
+                        return context.deserialize(json, Spin.class);
+                    }
+                    if (object.has("focusArea") || object.has("equipment") || object.has("intensityLevel")) {
+                        return context.deserialize(json, Strength.class);
+                    }
+                    return context.deserialize(json, Yoga.class);
+                }
+            })
             .setPrettyPrinting()
             .create();
     }

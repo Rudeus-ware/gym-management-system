@@ -24,15 +24,17 @@ public class Trainer extends User {
     }
     
     // TRAINER-SPECIFIC METHODS
-   /*  public void assignClass(String className) {
-        assignedClasses.add(className);
+    public void assignClass(String className) {
+        if (!assignedClasses.contains(className)) {
+            assignedClasses.add(className);
+        }
         System.out.println("Class " + className + " assigned to trainer " + getName());
     }
     
     public void removeClass(String className) {
         assignedClasses.remove(className);
         System.out.println("Class " + className + " removed from trainer " + getName());
-    }*/
+    }
     
     public void updateSchedule(String className, String newSchedule) {
         System.out.println("Schedule for " + className + " updated to: " + newSchedule);

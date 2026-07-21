@@ -1,15 +1,29 @@
-package com.gym.view.controllers;
+package com.gym.view.javafx.controllers;
 
 import com.gym.model.Profile;
 import com.gym.model.membership.Basic;
-import com.gym.model.membership.Premium;
 import com.gym.model.membership.Family;
+import com.gym.model.membership.Premium;
 import com.gym.persistence.DataManager;
+
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 public class ProfileController {
@@ -42,11 +56,11 @@ public class ProfileController {
         membershipColumn.setCellValueFactory(cellData -> {
             Profile profile = cellData.getValue();
             if (profile.getMembership() != null) {
-                return javafx.beans.property.SimpleStringProperty(
+                return new SimpleStringProperty(
                     profile.getMembership().getClass().getSimpleName()
                 );
             }
-            return javafx.beans.property.SimpleStringProperty("None");
+            return new SimpleStringProperty("None");
         });
         
         // Custom cell for actions

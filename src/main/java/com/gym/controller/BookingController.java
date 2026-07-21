@@ -4,7 +4,7 @@ import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
 import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
-import com.gym.model.booking.Attendance;
+import com.gym.model.attendance.Attendance;
 import com.gym.persistence.DataManager;
 
 import java.time.LocalDate;
@@ -21,6 +21,15 @@ public class BookingController {
     
     public BookingController(DataManager dataManager) {
         this.dataManager = dataManager;
+    }
+
+    public void addSession(Session session) {
+        boolean exists = dataManager.getSessions().stream()
+            .anyMatch(existing -> existing.getSessionId() == session.getSessionId());
+
+        if (!exists) {
+            dataManager.addSession(session);
+        }
     }
     
     // ===== CREATE BOOKING =====

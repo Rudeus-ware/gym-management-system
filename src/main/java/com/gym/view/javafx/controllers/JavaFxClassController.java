@@ -1,24 +1,32 @@
-package com.gym.view.controllers;
+package com.gym.view.javafx.controllers;
 
 import com.gym.model.classes.GymClass;
-import com.gym.model.classes.Yoga;
 import com.gym.model.classes.Spin;
 import com.gym.model.classes.Strength;
+import com.gym.model.classes.Yoga;
 import com.gym.persistence.DataManager;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import java.util.Optional;
-
-public class ClassController {
+public class JavaFxClassController {
     
     @FXML private TableView<GymClass> classTable;
     @FXML private TextField searchField;

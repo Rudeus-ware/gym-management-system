@@ -1,16 +1,7 @@
 package com.gym.controller;
 
-import com.gym.model.Profile;
-import com.gym.model.classes.GymClass;
-import com.gym.model.membership.Membership;
-import com.gym.model.booking.Booking;
-import com.gym.model.booking.Session;
-import com.gym.model.booking.Attendance;
-import com.gym.model.user.Trainer;
-import com.gym.model.user.Admin;
 import com.gym.persistence.DataManager;
-
-import java.util.List;
+import com.gym.service.MembershipService;
 
 /**
  * Main Controller - Orchestrates all gym operations
@@ -28,6 +19,7 @@ public class GymController {
     private AttendanceController attendanceController;
     private PaymentController paymentController;
     private ReportController reportController;
+    private MembershipService membershipService;
     
     // ===== CONSTRUCTOR =====
     public GymController() {
@@ -40,6 +32,7 @@ public class GymController {
         this.attendanceController = new AttendanceController(dataManager);
         this.paymentController = new PaymentController(dataManager);
         this.reportController = new ReportController(dataManager);
+        this.membershipService = new MembershipService();
     }
     
     // ===== GETTERS FOR SUB-CONTROLLERS =====
@@ -50,6 +43,7 @@ public class GymController {
     public AttendanceController getAttendanceController() { return attendanceController; }
     public PaymentController getPaymentController() { return paymentController; }
     public ReportController getReportController() { return reportController; }
+    public MembershipService getMembershipService() { return membershipService; }
     
     // ===== CONVENIENCE METHODS =====
     

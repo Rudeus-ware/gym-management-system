@@ -1,34 +1,28 @@
 package com.gym.controller;
 
+import java.util.List;
+
 import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
-import com.gym.model.booking.Booking;
-import com.gym.model.booking.Attendance;
 import com.gym.persistence.DataManager;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- * Controller for Reports and Statistics
+ * Controller for reports and statistics.
  */
 public class ReportController {
-    
-    private DataManager dataManager;
-    
+
+    private final DataManager dataManager;
+
     public ReportController(DataManager dataManager) {
         this.dataManager = dataManager;
     }
-    
-    /**
-     * Get member summary report
-     */
+
     public String getMemberReport() {
         List<Profile> profiles = dataManager.getProfiles();
         long active = profiles.stream()
             .filter(p -> p.getMembership() != null && p.getMembership().isValid())
             .count();
-            
+
         return String.format(
             "📊 MEMBER REPORT\n" +
             "=================\n" +
@@ -47,21 +41,40 @@ public class ReportController {
             countMembershipType("Family")
         );
     }
-    
-    /**
-     * Get class report
-     */
+
     public String getClassReport() {
         List<GymClass> classes = dataManager.getGymClasses();
         int totalCapacity = classes.stream().mapToInt(GymClass::getCapacity).sum();
         int totalBookings = classes.stream().mapToInt(GymClass::getCurrentBookings).sum();
         double utilization = totalCapacity > 0 ? (double) totalBookings / totalCapacity * 100 : 0;
-        
+
         return String.format(
             "📊 CLASS REPORT\n" +
             "================\n" +
             "Total Classes: %d\n" +
             "Total Capacity: %d\n" +
             "Total Bookings: %d\n" +
-            "Utilization Rate: %.1f%%\n" +
-            "Classes by
+            "Utilization Rate: %.1f%%",
+            classes.size(),
+            totalCapacity,
+            totalBookings,
+            utilization
+        );
+    }
+
+    public String getBookingReport() {
+        return String.format(
+            "📊 BOOKING REPORT\n" +
+            "=================\n" +
+            "Total Bookings: %d",
+            dataManager.getBookings().size()
+        );
+    }
+
+    private long countMembershipType(String type) {
+        return dataManager.getProfiles().stream()
+            .filter(profile -> profile.getMembership() != null)
+            .filter(profile -> profile.getMembership().getClass().getSimpleName().equalsIgnoreCase(type))
+            .count();
+    }
+}

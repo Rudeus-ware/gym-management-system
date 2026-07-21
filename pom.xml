@@ -76,7 +76,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.gym.GymApplication</mainClass>
+                    <mainClass>com.gym.view.javafx.controllers.GymApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

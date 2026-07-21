@@ -9,15 +9,14 @@ import com.gym.model.membership.Basic;
 import com.gym.model.membership.Premium;
 import com.gym.model.booking.Session;
 import com.gym.model.booking.Booking;
-import com.gym.controller.BookingSystem;
+import com.gym.controller.BookingController;
 import com.gym.persistence.DataManager;
 import com.gym.persistence.DataInitializer;
-
 import java.util.Scanner;
 
 public class Main {
     private static DataManager dataManager;
-    private static BookingSystem bookingSystem;
+    private static BookingController bookingController;
     private static Scanner scanner;
     
     public static void main(String[] args) {
@@ -38,7 +37,7 @@ public class Main {
         }
         
         // ===== CREATE BOOKING SYSTEM =====
-        bookingSystem = new BookingSystem();
+        bookingController = new BookingController(dataManager);
         
         // Load data from DataManager into BookingSystem
         loadDataIntoBookingSystem();
@@ -99,7 +98,7 @@ public class Main {
         
         // Add sessions
         for (Session session : dataManager.getSessions()) {
-            bookingSystem.addSession(session);
+            bookingController.addSession(session);
         }
         
         System.out.println("✅ Data loaded into booking system!");

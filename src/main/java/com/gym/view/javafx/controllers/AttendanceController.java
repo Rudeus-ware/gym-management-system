@@ -1,4 +1,4 @@
-package com.gym.view.controllers;
+package com.gym.view.javafx.controllers;
 
 import com.gym.persistence.DataManager;
 
