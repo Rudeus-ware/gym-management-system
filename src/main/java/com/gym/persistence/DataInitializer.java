@@ -1,21 +1,19 @@
 package com.gym.persistence;
 
-import com.gym.model.Profile;
-import com.gym.model.classes.Yoga;
-import com.gym.model.classes.Spin;
-import com.gym.model.classes.Strength;
-import com.gym.model.membership.Basic;
-import com.gym.model.membership.Premium;
-import com.gym.model.membership.Family;
-import com.gym.model.booking.Booking;
-import com.gym.model.booking.Session;
-import com.gym.model.attendance.Attendance;
-import com.gym.model.user.Trainer;
-import com.gym.model.user.Admin;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.gym.model.Profile;
+import com.gym.model.attendance.Attendance;
+import com.gym.model.booking.Booking;
+import com.gym.model.booking.Session;
+import com.gym.model.classes.Spin;
+import com.gym.model.classes.Strength;
+import com.gym.model.classes.Yoga;
+import com.gym.model.membership.Basic;
+import com.gym.model.membership.Family;
+import com.gym.model.membership.Premium;
+import com.gym.model.user.Trainer;
 
 public class DataInitializer {
     
