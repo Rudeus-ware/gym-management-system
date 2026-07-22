@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.javafx.controller.ReportsController"
+      spacing="20" style="-fx-padding: 20px;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="💰 Reports & Analytics" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="📊 Generate Report" styleClass="button-primary" onAction="#handleGenerateReport" />
+        <Button text="📥 Export PDF" styleClass="button-success" onAction="#handleExportPDF" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Report Type Selection -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+        <Label text="Report Type:" style="-fx-font-weight: bold; -fx-padding: 5px 0;" />
+        <ComboBox fx:id="reportType" promptText="Select report type" prefWidth="200">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Member Report" />
+                    <String fx:value="Class Report" />
+                    <String fx:value="Booking Report" />
+                    <String fx:value="Attendance Report" />
+                    <String fx:value="Revenue Report" />
+                    <String fx:value="Trainer Report" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <Label text="Date Range:" style="-fx-font-weight: bold; -fx-padding: 5px 0; -fx-margin-left: 20px;" />
+        <DatePicker fx:id="startDate" promptText="Start Date" />
+        <DatePicker fx:id="endDate" promptText="End Date" />
+        <Button text="Apply" styleClass="button-primary" onAction="#handleApplyFilter" />
+    </HBox>
+
+    <!-- Report Content Area -->
+    <VBox fx:id="reportContent" spacing="15" style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;" VBox.vgrow="ALWAYS">
+        <Text text="📋 Report Preview" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Separator />
+        <Label fx:id="reportTitle" text="Select a report type to view" style="-fx-font-size: 14px;" />
+        <TextArea fx:id="reportTextArea" promptText="Report will appear here..." 
+                  prefHeight="400" wrapText="true" editable="false" />
+    </VBox>
+
+    <!-- Stats Summary -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Members" />
+            <Text fx:id="reportTotalMembers" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Active Members" />
+            <Text fx:id="reportActiveMembers" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Total Revenue" />
+            <Text fx:id="reportTotalRevenue" text="$0.00" styleClass="stat-number, stat-warning" />
+        </VBox>
+        <VBox>
+            <Label text="Attendance Rate" />
+            <Text fx:id="reportAttendanceRate" text="0%" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Classes" />
+            <Text fx:id="reportTotalClasses" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Trainers" />
+            <Text fx:id="reportTotalTrainers" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
+</VBox>

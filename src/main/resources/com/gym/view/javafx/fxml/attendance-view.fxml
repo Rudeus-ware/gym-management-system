@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.javafx.controller.AttendanceController"
+      spacing="20" style="-fx-padding: 20px;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="✅ Attendance Tracking" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="➕ Mark Attendance" styleClass="button-success" onAction="#handleMarkAttendance" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Search & Filter -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+        <TextField fx:id="searchField" promptText="Search by member name..." HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="statusFilter" promptText="Filter by status" prefWidth="150">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="All" />
+                    <String fx:value="Present" />
+                    <String fx:value="Absent" />
+                    <String fx:value="Late" />
+                    <String fx:value="Excused" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
+        <Button text="Clear" styleClass="button-warning" onAction="#handleClear" />
+    </HBox>
+
+    <!-- Attendance Table -->
+    <TableView fx:id="attendanceTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="attendanceId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Member" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="profileId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Session" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="sessionId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Date" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="attendanceDate" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Status" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <!-- Stats -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Records" />
+            <Text fx:id="totalRecords" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Present" />
+            <Text fx:id="presentCount" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Absent" />
+            <Text fx:id="absentCount" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+        <VBox>
+            <Label text="Late" />
+            <Text fx:id="lateCount" text="0" styleClass="stat-number, stat-warning" />
+        </VBox>
+        <VBox>
+            <Label text="Attendance Rate" />
+            <Text fx:id="attendanceRate" text="0%" styleClass="stat-number, stat-primary" />
+        </VBox>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
+</VBox>

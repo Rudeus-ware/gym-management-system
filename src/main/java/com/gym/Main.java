@@ -1,18 +1,14 @@
 package com.gym;
 
+import java.util.Scanner;
+
+import com.gym.controller.BookingController;
 import com.gym.model.Profile;
 import com.gym.model.attendance.Attendance;
-import com.gym.model.classes.Yoga;
-import com.gym.model.classes.Spin;
-import com.gym.model.classes.Strength;
-import com.gym.model.membership.Basic;
-import com.gym.model.membership.Premium;
-import com.gym.model.booking.Session;
 import com.gym.model.booking.Booking;
-import com.gym.controller.BookingController;
-import com.gym.persistence.DataManager;
+import com.gym.model.booking.Session;
 import com.gym.persistence.DataInitializer;
-import java.util.Scanner;
+import com.gym.persistence.DataManager;
 
 public class Main {
     private static DataManager dataManager;

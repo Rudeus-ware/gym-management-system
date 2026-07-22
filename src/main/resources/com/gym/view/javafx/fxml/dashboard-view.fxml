@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19" spacing="20" style="-fx-padding: 20px;">
+    <Text text="📊 Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label text="Welcome to Gym Management System!" />
+    
+    <GridPane hgap="20" vgap="20">
+        <VBox style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;">
+            <Text text="Total Members" />
+            <Text text="0" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;">
+            <Text text="Total Classes" />
+            <Text text="0" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        </VBox>
+        <VBox style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;">
+            <Text text="Total Bookings" />
+            <Text text="0" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        </VBox>
+    </GridPane>
+</VBox>

@@ -1,17 +1,17 @@
 package com.gym.controller;
 
-import com.gym.model.classes.GymClass;
-import com.gym.model.classes.Yoga;
-import com.gym.model.classes.Spin;
-import com.gym.model.classes.Strength;
-import com.gym.model.Profile;
-import com.gym.model.booking.Session;
-import com.gym.model.booking.Booking;
-import com.gym.persistence.DataManager;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.gym.model.Profile;
+import com.gym.model.booking.Booking;
+import com.gym.model.booking.Session;
+import com.gym.model.classes.GymClass;
+import com.gym.model.classes.Spin;
+import com.gym.model.classes.Strength;
+import com.gym.model.classes.Yoga;
+import com.gym.persistence.DataManager;
 
 /**
  * Controller for Class operations

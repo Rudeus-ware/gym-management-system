@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gym.view.javafx.controller.LoginController"
+            prefHeight="500" prefWidth="400"
+            style="-fx-background-color: #ecf0f1;">
+
+    <center>
+        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 40px;">
+            <!-- Logo/Title -->
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="🏋️" style="-fx-font-size: 48px;" />
+                <Text text="Gym Management System" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
+                <Text text="Please login to continue" style="-fx-font-size: 14px; -fx-fill: #7f8c8d;" />
+            </VBox>
+
+            <!-- Login Form -->
+            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 30px; -fx-border-radius: 5px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" prefWidth="320">
+                <Label text="Email" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <TextField fx:id="emailField" promptText="Enter your email" prefHeight="35">
+                    <padding>
+                        <Insets left="10" right="10" />
+                    </padding>
+                </TextField>
+
+                <Label text="Password" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <PasswordField fx:id="passwordField" promptText="Enter your password" prefHeight="35">
+                    <padding>
+                        <Insets left="10" right="10" />
+                    </padding>
+                </PasswordField>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <CheckBox fx:id="rememberMe" text="Remember me" />
+                    <Hyperlink text="Forgot password?" onAction="#handleForgotPassword" />
+                </HBox>
+
+                <Button fx:id="loginButton" text="🔑 Login" styleClass="button-primary" 
+                        prefHeight="40" prefWidth="320" onAction="#handleLogin">
+                    <style>
+                        -fx-background-color: #2c3e50;
+                        -fx-text-fill: white;
+                        -fx-font-size: 16px;
+                        -fx-font-weight: bold;
+                        -fx-cursor: hand;
+                    </style>
+                </Button>
+
+                <Label fx:id="errorLabel" text="" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+            </VBox>
+
+            <!-- Footer -->
+            <Text text="© 2026 Gym Management System" style="-fx-font-size: 12px; -fx-fill: #bdc3c7;" />
+        </VBox>
+    </center>
+</BorderPane>

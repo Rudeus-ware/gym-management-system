@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.javafx.controller.SessionController"
+      spacing="20" style="-fx-padding: 20px;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="📅 Session Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="➕ New Session" styleClass="button-success" onAction="#handleAddSession" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Session Table -->
+    <TableView fx:id="sessionTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="sessionId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Class" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="classId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Date" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="sessionDate" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Start" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="startTime" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="End" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="expiryTime" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Duration" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="duration" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Attendees" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="currentAttendees" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Status" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Actions" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="actions" /></cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <!-- Stats -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Sessions" />
+            <Text fx:id="totalSessions" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Active" />
+            <Text fx:id="activeSessions" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Ended" />
+            <Text fx:id="endedSessions" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+        <VBox>
+            <Label text="Total Attendees" />
+            <Text fx:id="totalAttendees" text="0" styleClass="stat-number, stat-warning" />
+        </VBox>
+        <VBox>
+            <Label text="Avg Attendance" />
+            <Text fx:id="avgAttendance" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
+</VBox>

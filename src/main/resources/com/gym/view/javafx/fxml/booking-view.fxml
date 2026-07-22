@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.javafx.controller.BookingController"
+      spacing="20" style="-fx-padding: 20px;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="📋 Booking Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="➕ New Booking" styleClass="button-success" onAction="#handleNewBooking" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Search -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+        <TextField fx:id="searchField" promptText="Search bookings..." HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="statusFilter" promptText="Filter by status" prefWidth="150">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="All" />
+                    <String fx:value="Confirmed" />
+                    <String fx:value="Pending" />
+                    <String fx:value="Cancelled" />
+                    <String fx:value="Completed" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
+        <Button text="Clear" styleClass="button-warning" onAction="#handleClear" />
+    </HBox>
+
+    <!-- Booking Table -->
+    <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="bookingId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Member" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="profileId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Class" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="classId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Session" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="sessionId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Booking Date" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="bookingDate" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Status" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Actions" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="actions" /></cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <!-- Stats -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Bookings" />
+            <Text fx:id="totalBookings" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Confirmed" />
+            <Text fx:id="confirmedBookings" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Pending" />
+            <Text fx:id="pendingBookings" text="0" styleClass="stat-number, stat-warning" />
+        </VBox>
+        <VBox>
+            <Label text="Cancelled" />
+            <Text fx:id="cancelledBookings" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
+</VBox>

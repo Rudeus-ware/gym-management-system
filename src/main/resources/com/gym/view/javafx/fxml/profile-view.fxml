@@ -7,9 +7,9 @@
 
 <VBox xmlns="http://javafx.com/javafx/19"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.gym.view.controllers.ProfileController"
+      fx:controller="com.gym.view.javafx.controller.ProfileController"
       spacing="20" style="-fx-padding: 20px;">
-    
+
     <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
         <Text text="👤 Member Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
@@ -17,14 +17,14 @@
         <Button text="➕ Add Member" styleClass="button-success" onAction="#handleAddMember" />
         <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
     </HBox>
-    
+
     <!-- Search Bar -->
     <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
         <TextField fx:id="searchField" promptText="Search members..." HBox.hgrow="ALWAYS" />
         <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
         <Button text="Clear" styleClass="button-warning" onAction="#handleClearSearch" />
     </HBox>
-    
+
     <!-- Members Table -->
     <TableView fx:id="profileTable" VBox.vgrow="ALWAYS">
         <columns>
@@ -44,14 +44,14 @@
                 <cellValueFactory><PropertyValueFactory property="address" /></cellValueFactory>
             </TableColumn>
             <TableColumn text="Membership" prefWidth="120">
-                <cellValueFactory><PropertyValueFactory property="membership" /></cellValueFactory>
+                <cellValueFactory><PropertyValueFactory property="membershipType" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Actions" prefWidth="200">
+            <TableColumn text="Actions" prefWidth="150">
                 <cellValueFactory><PropertyValueFactory property="actions" /></cellValueFactory>
             </TableColumn>
         </columns>
     </TableView>
-    
+
     <!-- Stats -->
     <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
         <VBox>
@@ -66,5 +66,20 @@
             <Label text="Inactive Members" />
             <Text fx:id="inactiveMembers" text="0" styleClass="stat-number, stat-danger" />
         </VBox>
+        <VBox>
+            <Label text="Basic" />
+            <Text fx:id="basicCount" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Premium" />
+            <Text fx:id="premiumCount" text="0" styleClass="stat-number, stat-warning" />
+        </VBox>
+        <VBox>
+            <Label text="Family" />
+            <Text fx:id="familyCount" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
     </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
 </VBox>

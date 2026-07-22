@@ -1,4 +1,4 @@
-package com.gym.view.javafx.controllers;
+package com.gym.view.javafx.controller;
 
 import com.gym.model.classes.GymClass;
 import com.gym.model.classes.Spin;

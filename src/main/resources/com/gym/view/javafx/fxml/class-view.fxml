@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gym.view.javafx.controller.ClassController"
+      spacing="20" style="-fx-padding: 20px;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text text="📚 Class Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="➕ New Class" styleClass="button-success" onAction="#handleAddClass" />
+        <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Search -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+        <TextField fx:id="searchField" promptText="Search classes..." HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="typeFilter" promptText="Filter by type" prefWidth="150">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="All" />
+                    <String fx:value="Yoga" />
+                    <String fx:value="Spin" />
+                    <String fx:value="Strength" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
+        <Button text="Clear" styleClass="button-warning" onAction="#handleClear" />
+    </HBox>
+
+    <!-- Class Table -->
+    <TableView fx:id="classTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="classId" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Name" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="className" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Type" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="classType" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Schedule" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="schedule" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Trainer" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="trainer" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Capacity" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="capacity" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Bookings" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="currentBookings" /></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Actions" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="actions" /></cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <!-- Stats -->
+    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+        <VBox>
+            <Label text="Total Classes" />
+            <Text fx:id="totalClasses" text="0" styleClass="stat-number, stat-primary" />
+        </VBox>
+        <VBox>
+            <Label text="Available" />
+            <Text fx:id="availableClasses" text="0" styleClass="stat-number, stat-success" />
+        </VBox>
+        <VBox>
+            <Label text="Full" />
+            <Text fx:id="fullClasses" text="0" styleClass="stat-number, stat-danger" />
+        </VBox>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" text="Ready" />
+</VBox>
