@@ -1,3 +1,37 @@
+#!/bin/bash
+
+# =============================================================================
+# Script: fix-profile-controller.sh
+# Purpose: Fix all compilation errors in ProfileController.java
+# =============================================================================
+
+set -e  # Exit immediately if a command exits with a non-zero status.
+
+echo "🚀 Starting ProfileController fix..."
+echo "====================================="
+
+# Path to the ProfileController file
+PROFILE_PATH="src/main/java/com/gym/view/javafx/controller/ProfileController.java"
+
+# 1. Check if the ProfileController file exists
+if [ ! -f "$PROFILE_PATH" ]; then
+    echo "❌ Error: ProfileController not found at $PROFILE_PATH"
+    echo "   Please ensure you are running this script from the project root directory."
+    exit 1
+fi
+
+echo "✅ Found ProfileController at $PROFILE_PATH"
+
+# 2. Create a backup
+echo "📁 Creating backup..."
+cp "$PROFILE_PATH" "$PROFILE_PATH.bak"
+echo "✅ Backup created: $PROFILE_PATH.bak"
+
+# 3. Read the current file content
+echo "✏️ Analyzing and fixing ProfileController..."
+
+# Create the fixed version with proper structure
+cat > "$PROFILE_PATH" << 'EOF'
 package com.gym.view.javafx.controller;
 
 import com.gym.controller.GymController;
@@ -399,3 +433,22 @@ public class ProfileController {
         return dialog;
     }
 }
+EOF
+
+echo "✅ ProfileController.java has been completely rewritten with fixes."
+
+# 4. Compile to verify
+echo "⚙️ Compiling the project to verify fixes..."
+mvn clean compile
+
+if [ $? -eq 0 ]; then
+    echo "🎉 Compilation successful! All errors have been fixed."
+    echo "✅ Backup saved at: $PROFILE_PATH.bak (you can delete it later)"
+else
+    echo "❌ Compilation still has errors. Please check the output above."
+    echo "   You can restore the backup using: cp $PROFILE_PATH.bak $PROFILE_PATH"
+    exit 1
+fi
+
+echo "====================================="
+echo "✅ Script execution completed successfully!"

@@ -1,9 +1,7 @@
 package com.gym.view.javafx.controller;
 
-import java.io.IOException;
-
 import com.gym.controller.GymController;
-
+import com.gym.persistence.DataManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -11,23 +9,44 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-/**
- * Main UI Controller - Handles navigation and layout
- * THIS IS A UI CONTROLLER - Uses JavaFX
- */
+import java.io.IOException;
+
 public class MainController {
     
     @FXML private StackPane contentArea;
     @FXML private Label statusLabel;
     @FXML private Label userNameLabel;
     
+    // Fields
+    private DataManager dataManager;
     private GymController gymController;
     private Stage primaryStage;
     
-    public void setGymController(GymController gymController) {
-        this.gymController = gymController;
+    // ===== SETTER METHODS =====
+    
+    /**
+     * Set the DataManager for this controller
+     */
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+        this.gymController = new GymController();
+        System.out.println("✅ DataManager set in MainController");
+        updateStatus("Data Manager initialized");
     }
     
+    /**
+     * Set the GymController for this controller
+     */
+    public void setGymController(GymController gymController) {
+        this.gymController = gymController;
+        this.dataManager = gymController.getDataManager();
+        System.out.println("✅ GymController set in MainController");
+        updateStatus("Gym Controller initialized");
+    }
+    
+    /**
+     * Set the primary stage
+     */
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         if (userNameLabel != null) {
@@ -37,14 +56,16 @@ public class MainController {
     
     @FXML
     public void initialize() {
-        statusLabel.setText("✅ Application ready");
+        updateStatus("✅ Application ready");
         showDashboard();
     }
+    
+    // ===== NAVIGATION METHODS =====
     
     @FXML
     public void showDashboard() {
         loadView("dashboard-view.fxml");
-        statusLabel.setText("✅ Dashboard loaded");
+        updateStatus("✅ Dashboard loaded");
     }
     
     @FXML
@@ -53,40 +74,40 @@ public class MainController {
         if (loader != null) {
             ProfileController controller = loader.getController();
             if (controller != null && gymController != null) {
-                controller.setAdminController(gymController.getAdminController());
+                controller.setGymController(gymController);
             }
         }
-        statusLabel.setText("✅ Members loaded");
+        updateStatus("✅ Members loaded");
     }
     
     @FXML
     public void showClasses() {
         loadView("class-view.fxml");
-        statusLabel.setText("✅ Classes loaded");
+        updateStatus("✅ Classes loaded");
     }
     
     @FXML
     public void showSessions() {
         loadView("session-view.fxml");
-        statusLabel.setText("✅ Sessions loaded");
+        updateStatus("✅ Sessions loaded");
     }
     
     @FXML
     public void showBookings() {
         loadView("booking-view.fxml");
-        statusLabel.setText("✅ Bookings loaded");
+        updateStatus("✅ Bookings loaded");
     }
     
     @FXML
     public void showAttendance() {
         loadView("attendance-view.fxml");
-        statusLabel.setText("✅ Attendance loaded");
+        updateStatus("✅ Attendance loaded");
     }
     
     @FXML
     public void showReports() {
         loadView("reports-view.fxml");
-        statusLabel.setText("✅ Reports loaded");
+        updateStatus("✅ Reports loaded");
     }
     
     @FXML
@@ -94,22 +115,32 @@ public class MainController {
         if (gymController != null) {
             gymController.saveAllData();
         }
-        primaryStage.close();
+        if (primaryStage != null) {
+            primaryStage.close();
+        }
     }
+    
+    // ===== UTILITY METHODS =====
     
     private FXMLLoader loadView(String fxmlFile) {
         try {
             contentArea.getChildren().clear();
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/gym/view/fxml/" + fxmlFile)
+                getClass().getResource("/com/gym/view/javafx/fxml/" + fxmlFile)
             );
             Pane view = loader.load();
             contentArea.getChildren().add(view);
             return loader;
         } catch (IOException e) {
-            statusLabel.setText("❌ Error loading view: " + e.getMessage());
+            updateStatus("❌ Error loading view: " + e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+    
+    private void updateStatus(String message) {
+        if (statusLabel != null) {
+            statusLabel.setText(message);
         }
     }
 }

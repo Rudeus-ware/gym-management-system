@@ -1,7 +1,6 @@
 package com.gym;
 
 import com.gym.controller.GymController;
-import com.gym.persistence.DataInitializer;
 import com.gym.view.javafx.controller.MainController;
 
 import javafx.application.Application;
@@ -18,14 +17,9 @@ public class GymApplication extends Application {
         // Initialize the main controller
         gymController = new GymController();
         
-        // Load test data if empty
-        if (gymController.getDataManager().getProfiles().isEmpty()) {
-            DataInitializer.initializeTestData(gymController.getDataManager());
-        }
-        
         // Load the main FXML
         FXMLLoader loader = new FXMLLoader(
-            getClass().getResource("/com/gym/view/fxml/main-view.fxml")
+            getClass().getResource("/com/gym/view/javafx/fxml/main-view.fxml")
         );
         Scene scene = new Scene(loader.load(), 1200, 800);
         
@@ -34,7 +28,7 @@ public class GymApplication extends Application {
             getClass().getResource("/com/gym/view/css/styles.css").toExternalForm()
         );
         
-        // Get controller and pass dependencies
+        // ✅ FIX: Use setGymController instead of setDataManager
         MainController mainController = loader.getController();
         mainController.setGymController(gymController);
         mainController.setStage(primaryStage);

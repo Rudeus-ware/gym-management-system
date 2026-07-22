@@ -10,17 +10,17 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <!-- PROPERTIES SECTION -->
+    <!-- ===== PROPERTIES ===== -->
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <!-- FIXED: Use release instead of source/target -->
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>19.0.2</javafx.version>
     </properties>
 
-    <!-- DEPENDENCIES SECTION -->
+    <!-- ===== DEPENDENCIES ===== -->
     <dependencies>
-        <!-- Google GSON for JSON handling -->
+        <!-- Google GSON for JSON -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -44,9 +44,6 @@
             <version>${javafx.version}</version>
         </dependency>
         
-        <!-- MySQL Connector (if you use database) -->
-        <!-- Add if needed -->
-        
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -56,7 +53,7 @@
         </dependency>
     </dependencies>
 
-    <!-- BUILD SECTION -->
+    <!-- ===== BUILD ===== -->
     <build>
         <plugins>
             <!-- Compiler Plugin -->
@@ -65,8 +62,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <!-- FIXED: Use release instead of source/target -->
+                    <release>17</release>
                 </configuration>
             </plugin>
             
@@ -76,7 +73,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.gym.view.javafx.controllers.GymApplication</mainClass>
+                    <mainClass>com.gym.GymApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

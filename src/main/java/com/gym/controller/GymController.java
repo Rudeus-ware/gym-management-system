@@ -2,13 +2,11 @@ package com.gym.controller;
 
 import com.gym.persistence.DataManager;
 
-/**
- * Main orchestrator for the application
- * This is the central controller that coordinates everything
- */
 public class GymController {
     
     private DataManager dataManager;
+    private LoginController loginController;
+    private ProfileController profileController;
     private AdminController adminController;
     private MembershipController membershipController;
     private ClassController classController;
@@ -19,6 +17,8 @@ public class GymController {
     
     public GymController() {
         this.dataManager = new DataManager();
+        this.loginController = new LoginController(dataManager);
+        this.profileController = new ProfileController(dataManager);
         this.adminController = new AdminController(dataManager);
         this.membershipController = new MembershipController(dataManager);
         this.classController = new ClassController(dataManager);
@@ -30,35 +30,28 @@ public class GymController {
     
     // ===== GETTERS =====
     public DataManager getDataManager() { return dataManager; }
+    public LoginController getLoginController() { return loginController; }
+    public ProfileController getProfileController() { return profileController; }
     public AdminController getAdminController() { return adminController; }
-    public MembershipController getMembershipController() { return membershipController; }
+    
+    // ✅ FIX: Rename to match what's being called
+    public MembershipController getMembershipController() { 
+        return membershipController; 
+    }
+    
+    // ✅ FIX: Add this if you want the name getMembershipService()
+    public MembershipController getMembershipService() { 
+        return membershipController; 
+    }
+    
     public ClassController getClassController() { return classController; }
     public BookingController getBookingController() { return bookingController; }
     public AttendanceController getAttendanceController() { return attendanceController; }
     public PaymentController getPaymentController() { return paymentController; }
     public ReportController getReportController() { return reportController; }
     
-    // ===== SAVE & LOAD =====
+    // ===== CONVENIENCE METHODS =====
     public void saveAllData() {
         dataManager.saveAllData();
-        System.out.println("✅ All data saved!");
-    }
-    
-    public void loadAllData() {
-        // DataManager loads on construction
-        System.out.println("✅ All data loaded!");
-    }
-    
-    // ===== STATISTICS =====
-    public int getTotalMembers() {
-        return dataManager.getProfiles().size();
-    }
-    
-    public int getTotalClasses() {
-        return dataManager.getGymClasses().size();
-    }
-    
-    public int getTotalBookings() {
-        return dataManager.getBookings().size();
     }
 }
