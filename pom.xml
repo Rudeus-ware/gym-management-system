@@ -12,11 +12,19 @@
 
     <!-- ===== PROPERTIES ===== -->
     <properties>
-        <!-- FIXED: Use release instead of source/target -->
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>19.0.2</javafx.version>
+        <javafx.version>21.0.2</javafx.version>
+        <gluonfx.version>1.0.29</gluonfx.version>
     </properties>
+
+    <!-- ===== REPOSITORIES ===== -->
+    <repositories>
+        <repository>
+            <id>gluon-releases</id>
+            <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
     <!-- ===== DEPENDENCIES ===== -->
     <dependencies>
@@ -45,7 +53,7 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Add MySQL Connector -->
+        <!-- MySQL Connector -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -70,7 +78,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <!-- FIXED: Use release instead of source/target -->
                     <release>17</release>
                 </configuration>
             </plugin>
@@ -82,6 +89,17 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.gym.GymApplication</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- GluonFX Maven Plugin -->
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>${gluonfx.version}</version>
+                <configuration>
+                    <mainClass>com.gym.GymApplication</mainClass>
+                    <target>host</target>
                 </configuration>
             </plugin>
         </plugins>
