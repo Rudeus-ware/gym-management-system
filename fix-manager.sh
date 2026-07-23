@@ -1,3 +1,17 @@
+#!/bin/bash
+
+echo "🔧 Fixing FileManager.java..."
+echo "============================"
+
+# Create backup
+if [ -f "src/main/java/com/gym/persistence/FileManager.java" ]; then
+    cp src/main/java/com/gym/persistence/FileManager.java \
+       src/main/java/com/gym/persistence/FileManager.java.bak
+    echo "✅ Backup created"
+fi
+
+# Create the fixed file
+cat > src/main/java/com/gym/persistence/FileManager.java << 'EOF'
 package com.gym.persistence;
 
 import com.google.gson.Gson;
@@ -82,3 +96,17 @@ public class FileManager {
         System.out.println("✅ All data cleared!");
     }
 }
+EOF
+
+echo "✅ FileManager.java fixed!"
+
+# Verify
+if grep -q "package com.gym.persistence" src/main/java/com/gym/persistence/FileManager.java; then
+    echo "✅ Package declaration found - good!"
+else
+    echo "❌ Package declaration still missing!"
+fi
+
+echo ""
+echo "📋 Next steps:"
+echo "  1. mvn clean compile"
