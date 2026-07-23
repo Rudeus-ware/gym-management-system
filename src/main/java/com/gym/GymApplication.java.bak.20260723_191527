@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 
 public class GymApplication extends Application {
     
-    // ✅ Declare as class-level field
     private GymController gymController;
     
     @Override
@@ -34,7 +33,7 @@ public class GymApplication extends Application {
             getClass().getResource("/com/gym/view/css/styles.css").toExternalForm()
         );
         
-        // Get LoginController and set dependencies
+        // ✅ FIXED: Get LoginController and set dependencies
         LoginController loginController = loader.getController();
         loginController.setGymController(gymController);
         loginController.setStage(primaryStage);
@@ -46,9 +45,7 @@ public class GymApplication extends Application {
         
         // Save on close
         primaryStage.setOnCloseRequest(event -> {
-            if (gymController != null) {
-                gymController.saveAllData();
-            }
+            gymController.saveAllData();
         });
     }
     

@@ -8,34 +8,15 @@
 <VBox xmlns="http://javafx.com/javafx/19"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.gym.view.javafx.controller.ClassController"
-      spacing="20" style="-fx-padding: 20px;">
+      spacing="20" style="-fx-padding: 20px; -fx-background-color: #f0f2f5;">
 
-    <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Text text="📚 Class Management" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Text text="📚 Class Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
         <Region HBox.hgrow="ALWAYS" />
         <Button text="➕ New Class" styleClass="button-success" onAction="#handleAddClass" />
         <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
     </HBox>
 
-    <!-- Search -->
-    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
-        <TextField fx:id="searchField" promptText="Search classes..." HBox.hgrow="ALWAYS" />
-        <ComboBox fx:id="typeFilter" promptText="Filter by type" prefWidth="150">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="All" />
-                    <String fx:value="Yoga" />
-                    <String fx:value="Spin" />
-                    <String fx:value="Strength" />
-                </FXCollections>
-            </items>
-        </ComboBox>
-        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
-        <Button text="Clear" styleClass="button-warning" onAction="#handleClear" />
-    </HBox>
-
-    <!-- Class Table -->
     <TableView fx:id="classTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn text="ID" prefWidth="60">
@@ -65,22 +46,20 @@
         </columns>
     </TableView>
 
-    <!-- Stats -->
-    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+    <HBox spacing="20" styleClass="card">
         <VBox>
-            <Label text="Total Classes" />
+            <Label text="Total Classes" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="totalClasses" text="0" styleClass="stat-number, stat-primary" />
         </VBox>
         <VBox>
-            <Label text="Available" />
+            <Label text="Available" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="availableClasses" text="0" styleClass="stat-number, stat-success" />
         </VBox>
         <VBox>
-            <Label text="Full" />
+            <Label text="Full" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="fullClasses" text="0" styleClass="stat-number, stat-danger" />
         </VBox>
     </HBox>
 
-    <!-- Status Label -->
-    <Label fx:id="statusLabel" text="Ready" />
+    <Label fx:id="statusLabel" text="Ready" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
 </VBox>

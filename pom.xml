@@ -20,6 +20,7 @@
 
     <!-- ===== DEPENDENCIES ===== -->
     <dependencies>
+    
         <!-- Google GSON for JSON -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -43,7 +44,14 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        
+
+        <!-- Add MySQL Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

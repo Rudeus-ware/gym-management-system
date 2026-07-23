@@ -1,7 +1,7 @@
 package com.gym.view.javafx.controller;
 
 import com.gym.controller.GymController;
-import com.gym.persistence.DataManager;
+import com.gym.model.user.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -17,104 +17,41 @@ public class MainController {
     @FXML private Label statusLabel;
     @FXML private Label userNameLabel;
     
-    // Fields
-    private DataManager dataManager;
     private GymController gymController;
     private Stage primaryStage;
+    private User currentUser;
     
-    // ===== SETTER METHODS =====
-    
-    /**
-     * Set the DataManager for this controller
-     */
-    public void setDataManager(DataManager dataManager) {
-        this.dataManager = dataManager;
-        this.gymController = new GymController();
-        System.out.println("✅ DataManager set in MainController");
-        updateStatus("Data Manager initialized");
+    // ===== SETTERS =====
+    public void setGymController(GymController gymController) {
+        this.gymController = gymController;
     }
     
-    /**
-     * Set the GymController for this controller
-     */
-    public void setUser(com.gym.model.user.User user) {
+    public void setStage(Stage stage) {
+        this.primaryStage = stage;
+    }
+    
+    public void setUser(User user) {
+        this.currentUser = user;
         if (userNameLabel != null) {
             userNameLabel.setText(user.getName());
         }
-        System.out.println("✅ User set in MainController: " + user.getName());
-    }
-    public void setGymController(GymController gymController) {
-        this.gymController = gymController;
-        this.dataManager = gymController.getDataManager();
-        System.out.println("✅ GymController set in MainController");
-        updateStatus("Gym Controller initialized");
-    }
-    
-    /**
-     * Set the primary stage
-     */
-    public void setStage(Stage stage) {
-        this.primaryStage = stage;
-        if (userNameLabel != null) {
-            userNameLabel.setText("Admin");
-        }
+        System.out.println("✅ User set: " + user.getName());
     }
     
     @FXML
     public void initialize() {
-        updateStatus("✅ Application ready");
+        statusLabel.setText("✅ Application ready");
         showDashboard();
     }
     
-    // ===== NAVIGATION METHODS =====
-    
-    @FXML
-    public void showDashboard() {
-        loadView("dashboard-view.fxml");
-        updateStatus("✅ Dashboard loaded");
-    }
-    
-    @FXML
-    public void showProfiles() {
-        FXMLLoader loader = loadView("profile-view.fxml");
-        if (loader != null) {
-            ProfileController controller = loader.getController();
-            if (controller != null && gymController != null) {
-                controller.setGymController(gymController);
-            }
-        }
-        updateStatus("✅ Members loaded");
-    }
-    
-    @FXML
-    public void showClasses() {
-        loadView("class-view.fxml");
-        updateStatus("✅ Classes loaded");
-    }
-    
-    @FXML
-    public void showSessions() {
-        loadView("session-view.fxml");
-        updateStatus("✅ Sessions loaded");
-    }
-    
-    @FXML
-    public void showBookings() {
-        loadView("booking-view.fxml");
-        updateStatus("✅ Bookings loaded");
-    }
-    
-    @FXML
-    public void showAttendance() {
-        loadView("attendance-view.fxml");
-        updateStatus("✅ Attendance loaded");
-    }
-    
-    @FXML
-    public void showReports() {
-        loadView("reports-view.fxml");
-        updateStatus("✅ Reports loaded");
-    }
+    // ===== NAVIGATION =====
+    @FXML public void showDashboard() { loadView("dashboard-view.fxml"); statusLabel.setText("✅ Dashboard loaded"); }
+    @FXML public void showProfiles() { loadView("profile-view.fxml"); statusLabel.setText("✅ Members loaded"); }
+    @FXML public void showClasses() { loadView("class-view.fxml"); statusLabel.setText("✅ Classes loaded"); }
+    @FXML public void showSessions() { loadView("session-view.fxml"); statusLabel.setText("✅ Sessions loaded"); }
+    @FXML public void showBookings() { loadView("booking-view.fxml"); statusLabel.setText("✅ Bookings loaded"); }
+    @FXML public void showAttendance() { loadView("attendance-view.fxml"); statusLabel.setText("✅ Attendance loaded"); }
+    @FXML public void showReports() { loadView("reports-view.fxml"); statusLabel.setText("✅ Reports loaded"); }
     
     @FXML
     public void handleLogout() {
@@ -126,27 +63,29 @@ public class MainController {
         }
     }
     
-    // ===== UTILITY METHODS =====
-    
-    private FXMLLoader loadView(String fxmlFile) {
+    private void loadView(String fxmlFile) {
         try {
             contentArea.getChildren().clear();
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/gym/view/javafx/fxml/" + fxmlFile)
             );
             Pane view = loader.load();
+            
+            // Pass GymController to controllers that need it
+            Object controller = loader.getController();
+            if (controller != null) {
+                try {
+                    controller.getClass().getMethod("setGymController", GymController.class)
+                        .invoke(controller, gymController);
+                } catch (Exception e) {
+                    // Controller doesn't need GymController
+                }
+            }
+            
             contentArea.getChildren().add(view);
-            return loader;
         } catch (IOException e) {
-            updateStatus("❌ Error loading view: " + e.getMessage());
+            statusLabel.setText("❌ Error loading view: " + e.getMessage());
             e.printStackTrace();
-            return null;
-        }
-    }
-    
-    private void updateStatus(String message) {
-        if (statusLabel != null) {
-            statusLabel.setText(message);
         }
     }
 }

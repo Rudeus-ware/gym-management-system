@@ -6,13 +6,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.text.Text;
 
-public class AttendanceController {
-    @FXML private TableView<?> attendanceTable;
-    @FXML private Text totalRecords;
-    @FXML private Text presentCount;
-    @FXML private Text absentCount;
-    @FXML private Text lateCount;
-    @FXML private Text attendanceRate;
+public class ClassController {
+    @FXML private TableView<?> classTable;
+    @FXML private Text totalClasses;
+    @FXML private Text availableClasses;
+    @FXML private Text fullClasses;
     @FXML private Label statusLabel;
     
     private GymController gymController;
@@ -21,6 +19,6 @@ public class AttendanceController {
         this.gymController = gymController;
     }
     
-    @FXML public void handleMarkAttendance() { statusLabel.setText("Mark Attendance clicked"); }
+    @FXML public void handleAddClass() { statusLabel.setText("Add Class clicked"); }
     @FXML public void handleRefresh() { statusLabel.setText("Refreshed"); }
 }

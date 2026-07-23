@@ -8,63 +8,57 @@
 <VBox xmlns="http://javafx.com/javafx/19"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.gym.view.javafx.controller.ReportsController"
-      spacing="20" style="-fx-padding: 20px;">
+      spacing="20" style="-fx-padding: 20px; -fx-background-color: #f0f2f5;">
 
-    <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Text text="💰 Reports & Analytics" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Text text="💰 Reports & Analytics" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="📊 Generate Report" styleClass="button-primary" onAction="#handleGenerateReport" />
+        <Button text="📊 Generate" styleClass="button-primary" onAction="#handleGenerateReport" />
         <Button text="📥 Export PDF" styleClass="button-success" onAction="#handleExportPDF" />
         <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
     </HBox>
 
-    <!-- Report Type Selection -->
-    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
+    <HBox spacing="10" styleClass="form-container">
         <Label text="Report Type:" style="-fx-font-weight: bold; -fx-padding: 5px 0;" />
-        <ComboBox fx:id="reportType" promptText="Select report type" prefWidth="200" />
+        <ComboBox fx:id="reportType" prefWidth="200" />
         <Label text="Date Range:" style="-fx-font-weight: bold; -fx-padding: 5px 0; -fx-margin-left: 20px;" />
-        <DatePicker fx:id="startDate" promptText="Start Date" />
-        <DatePicker fx:id="endDate" promptText="End Date" />
+        <DatePicker fx:id="startDate" promptText="Start" />
+        <DatePicker fx:id="endDate" promptText="End" />
         <Button text="Apply" styleClass="button-primary" onAction="#handleApplyFilter" />
     </HBox>
 
-    <!-- Report Content -->
-    <VBox fx:id="reportContent" spacing="15" style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;" VBox.vgrow="ALWAYS">
-        <Text fx:id="reportTitle" text="📋 Report Preview" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    <VBox fx:id="reportContent" styleClass="card" spacing="10" VBox.vgrow="ALWAYS">
+        <Text fx:id="reportTitle" text="📋 Report Preview" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
         <Separator />
-        <TextArea fx:id="reportTextArea" promptText="Report will appear here..." 
-                  prefHeight="400" wrapText="true" editable="false" />
+        <TextArea fx:id="reportTextArea" prefHeight="400" wrapText="true" editable="false" />
     </VBox>
 
-    <!-- Stats Summary -->
-    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+    <HBox spacing="20" styleClass="card">
         <VBox>
-            <Label text="Total Members" />
+            <Label text="Members" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportTotalMembers" text="0" styleClass="stat-number, stat-primary" />
         </VBox>
         <VBox>
-            <Label text="Active Members" />
+            <Label text="Active" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportActiveMembers" text="0" styleClass="stat-number, stat-success" />
         </VBox>
         <VBox>
-            <Label text="Total Revenue" />
+            <Label text="Revenue" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportTotalRevenue" text="$0.00" styleClass="stat-number, stat-warning" />
         </VBox>
         <VBox>
-            <Label text="Attendance Rate" />
+            <Label text="Attendance" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportAttendanceRate" text="0%" styleClass="stat-number, stat-primary" />
         </VBox>
         <VBox>
-            <Label text="Classes" />
+            <Label text="Classes" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportTotalClasses" text="0" styleClass="stat-number, stat-success" />
         </VBox>
         <VBox>
-            <Label text="Trainers" />
+            <Label text="Trainers" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="reportTotalTrainers" text="0" styleClass="stat-number, stat-danger" />
         </VBox>
     </HBox>
 
-    <!-- Status Label -->
-    <Label fx:id="statusLabel" text="Ready" />
+    <Label fx:id="statusLabel" text="Ready" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
 </VBox>

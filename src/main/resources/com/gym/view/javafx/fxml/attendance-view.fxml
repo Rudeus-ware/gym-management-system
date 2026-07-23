@@ -8,35 +8,15 @@
 <VBox xmlns="http://javafx.com/javafx/19"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.gym.view.javafx.controller.AttendanceController"
-      spacing="20" style="-fx-padding: 20px;">
+      spacing="20" style="-fx-padding: 20px; -fx-background-color: #f0f2f5;">
 
-    <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Text text="✅ Attendance Tracking" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Text text="✅ Attendance Tracking" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
         <Region HBox.hgrow="ALWAYS" />
         <Button text="➕ Mark Attendance" styleClass="button-success" onAction="#handleMarkAttendance" />
         <Button text="🔄 Refresh" styleClass="button-primary" onAction="#handleRefresh" />
     </HBox>
 
-    <!-- Search & Filter -->
-    <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
-        <TextField fx:id="searchField" promptText="Search by member name..." HBox.hgrow="ALWAYS" />
-        <ComboBox fx:id="statusFilter" promptText="Filter by status" prefWidth="150">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="All" />
-                    <String fx:value="Present" />
-                    <String fx:value="Absent" />
-                    <String fx:value="Late" />
-                    <String fx:value="Excused" />
-                </FXCollections>
-            </items>
-        </ComboBox>
-        <Button text="🔍 Search" styleClass="button-primary" onAction="#handleSearch" />
-        <Button text="Clear" styleClass="button-warning" onAction="#handleClear" />
-    </HBox>
-
-    <!-- Attendance Table -->
     <TableView fx:id="attendanceTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn text="ID" prefWidth="60">
@@ -57,30 +37,28 @@
         </columns>
     </TableView>
 
-    <!-- Stats -->
-    <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15px; -fx-border-radius: 5px;">
+    <HBox spacing="20" styleClass="card">
         <VBox>
-            <Label text="Total Records" />
+            <Label text="Total" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="totalRecords" text="0" styleClass="stat-number, stat-primary" />
         </VBox>
         <VBox>
-            <Label text="Present" />
+            <Label text="Present" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="presentCount" text="0" styleClass="stat-number, stat-success" />
         </VBox>
         <VBox>
-            <Label text="Absent" />
+            <Label text="Absent" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="absentCount" text="0" styleClass="stat-number, stat-danger" />
         </VBox>
         <VBox>
-            <Label text="Late" />
+            <Label text="Late" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="lateCount" text="0" styleClass="stat-number, stat-warning" />
         </VBox>
         <VBox>
-            <Label text="Attendance Rate" />
+            <Label text="Rate" style="-fx-text-fill: #7f8c8d;" />
             <Text fx:id="attendanceRate" text="0%" styleClass="stat-number, stat-primary" />
         </VBox>
     </HBox>
 
-    <!-- Status Label -->
-    <Label fx:id="statusLabel" text="Ready" />
+    <Label fx:id="statusLabel" text="Ready" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" />
 </VBox>
