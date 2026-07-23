@@ -1,5 +1,44 @@
 [
   {
+    "profileId": 998,
+    "name": "Test User One",
+    "email": "test1@email.com",
+    "phone": "555-111-2222",
+    "address": "123 Test Street",
+    "membership": {
+      "membershipId": 9998,
+      "fee": 49.99,
+      "startDate": "2026-07-23",
+      "expiryDate": "2026-08-23",
+      "status": "Active"
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
+  },
+  {
+    "profileId": 997,
+    "name": "Test User Two",
+    "email": "test2@email.com",
+    "phone": "555-333-4444",
+    "address": "456 Test Avenue",
+    "membership": {
+      "benefits": "VIP Access",
+      "extraBenefits": [
+        "Free guest passes (2 per month)",
+        "Access to premium classes",
+        "Free towel service",
+        "Priority booking"
+      ],
+      "membershipId": 9997,
+      "fee": 99.99,
+      "startDate": "2026-07-23",
+      "expiryDate": "2026-08-23",
+      "status": "Active"
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
+  },
+  {
     "profileId": 1,
     "name": "John Doe",
     "email": "john@email.com",
@@ -11,7 +50,9 @@
       "startDate": "2026-01-01",
       "expiryDate": "2026-12-31",
       "status": "Active"
-    }
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
   },
   {
     "profileId": 2,
@@ -32,7 +73,9 @@
       "startDate": "2026-01-01",
       "expiryDate": "2026-12-31",
       "status": "Active"
-    }
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
   },
   {
     "profileId": 3,
@@ -53,7 +96,9 @@
       "startDate": "2026-01-01",
       "expiryDate": "2026-12-31",
       "status": "Active"
-    }
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
   },
   {
     "profileId": 4,
@@ -67,7 +112,9 @@
       "startDate": "2026-01-01",
       "expiryDate": "2026-12-31",
       "status": "Active"
-    }
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
   },
   {
     "profileId": 5,
@@ -81,6 +128,8 @@
       "startDate": "2026-01-01",
       "expiryDate": "2026-12-31",
       "status": "Active"
-    }
+    },
+    "registrationDate": "2026-07-23",
+    "isActive": true
   }
 ]

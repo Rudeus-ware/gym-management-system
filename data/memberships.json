@@ -1,5 +1,26 @@
 [
   {
+    "membershipId": 9998,
+    "fee": 49.99,
+    "startDate": "2026-07-23",
+    "expiryDate": "2026-08-23",
+    "status": "Active"
+  },
+  {
+    "benefits": "VIP Access",
+    "extraBenefits": [
+      "Free guest passes (2 per month)",
+      "Access to premium classes",
+      "Free towel service",
+      "Priority booking"
+    ],
+    "membershipId": 9997,
+    "fee": 99.99,
+    "startDate": "2026-07-23",
+    "expiryDate": "2026-08-23",
+    "status": "Active"
+  },
+  {
     "membershipId": 1001,
     "fee": 49.99,
     "startDate": "2026-01-01",

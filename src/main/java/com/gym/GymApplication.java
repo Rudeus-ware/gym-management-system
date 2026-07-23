@@ -3,6 +3,7 @@ package com.gym;
 import com.gym.controller.GymController;
 import com.gym.persistence.DataInitializer;
 import com.gym.view.javafx.controller.LoginController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,7 +15,7 @@ public class GymApplication extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Initialize the main controller
+        // Initialize controllers
         gymController = new GymController();
         
         // Load test data if empty
@@ -22,31 +23,24 @@ public class GymApplication extends Application {
             DataInitializer.initializeTestData(gymController.getDataManager());
         }
         
-        // Load the login FXML
+        // Load login screen
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/gym/view/javafx/fxml/login-view.fxml")
         );
-        Scene scene = new Scene(loader.load(), 400, 500);
-        
-        // Load CSS
+        Scene scene = new Scene(loader.load(), 400, 550);
         scene.getStylesheets().add(
             getClass().getResource("/com/gym/view/css/styles.css").toExternalForm()
         );
         
-        // Get controller and pass dependencies
         LoginController loginController = loader.getController();
         loginController.setGymController(gymController);
         loginController.setStage(primaryStage);
         
-        // Setup stage
         primaryStage.setTitle("🏋️ Gym Management System - Login");
         primaryStage.setScene(scene);
         primaryStage.show();
         
-        // Save on close
-        primaryStage.setOnCloseRequest(event -> {
-            gymController.saveAllData();
-        });
+        primaryStage.setOnCloseRequest(event -> gymController.saveAllData());
     }
     
     public static void main(String[] args) {

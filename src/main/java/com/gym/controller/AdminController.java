@@ -1,21 +1,21 @@
 package com.gym.controller;
 
-import com.gym.model.Profile;
-import com.gym.model.user.Trainer;
-import com.gym.model.user.Admin;
-import com.gym.model.classes.GymClass;
-import com.gym.model.membership.Membership;
-import com.gym.model.membership.Basic;
-import com.gym.model.membership.Premium;
-import com.gym.model.membership.Family;
-import com.gym.model.booking.Booking;
-import com.gym.model.booking.Session;
-import com.gym.model.booking.Attendance;
-import com.gym.persistence.DataManager;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.gym.model.Profile;
+import com.gym.model.booking.Attendance;
+import com.gym.model.booking.Booking;
+import com.gym.model.booking.Session;
+import com.gym.model.classes.GymClass;
+import com.gym.model.membership.Basic;
+import com.gym.model.membership.Family;
+import com.gym.model.membership.Membership;
+import com.gym.model.membership.Premium;
+import com.gym.model.user.Admin;
+import com.gym.model.user.Trainer;
+import com.gym.persistence.DataManager;
 
 /**
  * AdminController - Handles all administrative operations
@@ -54,6 +54,7 @@ public class AdminController {
     /**
      * Create a new member profile
      */
+    
     public Profile createMember(String name, String email, String phone, String address, 
                                String membershipType) {
         // Validate admin permissions
