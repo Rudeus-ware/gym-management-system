@@ -4,7 +4,7 @@ import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
 import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
-import com.gym.model.attendance.Attendance;
+import com.gym.model.booking.Attendance;
 import com.gym.persistence.DataManager;
 
 import java.time.LocalDate;

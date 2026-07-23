@@ -37,6 +37,12 @@ public class MainController {
     /**
      * Set the GymController for this controller
      */
+    public void setUser(com.gym.model.user.User user) {
+        if (userNameLabel != null) {
+            userNameLabel.setText(user.getName());
+        }
+        System.out.println("✅ User set in MainController: " + user.getName());
+    }
     public void setGymController(GymController gymController) {
         this.gymController = gymController;
         this.dataManager = gymController.getDataManager();

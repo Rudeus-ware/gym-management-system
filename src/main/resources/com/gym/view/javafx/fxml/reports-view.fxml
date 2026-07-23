@@ -22,29 +22,17 @@
     <!-- Report Type Selection -->
     <HBox spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-radius: 5px;">
         <Label text="Report Type:" style="-fx-font-weight: bold; -fx-padding: 5px 0;" />
-        <ComboBox fx:id="reportType" promptText="Select report type" prefWidth="200">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="Member Report" />
-                    <String fx:value="Class Report" />
-                    <String fx:value="Booking Report" />
-                    <String fx:value="Attendance Report" />
-                    <String fx:value="Revenue Report" />
-                    <String fx:value="Trainer Report" />
-                </FXCollections>
-            </items>
-        </ComboBox>
+        <ComboBox fx:id="reportType" promptText="Select report type" prefWidth="200" />
         <Label text="Date Range:" style="-fx-font-weight: bold; -fx-padding: 5px 0; -fx-margin-left: 20px;" />
         <DatePicker fx:id="startDate" promptText="Start Date" />
         <DatePicker fx:id="endDate" promptText="End Date" />
         <Button text="Apply" styleClass="button-primary" onAction="#handleApplyFilter" />
     </HBox>
 
-    <!-- Report Content Area -->
+    <!-- Report Content -->
     <VBox fx:id="reportContent" spacing="15" style="-fx-background-color: white; -fx-padding: 20px; -fx-border-radius: 5px;" VBox.vgrow="ALWAYS">
-        <Text text="📋 Report Preview" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Text fx:id="reportTitle" text="📋 Report Preview" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
         <Separator />
-        <Label fx:id="reportTitle" text="Select a report type to view" style="-fx-font-size: 14px;" />
         <TextArea fx:id="reportTextArea" promptText="Report will appear here..." 
                   prefHeight="400" wrapText="true" editable="false" />
     </VBox>

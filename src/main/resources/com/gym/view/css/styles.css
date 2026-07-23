@@ -1,0 +1,113 @@
+/* ===== ROOT STYLES ===== */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ===== HEADER ===== */
+.header {
+    -fx-background-color: linear-gradient(to right, #2c3e50, #3498db);
+}
+
+.header-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.sub-header {
+    -fx-font-size: 14px;
+    -fx-text-fill: #bdc3c7;
+}
+
+/* ===== NAVIGATION ===== */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+.nav-button:pressed {
+    -fx-background-color: rgba(255,255,255,0.2);
+}
+
+/* ===== BUTTONS ===== */
+.button-primary {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+}
+
+.button-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+.button-success {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+}
+
+.button-success:hover {
+    -fx-background-color: #27ae60;
+}
+
+.button-danger {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+}
+
+.button-danger:hover {
+    -fx-background-color: #c0392b;
+}
+
+.button-warning {
+    -fx-background-color: #f39c12;
+    -fx-text-fill: white;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+}
+
+.button-warning:hover {
+    -fx-background-color: #e67e22;
+}
+
+/* ===== TABLES ===== */
+.table-view {
+    -fx-background-color: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:even {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+/* ===== STATS ===== */
+.stat-number {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.stat-primary { -fx-text-fill: #3498db; }
+.stat-success { -fx-text-fill: #2ecc71; }
+.stat-warning { -fx-text-fill: #f39c12; }
+.stat-danger { -fx-text-fill: #e74c3c; }

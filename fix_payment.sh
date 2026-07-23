@@ -1,3 +1,4 @@
+cat > src/main/java/com/gym/controller/PaymentController.java << 'EOF'
 package com.gym.controller;
 
 import com.gym.model.Payment;
@@ -139,3 +140,4 @@ public class PaymentController {
             .orElse(1000) + 1;
     }
 }
+EOF

@@ -1,3 +1,4 @@
+cat > src/main/java/com/gym/persistence/DataManager.java << 'EOF'
 package com.gym.persistence;
 
 import com.gym.model.Profile;
@@ -123,3 +124,4 @@ public class DataManager {
         fileManager.clearAllData();
     }
 }
+EOF
