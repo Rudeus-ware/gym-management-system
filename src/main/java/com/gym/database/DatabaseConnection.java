@@ -1,31 +1,61 @@
 package com.gym.database;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DatabaseConnection {
     
     private static DatabaseConnection instance;
     private Connection connection;
-    
-    // XAMPP default settings [citation:6][citation:7]
-    private static final String URL = "jdbc:mysql://localhost:3306/gym_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";  // XAMPP default is empty
+    private Properties props;
+    private static final String PROPERTIES_FILE = "application.properties";
     
     private DatabaseConnection() {
+        loadProperties();
+        connect();
+    }
+    
+    private void loadProperties() {
+        props = new Properties();
+        try (InputStream input = getClass().getClassLoader()
+                .getResourceAsStream(PROPERTIES_FILE)) {
+            if (input != null) {
+                props.load(input);
+            } else {
+                // Fallback to default values
+                System.out.println("⚠️ " + PROPERTIES_FILE + " not found. Using defaults.");
+                setDefaults();
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error loading properties: " + e.getMessage());
+            setDefaults();
+        }
+    }
+    
+    private void setDefaults() {
+        props.setProperty("db.driver", "com.mysql.cj.jdbc.Driver");
+        props.setProperty("db.url", "jdbc:mysql://localhost:3306/gym_db?useSSL=false&serverTimezone=UTC");
+        props.setProperty("db.username", "root");
+        props.setProperty("db.password", "");
+    }
+    
+    private void connect() {
         try {
-            // Load the MySQL driver [citation:6]
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            Class.forName(props.getProperty("db.driver"));
+            this.connection = DriverManager.getConnection(
+                props.getProperty("db.url"),
+                props.getProperty("db.username"),
+                props.getProperty("db.password")
+            );
             System.out.println("✅ Database connected successfully!");
         } catch (ClassNotFoundException e) {
-            System.out.println("❌ MySQL Driver not found!");
-            e.printStackTrace();
+            System.err.println("❌ MySQL Driver not found! Add to pom.xml");
         } catch (SQLException e) {
-            System.out.println("❌ Connection failed!");
-            e.printStackTrace();
+            System.err.println("❌ Connection failed: " + e.getMessage());
+            System.err.println("   Make sure MySQL is running in XAMPP");
         }
     }
     
@@ -53,10 +83,15 @@ public class DatabaseConnection {
     
     private void reconnect() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            Class.forName(props.getProperty("db.driver"));
+            this.connection = DriverManager.getConnection(
+                props.getProperty("db.url"),
+                props.getProperty("db.username"),
+                props.getProperty("db.password")
+            );
+            System.out.println("✅ Reconnected successfully!");
         } catch (Exception e) {
-            System.out.println("❌ Reconnection failed!");
+            System.err.println("❌ Reconnection failed!");
         }
     }
     
@@ -67,7 +102,15 @@ public class DatabaseConnection {
                 System.out.println("✅ Connection closed.");
             }
         } catch (SQLException e) {
-            System.out.println("❌ Error closing connection.");
+            System.err.println("❌ Error closing connection.");
+        }
+    }
+    
+    public boolean testConnection() {
+        try {
+            return getConnection() != null && !getConnection().isClosed();
+        } catch (SQLException e) {
+            return false;
         }
     }
 }

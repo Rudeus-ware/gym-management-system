@@ -18,7 +18,7 @@ public class DatabaseManager {
         this.connection = DatabaseConnection.getInstance().getConnection();
     }
     
-    // ===== PROFILE CRUD OPERATIONS =====
+    // ===== PROFILE CRUD =====
     
     public Profile createProfile(String name, String email, String phone, String address) {
         String sql = "INSERT INTO profiles (name, email, phone, address, registration_date) VALUES (?, ?, ?, ?, CURDATE())";
@@ -29,14 +29,11 @@ public class DatabaseManager {
             stmt.setString(3, phone);
             stmt.setString(4, address);
             
-            int affectedRows = stmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        int id = rs.getInt(1);
-                        return findProfileById(id);
-                    }
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                ResultSet rs = stmt.getGeneratedKeys();
+                if (rs.next()) {
+                    return findProfileById(rs.getInt(1));
                 }
             }
         } catch (SQLException e) {
@@ -51,9 +48,16 @@ public class DatabaseManager {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
-            
             if (rs.next()) {
-                return mapProfile(rs);
+                Profile profile = new Profile(
+                    rs.getInt("profile_id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("address")
+                );
+                profile.setActive(rs.getBoolean("is_active"));
+                return profile;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,13 +67,20 @@ public class DatabaseManager {
     
     public List<Profile> findAllProfiles() {
         List<Profile> profiles = new ArrayList<>();
-        String sql = "SELECT * FROM profiles WHERE is_active = TRUE ORDER BY name";
+        String sql = "SELECT * FROM profiles ORDER BY name";
         
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
-            
             while (rs.next()) {
-                profiles.add(mapProfile(rs));
+                Profile profile = new Profile(
+                    rs.getInt("profile_id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("address")
+                );
+                profile.setActive(rs.getBoolean("is_active"));
+                profiles.add(profile);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,7 +88,7 @@ public class DatabaseManager {
         return profiles;
     }
     
-    public void updateProfile(Profile profile) {
+    public boolean updateProfile(Profile profile) {
         String sql = "UPDATE profiles SET name = ?, email = ?, phone = ?, address = ? WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -86,21 +97,22 @@ public class DatabaseManager {
             stmt.setString(3, profile.getPhone());
             stmt.setString(4, profile.getAddress());
             stmt.setInt(5, profile.getProfileId());
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
     
-    private Profile mapProfile(ResultSet rs) throws SQLException {
-        Profile profile = new Profile(
-            rs.getInt("profile_id"),
-            rs.getString("name"),
-            rs.getString("email"),
-            rs.getString("phone"),
-            rs.getString("address")
-        );
-        profile.setActive(rs.getBoolean("is_active"));
-        return profile;
+    public boolean deleteProfile(int id) {
+        String sql = "DELETE FROM profiles WHERE profile_id = ?";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
