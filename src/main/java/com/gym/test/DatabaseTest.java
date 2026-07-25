@@ -1,12 +1,16 @@
 package com.gym.test;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import com.gym.database.DatabaseConnection;
 import com.gym.database.DatabaseManager;
 import com.gym.model.Profile;
 import com.gym.util.IdGenerator;
 
 public class DatabaseTest {
-    
     public static void main(String[] args) {
         System.out.println("=".repeat(60));
         System.out.println("🔍 TESTING DATABASE WITH CUSTOM IDs");
