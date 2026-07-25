@@ -10,7 +10,7 @@ import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
 import com.gym.model.classes.GymClass;
 import com.gym.persistence.DataInitializer;
-import com.gym.persistence.DataManager;
+import com.gym.persistence.JsonDataManager;
 
 /**
  * Main Console Application Entry Point
@@ -35,7 +35,7 @@ public class Main {
         scanner = new Scanner(System.in);
         
         // Check if data exists, if not, initialize test data
-        DataManager dataManager = gymController.getDataManager();
+        JsonDataManager dataManager = gymController.getDataManager();
         if (dataManager.getProfiles().isEmpty()) {
             System.out.println("📌 No data found. Loading test data...");
             DataInitializer.initializeTestData(dataManager);
@@ -450,7 +450,7 @@ public class Main {
         System.out.println("\n📊 SYSTEM STATISTICS");
         System.out.println("=".repeat(40));
         
-        DataManager dm = gymController.getDataManager();
+        JsonDataManager dm = gymController.getDataManager();
         System.out.println("👤 Members: " + dm.getProfiles().size());
         System.out.println("📚 Classes: " + dm.getGymClasses().size());
         System.out.println("📋 Bookings: " + dm.getBookings().size());

@@ -5,7 +5,7 @@ import com.gym.model.membership.Membership;
 import com.gym.model.membership.Basic;
 import com.gym.model.membership.Premium;
 import com.gym.model.membership.Family;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 import com.gym.util.IdGenerator;
 
 import java.time.LocalDate;
@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
  */
 public class MembershipController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     private IdGenerator idGenerator;
     
-    public MembershipController(DataManager dataManager) {
+    public MembershipController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
         this.idGenerator = new IdGenerator(null); // Will be initialized properly
     }
@@ -42,13 +42,13 @@ public class MembershipController {
         String expiryDate = LocalDate.now().plusYears(1).toString();
         
         Basic membership = new Basic(membershipId, 49.99, startDate, expiryDate, "Active");
-        dataManager.addMembership(membership);
+        databaseManager.addMembership(membership);
         
         // Associate with profile
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile != null) {
             profile.setMembership(membership);
-            dataManager.saveAllData();
+            databaseManager.saveAllData();
             System.out.println("✅ Basic membership created for: " + profile.getName());
         } else {
             System.out.println("❌ Profile not found: " + profileId);
@@ -67,13 +67,13 @@ public class MembershipController {
         String expiryDate = LocalDate.now().plusYears(1).toString();
         
         Premium membership = new Premium(membershipId, 99.99, startDate, expiryDate, "Active", "VIP Access");
-        dataManager.addMembership(membership);
+        databaseManager.addMembership(membership);
         
         // Associate with profile
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile != null) {
             profile.setMembership(membership);
-            dataManager.saveAllData();
+            databaseManager.saveAllData();
             System.out.println("✅ Premium membership created for: " + profile.getName());
         } else {
             System.out.println("❌ Profile not found: " + profileId);
@@ -92,13 +92,13 @@ public class MembershipController {
         String expiryDate = LocalDate.now().plusYears(1).toString();
         
         Family membership = new Family(membershipId, 69.99, startDate, expiryDate, "Active", numberOfMembers);
-        dataManager.addMembership(membership);
+        databaseManager.addMembership(membership);
         
         // Associate with profile
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile != null) {
             profile.setMembership(membership);
-            dataManager.saveAllData();
+            databaseManager.saveAllData();
             System.out.println("✅ Family membership created for: " + profile.getName());
         } else {
             System.out.println("❌ Profile not found: " + profileId);
@@ -120,10 +120,10 @@ public class MembershipController {
             return false;
         }
         
-        for (Membership m : dataManager.getMemberships()) {
+        for (Membership m : databaseManager.getMemberships()) {
             if (m.getMembershipId().equals(membershipId)) {  // ✅ Use .equals()
                 m.renew();
-                dataManager.saveAllData();
+                databaseManager.saveAllData();
                 System.out.println("✅ Membership renewed: " + membershipId);
                 return true;
             }
@@ -141,10 +141,10 @@ public class MembershipController {
             return false;
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile != null && profile.getMembership() != null) {
             profile.getMembership().renew();
-            dataManager.saveAllData();
+            databaseManager.saveAllData();
             System.out.println("✅ Membership renewed for profile: " + profile.getName());
             return true;
         }
@@ -164,7 +164,7 @@ public class MembershipController {
             return false;
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null || profile.getMembership() == null) {
             return false;
         }
@@ -179,7 +179,7 @@ public class MembershipController {
             return "Invalid profile ID";
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             return "Profile not found";
         }
@@ -200,7 +200,7 @@ public class MembershipController {
             return "Invalid profile ID";
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null || profile.getMembership() == null) {
             return "None";
         }
@@ -220,7 +220,7 @@ public class MembershipController {
             return null;
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return null;
@@ -229,7 +229,7 @@ public class MembershipController {
         // Remove existing membership
         Membership oldMembership = profile.getMembership();
         if (oldMembership != null) {
-            dataManager.getMemberships().remove(oldMembership);
+            databaseManager.getMemberships().remove(oldMembership);
         }
         
         // Create new Premium membership
@@ -247,7 +247,7 @@ public class MembershipController {
             return null;
         }
         
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return null;
@@ -256,7 +256,7 @@ public class MembershipController {
         // Remove existing membership
         Membership oldMembership = profile.getMembership();
         if (oldMembership != null) {
-            dataManager.getMemberships().remove(oldMembership);
+            databaseManager.getMemberships().remove(oldMembership);
         }
         
         // Create new Basic membership
@@ -273,7 +273,7 @@ public class MembershipController {
      * Get all members with active memberships
      */
     public List<Profile> getActiveMembers() {
-        return dataManager.getProfiles().stream()
+        return databaseManager.getProfiles().stream()
             .filter(p -> p.getMembership() != null && p.getMembership().isValid())
             .collect(Collectors.toList());
     }
@@ -282,7 +282,7 @@ public class MembershipController {
      * Get all members with expired memberships
      */
     public List<Profile> getExpiredMembers() {
-        return dataManager.getProfiles().stream()
+        return databaseManager.getProfiles().stream()
             .filter(p -> p.getMembership() == null || !p.getMembership().isValid())
             .collect(Collectors.toList());
     }
@@ -292,7 +292,7 @@ public class MembershipController {
      */
     public double getTotalRevenue() {
         double total = 0;
-        for (Membership m : dataManager.getMemberships()) {
+        for (Membership m : databaseManager.getMemberships()) {
             if (m.isValid()) {
                 total += m.calculateFee();
             }
@@ -304,7 +304,7 @@ public class MembershipController {
      * Count members by membership type
      */
     public long countByType(String type) {
-        return dataManager.getProfiles().stream()
+        return databaseManager.getProfiles().stream()
             .filter(p -> p.getMembership() != null)
             .filter(p -> p.getMembership().getClass().getSimpleName().equalsIgnoreCase(type))
             .count();
@@ -320,7 +320,7 @@ public class MembershipController {
     private String generateMembershipId(String type) {
         String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String prefix = type.substring(0, 3).toUpperCase();
-        int count = dataManager.getMemberships().size() + 1;
+        int count = databaseManager.getMemberships().size() + 1;
         return prefix + timestamp + String.format("%04d", count);
     }
 }

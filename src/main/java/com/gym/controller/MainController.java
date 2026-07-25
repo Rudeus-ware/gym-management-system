@@ -9,7 +9,7 @@ import com.gym.model.booking.Session;
 import com.gym.model.classes.GymClass;
 import com.gym.model.membership.Membership;
 import com.gym.model.user.Trainer;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 /**
  * MainController - Central orchestrator for the entire application
@@ -18,7 +18,7 @@ import com.gym.persistence.DataManager;
  */
 public class MainController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     private LoginController loginController;
     private ProfileController profileController;
     private AdminController adminController;
@@ -34,7 +34,7 @@ public class MainController {
     // ============================================================
     
     public MainController() {
-        this.dataManager = new DataManager();
+        this.dataManager = new DatabaseManager();
         
         // Initialize all sub-controllers
         this.loginController = new LoginController(dataManager);
@@ -54,7 +54,7 @@ public class MainController {
     // GETTERS FOR SUB-CONTROLLERS
     // ============================================================
     
-    public DataManager getDataManager() { return dataManager; }
+    public JsonDataManager getDataManager() { return dataManager; }
     public LoginController getLoginController() { return loginController; }
     public ProfileController getProfileController() { return profileController; }
     public AdminController getAdminController() { return adminController; }

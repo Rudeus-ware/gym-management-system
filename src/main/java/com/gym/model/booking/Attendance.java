@@ -44,7 +44,13 @@ public class Attendance {
         this.attendanceDate = attendanceDate;
         this.status = status;
     }
-    
+    // Add this constructor next to your existing one
+    public Attendance(String attendanceId, String profileId, String sessionId, 
+                    String attendanceDate, String status) {
+        this(attendanceId, profileId, sessionId, 
+            LocalDateTime.parse(attendanceDate + "T00:00:00"), status);
+    }
+        
     /**
      * Simplified constructor - uses current date
      * 

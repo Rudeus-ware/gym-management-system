@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.gym.model.Profile;
+import com.gym.model.booking.Attendance;
+import com.gym.model.booking.Booking;
+import com.gym.model.classes.GymClass;
+import com.gym.model.user.Admin;
+import com.gym.model.user.Trainer;
 
 /**
  * ProfileDatabaseManager - Handles all Profile CRUD operations
@@ -307,6 +312,107 @@ public class ProfileDatabaseManager {
             this.active = active;
             this.inactive = inactive;
         }
+
+        // ============================================================
+// ADDITIONAL METHODS FOR DATABASE MANAGER
+// ============================================================
+
+                public List<GymClass> findAllClasses() {
+                    List<GymClass> classes = new ArrayList<>();
+                    String sql = "SELECT * FROM gym_classes WHERE is_active = TRUE";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            // Map to appropriate GymClass type
+                            // Implementation depends on your class structure
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return classes;
+                }
+
+                public List<Booking> findAllBookings() {
+                    List<Booking> bookings = new ArrayList<>();
+                    String sql = "SELECT * FROM bookings";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            Booking booking = new Booking(
+                                rs.getString("booking_id"),
+                                rs.getString("profile_id"),
+                                rs.getString("class_id"),
+                                rs.getString("session_id"),
+                                rs.getString("booking_date"),
+                                rs.getString("status")
+                            );
+                            bookings.add(booking);
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return bookings;
+                }
+
+                public List<Session> findAllSessions() {
+                    List<Session> sessions = new ArrayList<>();
+                    String sql = "SELECT * FROM sessions";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            // Map to Session
+                            // Implementation depends on your Session constructor
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return sessions;
+                }
+
+                public List<Attendance> findAllAttendance() {
+                    List<Attendance> attendance = new ArrayList<>();
+                    String sql = "SELECT * FROM attendance";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            // Map to Attendance
+                            // Implementation depends on your Attendance constructor
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return attendance;
+                }
+
+                public List<Trainer> findAllTrainers() {
+                    List<Trainer> trainers = new ArrayList<>();
+                    String sql = "SELECT * FROM trainers WHERE is_active = TRUE";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            // Map to Trainer
+                            // Implementation depends on your Trainer constructor
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return trainers;
+                }
+
+                public List<Admin> findAllAdmins() {
+                    List<Admin> admins = new ArrayList<>();
+                    String sql = "SELECT * FROM admins";
+                    try (Statement stmt = connection.createStatement()) {
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            // Map to Admin
+                            // Implementation depends on your Admin constructor
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    return admins;
+                }
         
         @Override
         public String toString() {

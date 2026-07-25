@@ -4,7 +4,7 @@ import com.gym.model.Profile;
 import com.gym.model.user.Admin;
 import com.gym.model.user.Trainer;
 import com.gym.model.user.User;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 /**
  * LoginController - Business Logic for Authentication
@@ -19,14 +19,14 @@ import com.gym.persistence.DataManager;
  */
 public class LoginController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     private User currentUser;
     
     // ============================================================
     // CONSTRUCTOR
     // ============================================================
     
-    public LoginController(DataManager dataManager) {
+    public LoginController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
         this.currentUser = null;
     }
@@ -85,7 +85,7 @@ public class LoginController {
      * Authenticate a member (Profile)
      */
     private User authenticateMember(String email, String password) {
-        for (Profile profile : dataManager.getProfiles()) {
+        for (Profile profile : databaseManager.getProfiles()) {
             if (profile.getEmail().equalsIgnoreCase(email)) {
                 // Check if account is active
                 if (!profile.isActive()) {
@@ -121,7 +121,7 @@ public class LoginController {
      * Authenticate a trainer
      */
     private Trainer authenticateTrainer(String email, String password) {
-        for (Trainer trainer : dataManager.getTrainers()) {
+        for (Trainer trainer : databaseManager.getTrainers()) {
             if (trainer.getEmail().equalsIgnoreCase(email) && 
                 trainer.getPassword().equals(password)) {
                 return trainer;
@@ -134,7 +134,7 @@ public class LoginController {
      * Authenticate an admin
      */
     private Admin authenticateAdmin(String email, String password) {
-        for (Admin admin : dataManager.getAdmins()) {
+        for (Admin admin : databaseManager.getAdmins()) {
             if (admin.getEmail().equalsIgnoreCase(email) && 
                 admin.getPassword().equals(password)) {
                 return admin;
@@ -175,32 +175,32 @@ public class LoginController {
         String normalizedEmail = email.trim().toLowerCase();
         
         // Check members
-        for (Profile profile : dataManager.getProfiles()) {
+        for (Profile profile : databaseManager.getProfiles()) {
             if (profile.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 // In production: hash the password before storing
                 // profile.setPassword(newPassword);
                 System.out.println("✅ Password reset for member: " + profile.getName());
-                dataManager.saveAllData();
+                databaseManager.saveAllData();
                 return true;
             }
         }
         
         // Check trainers
-        for (Trainer trainer : dataManager.getTrainers()) {
+        for (Trainer trainer : databaseManager.getTrainers()) {
             if (trainer.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 trainer.setPassword(newPassword);
                 System.out.println("✅ Password reset for trainer: " + trainer.getName());
-                dataManager.saveAllData();
+                databaseManager.saveAllData();
                 return true;
             }
         }
         
         // Check admins
-        for (Admin admin : dataManager.getAdmins()) {
+        for (Admin admin : databaseManager.getAdmins()) {
             if (admin.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 admin.setPassword(newPassword);
                 System.out.println("✅ Password reset for admin: " + admin.getName());
-                dataManager.saveAllData();
+                databaseManager.saveAllData();
                 return true;
             }
         }
@@ -311,7 +311,7 @@ public class LoginController {
         String normalizedEmail = email.trim().toLowerCase();
         
         // Check members
-        for (Profile profile : dataManager.getProfiles()) {
+        for (Profile profile : databaseManager.getProfiles()) {
             if (profile.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 return new User(
                     profile.getProfileId(),
@@ -326,14 +326,14 @@ public class LoginController {
         }
         
         // Check trainers
-        for (Trainer trainer : dataManager.getTrainers()) {
+        for (Trainer trainer : databaseManager.getTrainers()) {
             if (trainer.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 return trainer;
             }
         }
         
         // Check admins
-        for (Admin admin : dataManager.getAdmins()) {
+        for (Admin admin : databaseManager.getAdmins()) {
             if (admin.getEmail().equalsIgnoreCase(normalizedEmail)) {
                 return admin;
             }
@@ -357,9 +357,9 @@ public class LoginController {
      * Get login statistics
      */
     public LoginStats getLoginStats() {
-        int totalMembers = dataManager.getProfiles().size();
-        int totalTrainers = dataManager.getTrainers().size();
-        int totalAdmins = dataManager.getAdmins().size();
+        int totalMembers = databaseManager.getProfiles().size();
+        int totalTrainers = databaseManager.getTrainers().size();
+        int totalAdmins = databaseManager.getAdmins().size();
         boolean isLoggedIn = this.isLoggedIn();
         String currentUserInfo = isLoggedIn ? currentUser.getName() : "None";
         String currentUserRole = getCurrentUserRole();

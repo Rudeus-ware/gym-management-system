@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DataManager - Central data management class
- * Manages all data lists and operations
- * Updated to use String-based IDs
+ * JsonDataManager - JSON file-based data management (Backup)
+ * Used as fallback when database is unavailable
  */
-public class DataManager {
+public class JsonDataManager {
     
     private FileManager fileManager;
     
@@ -33,7 +32,7 @@ public class DataManager {
     private List<Admin> admins;
     private List<Payment> payments;
     
-    public DataManager() {
+    public JsonDataManager() {
         this.fileManager = new FileManager();
         this.profiles = new ArrayList<>();
         this.memberships = new ArrayList<>();
@@ -71,10 +70,7 @@ public class DataManager {
     public void addSession(Session session) { sessions.add(session); }
     public void addBooking(Booking booking) { bookings.add(booking); }
     public void addAttendance(Attendance attendance) { attendanceRecords.add(attendance); }
-    
-    // ✅ FIXED: Changed parameter from 'Trainer trainers' to 'Trainer trainer'
     public void addTrainer(Trainer trainer) { trainers.add(trainer); }
-    
     public void addAdmin(Admin admin) { admins.add(admin); }
     public void addPayment(Payment payment) { payments.add(payment); }
     
@@ -82,7 +78,6 @@ public class DataManager {
     // REMOVE METHODS
     // ============================================================
     
-    // ✅ FIXED: Using .equals() for String comparison
     public void removeProfile(String profileId) { 
         profiles.removeIf(p -> p.getProfileId().equals(profileId)); 
     }
@@ -101,7 +96,7 @@ public class DataManager {
     
     public Profile findProfileById(String id) {
         for (Profile p : profiles) {
-            if (p.getProfileId().equals(id)) {  // ✅ FIXED: .equals() and added return
+            if (p.getProfileId().equals(id)) {
                 return p;
             }
         }
@@ -110,7 +105,7 @@ public class DataManager {
     
     public GymClass findClassById(String id) {
         for (GymClass c : gymClasses) {
-            if (c.getClassId().equals(id)) {  // ✅ FIXED: .equals()
+            if (c.getClassId().equals(id)) {
                 return c;
             }
         }
@@ -119,7 +114,7 @@ public class DataManager {
     
     public Booking findBookingById(String id) {
         for (Booking b : bookings) {
-            if (b.getBookingId().equals(id)) {  // ✅ FIXED: .equals()
+            if (b.getBookingId().equals(id)) {
                 return b;
             }
         }
@@ -139,13 +134,11 @@ public class DataManager {
         fileManager.saveData(attendanceRecords, "attendance.json");
         fileManager.saveData(trainers, "trainers.json");
         fileManager.saveData(payments, "payments.json");
-        System.out.println("✅ All data saved!");
+        System.out.println("✅ JSON data saved!");
     }
     
     private void loadAllData() {
-        // Load from JSON files
-        // Implementation depends on FileManager
-        System.out.println("✅ Data loaded from files");
+        System.out.println("✅ JSON data loaded from files");
     }
     
     public void clearAllData() {
@@ -159,6 +152,6 @@ public class DataManager {
         admins.clear();
         payments.clear();
         fileManager.clearAllData();
-        System.out.println("✅ All data cleared!");
+        System.out.println("✅ JSON data cleared!");
     }
 }

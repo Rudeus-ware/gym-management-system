@@ -2,7 +2,7 @@ package com.gym.view.javafx.controller;
 
 import com.gym.controller.GymController;
 import com.gym.persistence.DataInitializer;
-import com.gym.persistence.DataManager;
+import com.gym.persistence.JsonDataManager;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,13 +11,13 @@ import javafx.stage.Stage;
 
 public class GymApplication extends Application {
     
-    private DataManager dataManager;
+    private JsonDataManager dataManager;
     private GymController gymController;  // ✅ ADDED: Declare as class field
     
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Initialize data manager
-        dataManager = new DataManager();
+        dataManager = new JsonDataManager();
         
         // ✅ ADDED: Initialize gymController
         gymController = new GymController();

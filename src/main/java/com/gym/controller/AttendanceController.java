@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.gym.model.Profile;
 import com.gym.model.booking.Attendance;
 import com.gym.model.booking.Session;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 import com.gym.util.IdGenerator;
 
 /**
@@ -18,10 +18,10 @@ import com.gym.util.IdGenerator;
  */
 public class AttendanceController {
     
-    private final DataManager dataManager;
+    private final DatabaseManager dataManager;
     private final IdGenerator idGenerator;
     
-    public AttendanceController(DataManager dataManager) {
+    public AttendanceController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
         this.idGenerator = new IdGenerator(null); // Will be initialized properly
     }
@@ -49,7 +49,7 @@ public class AttendanceController {
         }
         
         // Check if profile exists
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return null;
@@ -57,7 +57,7 @@ public class AttendanceController {
         
         // Check if session exists
         Session session = null;
-        for (Session s : dataManager.getSessions()) {
+        for (Session s : databaseManager.getSessions()) {
             if (s.getSessionId().equals(sessionId)) {  // ✅ Use .equals()
                 session = s;
                 break;
@@ -69,7 +69,7 @@ public class AttendanceController {
         }
         
         // Check if already marked
-        boolean alreadyMarked = dataManager.getAttendanceRecords().stream()
+        boolean alreadyMarked = databaseManager.getAttendanceRecords().stream()
             .anyMatch(a -> a.getProfileId().equals(profileId) && a.getSessionId().equals(sessionId));  // ✅ Use .equals()
         if (alreadyMarked) {
             System.out.println("⚠️ Attendance already marked for this session!");
@@ -81,7 +81,7 @@ public class AttendanceController {
         String attendanceDate = LocalDate.now().toString();
         Attendance attendance = new Attendance(attendanceId, profileId, sessionId, attendanceDate, status);
         
-        dataManager.addAttendance(attendance);
+        databaseManager.addAttendance(attendance);
         
         // Mark based on status
         String normalizedStatus = status.toLowerCase();
@@ -119,7 +119,7 @@ public class AttendanceController {
         if (profileId == null || profileId.isEmpty()) {
             return List.of();
         }
-        return dataManager.getAttendanceRecords().stream()
+        return databaseManager.getAttendanceRecords().stream()
             .filter(a -> a.getProfileId().equals(profileId))  // ✅ Use .equals()
             .collect(Collectors.toList());
     }
@@ -131,7 +131,7 @@ public class AttendanceController {
         if (sessionId == null || sessionId.isEmpty()) {
             return List.of();
         }
-        return dataManager.getAttendanceRecords().stream()
+        return databaseManager.getAttendanceRecords().stream()
             .filter(a -> a.getSessionId().equals(sessionId))  // ✅ Use .equals()
             .collect(Collectors.toList());
     }
@@ -143,7 +143,7 @@ public class AttendanceController {
         if (date == null || date.isEmpty()) {
             return List.of();
         }
-        return dataManager.getAttendanceRecords().stream()
+        return databaseManager.getAttendanceRecords().stream()
             .filter(a -> a.getAttendanceDate().equals(date))
             .collect(Collectors.toList());
     }
@@ -155,7 +155,7 @@ public class AttendanceController {
         if (status == null || status.isEmpty()) {
             return List.of();
         }
-        return dataManager.getAttendanceRecords().stream()
+        return databaseManager.getAttendanceRecords().stream()
             .filter(a -> a.getStatus().equalsIgnoreCase(status))
             .collect(Collectors.toList());
     }
@@ -185,7 +185,7 @@ public class AttendanceController {
      * Get overall attendance rate
      */
     public double getOverallAttendanceRate() {
-        List<Attendance> records = dataManager.getAttendanceRecords();
+        List<Attendance> records = databaseManager.getAttendanceRecords();
         if (records.isEmpty()) return 0.0;
         
         long present = records.stream()
@@ -199,7 +199,7 @@ public class AttendanceController {
      * Get attendance statistics
      */
     public AttendanceStats getAttendanceStats() {
-        List<Attendance> records = dataManager.getAttendanceRecords();
+        List<Attendance> records = databaseManager.getAttendanceRecords();
         int total = records.size();
         long present = records.stream().filter(Attendance::isPresent).count();
         long absent = records.stream().filter(Attendance::isAbsent).count();
@@ -230,7 +230,7 @@ public class AttendanceController {
         }
         
         record.setStatus(newStatus);
-        dataManager.saveAllData();
+        databaseManager.saveAllData();
         System.out.println("✅ Attendance status updated to: " + newStatus);
         return true;
     }
@@ -248,9 +248,9 @@ public class AttendanceController {
             return false;
         }
         
-        boolean removed = dataManager.getAttendanceRecords().removeIf(a -> a.getAttendanceId().equals(attendanceId));
+        boolean removed = databaseManager.getAttendanceRecords().removeIf(a -> a.getAttendanceId().equals(attendanceId));
         if (removed) {
-            dataManager.saveAllData();
+            databaseManager.saveAllData();
             System.out.println("✅ Attendance record deleted: " + attendanceId);
             return true;
         } else {
@@ -270,7 +270,7 @@ public class AttendanceController {
         if (attendanceId == null || attendanceId.isEmpty()) {
             return null;
         }
-        return dataManager.getAttendanceRecords().stream()
+        return databaseManager.getAttendanceRecords().stream()
             .filter(a -> a.getAttendanceId().equals(attendanceId))
             .findFirst()
             .orElse(null);
@@ -285,7 +285,7 @@ public class AttendanceController {
         }
         // Fallback
         String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        int count = dataManager.getAttendanceRecords().size() + 1;
+        int count = databaseManager.getAttendanceRecords().size() + 1;
         return "ATT" + timestamp + String.format("%04d", count);
     }
     

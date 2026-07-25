@@ -7,7 +7,7 @@ import com.gym.model.Profile;
 import com.gym.model.membership.Basic;
 import com.gym.model.membership.Family;
 import com.gym.model.membership.Premium;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 import com.gym.util.IdGenerator;
 
 /**
@@ -18,10 +18,10 @@ import com.gym.util.IdGenerator;
  */
 public class RegisterController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     private IdGenerator idGenerator;
     
-    public RegisterController(DataManager dataManager) {
+    public RegisterController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
         this.idGenerator = new IdGenerator(null); // Will be initialized properly
     }
@@ -76,26 +76,26 @@ public class RegisterController {
             case "Premium":
                 Premium premium = new Premium(membershipId, 99.99, startDate, expiryDate, "Active", "VIP Access");
                 profile.setMembership(premium);
-                dataManager.addMembership(premium);
+                databaseManager.addMembership(premium);
                 System.out.println("   Membership: Premium (ID: " + membershipId + ")");
                 break;
             case "Family":
                 Family family = new Family(membershipId, 69.99, startDate, expiryDate, "Active", 2);
                 profile.setMembership(family);
-                dataManager.addMembership(family);
+                databaseManager.addMembership(family);
                 System.out.println("   Membership: Family (ID: " + membershipId + ")");
                 break;
             default:
                 Basic basic = new Basic(membershipId, 49.99, startDate, expiryDate, "Active");
                 profile.setMembership(basic);
-                dataManager.addMembership(basic);
+                databaseManager.addMembership(basic);
                 System.out.println("   Membership: Basic (ID: " + membershipId + ")");
                 break;
         }
         
         // Save profile
-        dataManager.addProfile(profile);
-        dataManager.saveAllData();
+        databaseManager.addProfile(profile);
+        databaseManager.saveAllData();
         
         System.out.println("✅ Registration successful!");
         System.out.println("   Profile ID: " + profileId);
@@ -159,22 +159,22 @@ public class RegisterController {
             case "Premium":
                 Premium premium = new Premium(membershipId, 99.99, startDate, expiryDate, "Active", "VIP Access");
                 profile.setMembership(premium);
-                dataManager.addMembership(premium);
+                databaseManager.addMembership(premium);
                 break;
             case "Family":
                 Family family = new Family(membershipId, 69.99, startDate, expiryDate, "Active", 2);
                 profile.setMembership(family);
-                dataManager.addMembership(family);
+                databaseManager.addMembership(family);
                 break;
             default:
                 Basic basic = new Basic(membershipId, 49.99, startDate, expiryDate, "Active");
                 profile.setMembership(basic);
-                dataManager.addMembership(basic);
+                databaseManager.addMembership(basic);
                 break;
         }
         
-        dataManager.addProfile(profile);
-        dataManager.saveAllData();
+        databaseManager.addProfile(profile);
+        databaseManager.saveAllData();
         
         System.out.println("✅ Registration successful!");
         System.out.println("   Profile ID: " + profileId + " (Role: " + getRoleName(roleCode) + ")");
@@ -192,7 +192,7 @@ public class RegisterController {
             return false;
         }
         String trimmedEmail = email.trim();
-        for (Profile p : dataManager.getProfiles()) {
+        for (Profile p : databaseManager.getProfiles()) {
             if (p.getEmail().equalsIgnoreCase(trimmedEmail)) {
                 return true;
             }
@@ -221,7 +221,7 @@ public class RegisterController {
         }
         // Fallback ID generation
         String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("MMdd"));
-        int count = dataManager.getProfiles().size() + 1;
+        int count = databaseManager.getProfiles().size() + 1;
         return String.format("%03d", count) + timestamp + roleCode;
     }
     
@@ -231,7 +231,7 @@ public class RegisterController {
     private String generateMembershipId(String type) {
         String prefix = type.substring(0, 3).toUpperCase();
         String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        int count = dataManager.getMemberships().size() + 1;
+        int count = databaseManager.getMemberships().size() + 1;
         return prefix + timestamp + String.format("%04d", count);
     }
 }

@@ -5,7 +5,7 @@ import com.gym.model.classes.GymClass;
 import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
 import com.gym.model.booking.Attendance;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,18 +17,18 @@ import java.util.stream.Collectors;
  */
 public class BookingController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     
-    public BookingController(DataManager dataManager) {
+    public BookingController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
     }
 
     public void addSession(Session session) {
-        boolean exists = dataManager.getSessions().stream()
-            .anyMatch(existing -> existing.getSessionId().equals(session.getSessionId());)
-
+        boolean exists = databaseManager.getSessions().stream()
+            .anyMatch(existing -> existing.getSessionId().equals(session.getSessionId()));
+        
         if (!exists) {
-            dataManager.addSession(session);
+            databaseManager.addSession(session);
         }
     }
     
@@ -39,14 +39,14 @@ public class BookingController {
      */
     public Booking createBooking(String profileId, String classId, String sessionId) {
         // Check if profile exists
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found!");
             return null;
         }
         
         // Check if class exists
-        GymClass gymClass = dataManager.findClassById(classId);
+        GymClass gymClass = databaseManager.findClassById(classId);
         if (gymClass == null) {
             System.out.println("❌ Class not found!");
             return null;
@@ -54,7 +54,7 @@ public class BookingController {
         
         // Check if session exists
         Session session = null;
-        for (Session s : dataManager.getSessions()) {
+        for (Session s : databaseManager.getSessions()) {
             if (s.getSessionId().equals(sessionId)) {
                 session = s;
                 break;
@@ -78,22 +78,22 @@ public class BookingController {
         }
         
         // Check if already booked
-        boolean alreadyBooked = dataManager.getBookings().stream()
-            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId);)
+        boolean alreadyBooked = databaseManager.getBookings().stream()
+            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId));
         if (alreadyBooked) {
             System.out.println("❌ Already booked for this session!");
             return null;
         }
         
         // Create booking
-        int bookingId = dataManager.getBookings().size() + 1;
+        int bookingId = databaseManager.getBookings().size() + 1;
         String bookingDate = LocalDate.now().toString();
         Booking booking = new Booking(bookingId, profileId, classId, sessionId, bookingDate, "Confirmed");
         
-        dataManager.addBooking(booking);
+        databaseManager.addBooking(booking);
         gymClass.addBooking(profile.getName());
         session.addAttendee();
-        dataManager.saveAllData();
+        databaseManager.saveAllData();
         
         System.out.println("✅ Booking created successfully!");
         return booking;
@@ -105,22 +105,22 @@ public class BookingController {
      * Cancel a booking
      */
     public boolean cancelBooking(String bookingId) {
-        Booking booking = dataManager.findBookingById(bookingId);
+        Booking booking = databaseManager.findBookingById(bookingId);
         if (booking == null) {
             System.out.println("❌ Booking not found!");
             return false;
         }
         
         // Remove from class
-        GymClass gymClass = dataManager.findClassById(booking.getClassId());
-        Profile profile = dataManager.findProfileById(booking.getProfileId());
+        GymClass gymClass = databaseManager.findClassById(booking.getClassId());
+        Profile profile = databaseManager.findProfileById(booking.getProfileId());
         
         if (gymClass != null && profile != null) {
             gymClass.removeBooking(profile.getName());
         }
         
         // Remove from session
-        for (Session session : dataManager.getSessions()) {
+        for (Session session : databaseManager.getSessions()) {
             if (session.getSessionId().equals(booking.getSessionId())) {
                 session.removeAttendee();
                 break;
@@ -128,8 +128,8 @@ public class BookingController {
         }
         
         // Remove booking
-        dataManager.getBookings().remove(booking);
-        dataManager.saveAllData();
+        databaseManager.getBookings().remove(booking);
+        databaseManager.saveAllData();
         
         System.out.println("✅ Booking cancelled successfully!");
         return true;
@@ -139,7 +139,7 @@ public class BookingController {
      * Cancel all bookings for a profile
      */
     public int cancelAllBookingsForProfile(String profileId) {
-        List<Booking> toRemove = dataManager.getBookings().stream()
+        List<Booking> toRemove = databaseManager.getBookings().stream()
             .filter(b -> b.getProfileId().equals(profileId))
             .collect(Collectors.toList());
             
@@ -156,14 +156,14 @@ public class BookingController {
      * Change booking status
      */
     public boolean changeBookingStatus(String bookingId, String newStatus) {
-        Booking booking = dataManager.findBookingById(bookingId);
+        Booking booking = databaseManager.findBookingById(bookingId);
         if (booking == null) {
             System.out.println("❌ Booking not found!");
             return false;
         }
         
         booking.changeStatus(newStatus);
-        dataManager.saveAllData();
+        databaseManager.saveAllData();
         return true;
     }
     
@@ -171,14 +171,14 @@ public class BookingController {
      * Confirm a booking
      */
     public boolean confirmBooking(String bookingId) {
-        Booking booking = dataManager.findBookingById(bookingId);
+        Booking booking = databaseManager.findBookingById(bookingId);
         if (booking == null) {
             System.out.println("❌ Booking not found!");
             return false;
         }
         
         booking.confirmBooking();
-        dataManager.saveAllData();
+        databaseManager.saveAllData();
         return true;
     }
     
@@ -188,7 +188,7 @@ public class BookingController {
      * Get all bookings for a profile
      */
     public List<Booking> getBookingsForProfile(String profileId) {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(b -> b.getProfileId().equals(profileId))
             .collect(Collectors.toList());
     }
@@ -197,7 +197,7 @@ public class BookingController {
      * Get all bookings for a class
      */
     public List<Booking> getBookingsForClass(String classId) {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(b -> b.getClassId().equals(classId))
             .collect(Collectors.toList());
     }
@@ -206,7 +206,7 @@ public class BookingController {
      * Get all bookings for a session
      */
     public List<Booking> getBookingsForSession(String sessionId) {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(b -> b.getSessionId().equals(sessionId))
             .collect(Collectors.toList());
     }
@@ -215,7 +215,7 @@ public class BookingController {
      * Get active bookings for a profile
      */
     public List<Booking> getActiveBookingsForProfile(String profileId) {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(b -> b.getProfileId().equals(profileId) && b.isActive())
             .collect(Collectors.toList());
     }
@@ -224,7 +224,7 @@ public class BookingController {
      * Get confirmed bookings
      */
     public List<Booking> getConfirmedBookings() {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(Booking::isConfirmed)
             .collect(Collectors.toList());
     }
@@ -233,8 +233,8 @@ public class BookingController {
      * Check if a profile is booked for a session
      */
     public boolean isBookedForSession(String profileId, String sessionId) {
-        return dataManager.getBookings().stream()
-            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId);)
+        return databaseManager.getBookings().stream()
+            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId));
     }
     
     // ===== STATISTICS =====
@@ -243,14 +243,14 @@ public class BookingController {
      * Get total bookings count
      */
     public int getTotalBookings() {
-        return dataManager.getBookings().size();
+        return databaseManager.getBookings().size();
     }
     
     /**
      * Get booking count by status
      */
     public long getBookingCountByStatus(String status) {
-        return dataManager.getBookings().stream()
+        return databaseManager.getBookings().stream()
             .filter(b -> b.getStatus().equalsIgnoreCase(status))
             .count();
     }

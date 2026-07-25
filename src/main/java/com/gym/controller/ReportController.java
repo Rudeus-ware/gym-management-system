@@ -4,21 +4,21 @@ import java.util.List;
 
 import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 /**
  * Controller for reports and statistics.
  */
 public class ReportController {
 
-    private final DataManager dataManager;
+    private final DatabaseManager dataManager;
 
-    public ReportController(DataManager dataManager) {
+    public ReportController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
     }
 
     public String getMemberReport() {
-        List<Profile> profiles = dataManager.getProfiles();
+        List<Profile> profiles = databaseManager.getProfiles();
         long active = profiles.stream()
             .filter(p -> p.getMembership() != null && p.getMembership().isValid())
             .count();
@@ -43,7 +43,7 @@ public class ReportController {
     }
 
     public String getClassReport() {
-        List<GymClass> classes = dataManager.getGymClasses();
+        List<GymClass> classes = databaseManager.getGymClasses();
         int totalCapacity = classes.stream().mapToInt(GymClass::getCapacity).sum();
         int totalBookings = classes.stream().mapToInt(GymClass::getCurrentBookings).sum();
         double utilization = totalCapacity > 0 ? (double) totalBookings / totalCapacity * 100 : 0;
@@ -67,12 +67,12 @@ public class ReportController {
             "📊 BOOKING REPORT\n" +
             "=================\n" +
             "Total Bookings: %d",
-            dataManager.getBookings().size()
+            databaseManager.getBookings().size()
         );
     }
 
     private long countMembershipType(String type) {
-        return dataManager.getProfiles().stream()
+        return databaseManager.getProfiles().stream()
             .filter(profile -> profile.getMembership() != null)
             .filter(profile -> profile.getMembership().getClass().getSimpleName().equalsIgnoreCase(type))
             .count();

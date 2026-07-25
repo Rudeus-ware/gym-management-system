@@ -32,7 +32,7 @@ public class DataInitializer {
     private static int bookingCounter = 1;
     private static int attendanceCounter = 1;
     
-    public static void initializeTestData(DataManager dataManager) {
+    public static void initializeTestData(DatabaseManager dataManager) {
         System.out.println("\n📋 Initializing test data...");
         System.out.println("-".repeat(40));
         

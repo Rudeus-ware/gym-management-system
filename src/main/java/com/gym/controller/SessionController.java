@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.gym.model.booking.Session;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 public class SessionController {
 
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
 
-    public SessionController(DataManager dataManager) {
+    public SessionController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
     }
 
-    public void setDataManager(DataManager dataManager) {
+    public void setDataManager(JsonDataManager dataManager) {
         this.dataManager = dataManager;
     }
 

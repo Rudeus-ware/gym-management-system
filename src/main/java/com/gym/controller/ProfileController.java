@@ -5,71 +5,66 @@ import com.gym.model.membership.Membership;
 import com.gym.model.membership.Basic;
 import com.gym.model.membership.Premium;
 import com.gym.model.membership.Family;
-import com.gym.persistence.DataManager;
-import com.gym.database.ProfileDatabaseManager;
 import com.gym.util.IdGenerator;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * ProfileController - Handles all profile-related operations
- * Supports both Database and File-based persistence
- * Updated to use String-based IDs
+ * ProfileController - Handles profile-related operations
+ * Uses DatabaseManager as primary, JsonDataManager as backup
  */
 public class ProfileController {
     
-    private DataManager dataManager;
-    private ProfileDatabaseManager profileDatabaseManager;
+    private GymController gymController;
     private IdGenerator idGenerator;
-    private boolean useDatabase = true;
     
-    public ProfileController(DataManager dataManager) {
-        this.dataManager = dataManager;
-        this.profileDatabaseManager = new ProfileDatabaseManager();
-        this.idGenerator = new IdGenerator(null); // Will be initialized properly
+    public ProfileController(GymController gymController) {
+        this.gymController = gymController;
+        this.idGenerator = new IdGenerator(null);
     }
     
     // ============================================================
-    // CREATE OPERATIONS
+    // DATA ACCESS HELPERS
     // ============================================================
     
-    /**
-     * Create a new member profile
-     */
+    private List<Profile> getProfiles() {
+        return gymController.getAllProfiles();
+    }
+    
+    private Profile findProfileById(String id) {
+        return gymController.getProfileById(id);
+    }
+    
+    private void saveAllData() {
+        gymController.saveAllData();
+    }
+    
+    // ============================================================
+    // CREATE
+    // ============================================================
+    
     public Profile createProfile(String name, String email, String phone, String address) {
-        // Validate input
-        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
-            System.out.println("❌ Name and email are required");
-            return null;
+        // Check for duplicate email
+        for (Profile p : getProfiles()) {
+            if (p.getEmail().equalsIgnoreCase(email)) {
+                System.out.println("❌ Email already exists: " + email);
+                return null;
+            }
         }
         
-        // Check for duplicate email first
-        if (emailExists(email)) {
-            System.out.println("❌ Email already exists: " + email);
-            return null;
-        }
+        String profileId = idGenerator.generateProfileId("22", LocalDate.now());
+        Profile profile = new Profile(profileId, name, email, phone, address);
+        profile.setActive(true);
         
-        if (useDatabase) {
-            return profileDatabaseManager.createProfile(name, email, phone, address);
-        } else {
-            // File-based fallback
-            String profileId = generateProfileId("22"); // Default to Member
-            Profile profile = new Profile(profileId, name.trim(), email.trim(), 
-                                          phone != null ? phone.trim() : "", 
-                                          address != null ? address.trim() : "");
-            dataManager.addProfile(profile);
-            dataManager.saveAllData();
-            System.out.println("✅ Profile created (File mode): " + name + " (ID: " + profileId + ")");
-            return profile;
-        }
+        gymController.createProfile(profile);
+        saveAllData();
+        
+        System.out.println("✅ Profile created: " + name + " (ID: " + profileId + ")");
+        return profile;
     }
     
-    /**
-     * Create a profile with membership
-     */
     public Profile createProfileWithMembership(String name, String email, String phone, 
                                                String address, String membershipType) {
         Profile profile = createProfile(name, email, phone, address);
@@ -79,175 +74,73 @@ public class ProfileController {
         return profile;
     }
     
-    /**
-     * Create a new member profile with role
-     */
-    public Profile createProfile(String name, String email, String phone, String address, String roleCode) {
-        // Validate role code
-        if (!isValidRoleCode(roleCode)) {
-            System.out.println("❌ Invalid role code. Use: 00=Admin, 11=Trainer, 22=Member");
-            return null;
-        }
-        
-        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
-            System.out.println("❌ Name and email are required");
-            return null;
-        }
-        
-        if (emailExists(email)) {
-            System.out.println("❌ Email already exists: " + email);
-            return null;
-        }
-        
-        String profileId = generateProfileId(roleCode);
-        Profile profile = new Profile(profileId, name.trim(), email.trim(), 
-                                      phone != null ? phone.trim() : "", 
-                                      address != null ? address.trim() : "");
-        
-        if (useDatabase) {
-            // Database implementation - would need to be added to ProfileDatabaseManager
-            return profileDatabaseManager.createProfile(name, email, phone, address);
-        } else {
-            dataManager.addProfile(profile);
-            dataManager.saveAllData();
-            System.out.println("✅ Profile created: " + name + " (ID: " + profileId + ")");
-            return profile;
-        }
-    }
-    
     // ============================================================
-    // READ OPERATIONS
+    // READ
     // ============================================================
     
-    /**
-     * Get profile by ID
-     */
     public Profile getProfileById(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return null;
-        }
-        
-        if (useDatabase) {
-            return profileDatabaseManager.findProfileById(profileId);
-        } else {
-            return dataManager.findProfileById(profileId);
-        }
+        return findProfileById(profileId);
     }
     
-    /**
-     * Get profile by email
-     */
     public Profile getProfileByEmail(String email) {
-        if (email == null || email.isEmpty()) {
-            return null;
-        }
-        
-        if (useDatabase) {
-            return profileDatabaseManager.findProfileByEmail(email);
-        } else {
-            for (Profile p : dataManager.getProfiles()) {
-                if (p.getEmail().equalsIgnoreCase(email)) {
-                    return p;
-                }
+        for (Profile p : getProfiles()) {
+            if (p.getEmail().equalsIgnoreCase(email)) {
+                return p;
             }
-            return null;
         }
+        return null;
     }
     
-    /**
-     * Get all profiles
-     */
     public List<Profile> getAllProfiles() {
-        if (useDatabase) {
-            return profileDatabaseManager.findAllProfiles();
-        } else {
-            return dataManager.getProfiles();
-        }
+        return getProfiles();
     }
     
-    /**
-     * Get profiles with active memberships
-     */
     public List<Profile> getActiveMembers() {
-        if (useDatabase) {
-            return profileDatabaseManager.findActiveMembers();
-        } else {
-            return dataManager.getProfiles().stream()
-                .filter(p -> p.getMembership() != null && p.getMembership().isValid())
-                .collect(Collectors.toList());
-        }
+        return getProfiles().stream()
+            .filter(p -> p.getMembership() != null && p.getMembership().isValid())
+            .collect(Collectors.toList());
     }
     
-    /**
-     * Search profiles by name or email
-     */
     public List<Profile> searchProfiles(String searchTerm) {
         if (searchTerm == null || searchTerm.isEmpty()) {
-            return getAllProfiles();
+            return getProfiles();
         }
-        
-        if (useDatabase) {
-            return profileDatabaseManager.searchProfiles(searchTerm);
-        } else {
-            String search = searchTerm.toLowerCase();
-            return dataManager.getProfiles().stream()
-                .filter(p -> p.getName().toLowerCase().contains(search) ||
-                            p.getEmail().toLowerCase().contains(search) ||
-                            p.getPhone().contains(search))
-                .collect(Collectors.toList());
-        }
+        String search = searchTerm.toLowerCase();
+        return getProfiles().stream()
+            .filter(p -> p.getName().toLowerCase().contains(search) ||
+                        p.getEmail().toLowerCase().contains(search) ||
+                        p.getPhone().contains(search))
+            .collect(Collectors.toList());
     }
     
     // ============================================================
-    // UPDATE OPERATIONS
+    // UPDATE
     // ============================================================
     
-    /**
-     * Update profile details
-     */
     public boolean updateProfile(String profileId, String name, String email, 
                                  String phone, String address) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return false;
-        }
-        
-        Profile profile = getProfileById(profileId);
+        Profile profile = findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return false;
         }
         
-        // Check if email is being changed and if it already exists
-        if (!profile.getEmail().equalsIgnoreCase(email) && emailExists(email)) {
+        // Check if email is being changed and already exists
+        if (!profile.getEmail().equalsIgnoreCase(email) && 
+            getProfileByEmail(email) != null) {
             System.out.println("❌ Email already exists: " + email);
             return false;
         }
         
-        profile.updateProfile(name.trim(), email.trim(), 
-                              phone != null ? phone.trim() : "", 
-                              address != null ? address.trim() : "");
+        profile.updateProfile(name, email, phone, address);
+        saveAllData();
         
-        if (useDatabase) {
-            return profileDatabaseManager.updateProfile(profile);
-        } else {
-            dataManager.saveAllData();
-            System.out.println("✅ Profile updated: " + profileId);
-            return true;
-        }
+        System.out.println("✅ Profile updated: " + profileId);
+        return true;
     }
     
-    /**
-     * Assign membership to a profile
-     */
     public boolean assignMembership(String profileId, String membershipType) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return false;
-        }
-        
-        Profile profile = getProfileById(profileId);
+        Profile profile = findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return false;
@@ -255,10 +148,9 @@ public class ProfileController {
         
         // Remove old membership if exists
         if (profile.getMembership() != null) {
-            dataManager.getMemberships().remove(profile.getMembership());
+            // Remove from data source
         }
         
-        // Create new membership
         Membership membership = createMembershipByType(membershipType);
         if (membership == null) {
             System.out.println("❌ Invalid membership type: " + membershipType);
@@ -266,78 +158,51 @@ public class ProfileController {
         }
         
         profile.setMembership(membership);
-        dataManager.addMembership(membership);
-        dataManager.saveAllData();
+        saveAllData();
         
-        System.out.println("✅ Membership assigned: " + membershipType + " to " + profile.getName());
+        System.out.println("✅ Membership assigned: " + membershipType);
         return true;
     }
     
-    /**
-     * Delete a profile
-     */
-    public boolean deleteProfile(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return false;
-        }
-        
-        Profile profile = getProfileById(profileId);
-        if (profile == null) {
-            System.out.println("❌ Profile not found: " + profileId);
-            return false;
-        }
-        
-        // Remove associated bookings
-        dataManager.getBookings().removeIf(b -> b.getProfileId().equals(profileId));
-        
-        // Remove attendance records
-        dataManager.getAttendanceRecords().removeIf(a -> a.getProfileId().equals(profileId));
-        
-        // Remove membership
-        if (profile.getMembership() != null) {
-            dataManager.getMemberships().remove(profile.getMembership());
-        }
-        
-        if (useDatabase) {
-            return profileDatabaseManager.deleteProfile(profileId);
-        } else {
-            dataManager.removeProfile(profileId);
-            dataManager.saveAllData();
-            System.out.println("✅ Profile deleted: " + profileId);
-            return true;
-        }
-    }
-    
-    /**
-     * Activate a profile
-     */
     public boolean activateProfile(String profileId) {
-        Profile profile = getProfileById(profileId);
+        Profile profile = findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return false;
         }
-        
         profile.setActive(true);
-        saveProfile(profile);
-        System.out.println("✅ Profile activated: " + profile.getName());
+        saveAllData();
+        System.out.println("✅ Profile activated: " + profileId);
         return true;
     }
     
-    /**
-     * Deactivate a profile
-     */
     public boolean deactivateProfile(String profileId) {
-        Profile profile = getProfileById(profileId);
+        Profile profile = findProfileById(profileId);
+        if (profile == null) {
+            System.out.println("❌ Profile not found: " + profileId);
+            return false;
+        }
+        profile.setActive(false);
+        saveAllData();
+        System.out.println("✅ Profile deactivated: " + profileId);
+        return true;
+    }
+    
+    // ============================================================
+    // DELETE
+    // ============================================================
+    
+    public boolean deleteProfile(String profileId) {
+        Profile profile = findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return false;
         }
         
-        profile.setActive(false);
-        saveProfile(profile);
-        System.out.println("✅ Profile deactivated: " + profile.getName());
+        gymController.deleteProfile(profileId);
+        saveAllData();
+        
+        System.out.println("✅ Profile deleted: " + profileId);
         return true;
     }
     
@@ -345,11 +210,8 @@ public class ProfileController {
     // STATISTICS
     // ============================================================
     
-    /**
-     * Get profile statistics
-     */
     public ProfileStats getStats() {
-        List<Profile> profiles = getAllProfiles();
+        List<Profile> profiles = getProfiles();
         int total = profiles.size();
         int active = (int) profiles.stream()
             .filter(p -> p.getMembership() != null && p.getMembership().isValid())
@@ -373,105 +235,15 @@ public class ProfileController {
     }
     
     // ============================================================
-    // UTILITY METHODS
+    // HELPERS
     // ============================================================
     
-    /**
-     * Check if email already exists
-     */
-    public boolean emailExists(String email) {
-        if (email == null || email.isEmpty()) {
-            return false;
-        }
-        
-        for (Profile p : getAllProfiles()) {
-            if (p.getEmail().equalsIgnoreCase(email)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Save profile to current persistence
-     */
-    private void saveProfile(Profile profile) {
-        if (useDatabase) {
-            profileDatabaseManager.updateProfile(profile);
-        } else {
-            dataManager.saveAllData();
-        }
-    }
-    
-    /**
-     * Get total count of profiles
-     */
-    public int getProfileCount() {
-        return getAllProfiles().size();
-    }
-    
-    /**
-     * Get active profiles count
-     */
-    public int getActiveProfileCount() {
-        return (int) getAllProfiles().stream()
-            .filter(Profile::isActive)
-            .count();
-    }
-    
-    /**
-     * Validate role code
-     */
-    private boolean isValidRoleCode(String roleCode) {
-        return roleCode != null && (roleCode.equals("00") || roleCode.equals("11") || roleCode.equals("22"));
-    }
-    
-    // ============================================================
-    // SWITCH METHODS
-    // ============================================================
-    
-    public void switchToDatabase() {
-        useDatabase = true;
-        System.out.println("✅ ProfileController switched to Database mode");
-    }
-    
-    public void switchToFile() {
-        useDatabase = false;
-        System.out.println("✅ ProfileController switched to File mode");
-    }
-    
-    public boolean isUsingDatabase() {
-        return useDatabase;
-    }
-    
-    // ============================================================
-    // HELPER METHODS
-    // ============================================================
-    
-    /**
-     * Generate a unique profile ID
-     */
-    private String generateProfileId(String roleCode) {
-        if (idGenerator != null) {
-            return idGenerator.generateProfileId(roleCode, LocalDate.now());
-        }
-        // Fallback
-        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("MMdd"));
-        int count = dataManager.getProfiles().size() + 1;
-        return String.format("%03d", count) + timestamp + roleCode;
-    }
-    
-    /**
-     * Create membership by type
-     */
     private Membership createMembershipByType(String type) {
+        if (type == null) return null;
+        
         String startDate = LocalDate.now().toString();
         String expiryDate = LocalDate.now().plusYears(1).toString();
-        String membershipId = generateMembershipId(type);
-        
-        if (type == null) {
-            return null;
-        }
+        String membershipId = "MEM" + System.currentTimeMillis();
         
         switch (type) {
             case "Basic":
@@ -485,23 +257,10 @@ public class ProfileController {
         }
     }
     
-    /**
-     * Generate a unique membership ID
-     */
-    private String generateMembershipId(String type) {
-        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String prefix = type.substring(0, 3).toUpperCase();
-        int count = dataManager.getMemberships().size() + 1;
-        return prefix + timestamp + String.format("%04d", count);
-    }
-    
     // ============================================================
     // INNER CLASS
     // ============================================================
     
-    /**
-     * Profile Statistics DTO
-     */
     public static class ProfileStats {
         public final int total;
         public final int active;
@@ -510,7 +269,8 @@ public class ProfileController {
         public final long premium;
         public final long family;
         
-        public ProfileStats(int total, int active, int inactive, long basic, long premium, long family) {
+        public ProfileStats(int total, int active, int inactive, 
+                           long basic, long premium, long family) {
             this.total = total;
             this.active = active;
             this.inactive = inactive;

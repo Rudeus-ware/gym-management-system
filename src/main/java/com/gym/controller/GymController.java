@@ -1,24 +1,26 @@
 package com.gym.controller;
 
-import java.util.List;
-
-import com.gym.database.ProfileDatabaseManager;
+import com.gym.database.DatabaseManager;
+import com.gym.persistence.JsonDataManager;
 import com.gym.model.Profile;
-import com.gym.persistence.DataManager;
+import com.gym.model.classes.GymClass;
+import com.gym.model.booking.Booking;
+import com.gym.model.booking.Session;
+import com.gym.model.booking.Attendance;
+import com.gym.model.user.Trainer;
+
+import java.util.List;
 
 /**
  * GymController - Main orchestrator for the application
- * Now supports both Database and File-based persistence
+ * Uses DatabaseManager as primary, JsonDataManager as backup
  */
-public class GymController {
-    
-    private DataManager dataManager;
-    private ProfileDatabaseManager profileDatabaseManager;
-    private boolean useDatabase = true; // Set to false to use FileManager
+public class GymController extends BaseController {
     
     // Sub-controllers
     private LoginController loginController;
     private AdminController adminController;
+    private ProfileController profileController;
     private MembershipController membershipController;
     private ClassController classController;
     private BookingController bookingController;
@@ -27,32 +29,34 @@ public class GymController {
     private ReportController reportController;
     
     public GymController() {
-        this.dataManager = new DataManager();
-        this.profileDatabaseManager = new ProfileDatabaseManager();
-        
-        // Initialize sub-controllers
-        this.loginController = new LoginController(dataManager);
-        this.adminController = new AdminController(dataManager);
-        this.membershipController = new MembershipController(dataManager);
-        this.classController = new ClassController(dataManager);
-        this.bookingController = new BookingController(dataManager);
-        this.attendanceController = new AttendanceController(dataManager);
-        this.paymentController = new PaymentController(dataManager);
-        this.reportController = new ReportController(dataManager);
-        
-        System.out.println("✅ GymController initialized");
-        if (useDatabase) {
-            System.out.println("   Using Database persistence");
-        } else {
-            System.out.println("   Using File persistence");
-        }
+        super();
+        initializeSubControllers();
     }
     
-    // ===== GETTERS =====
-    public DataManager getDataManager() { return dataManager; }
-    public ProfileDatabaseManager getProfileDatabaseManager() { return profileDatabaseManager; }
+    public GymController(boolean useDatabase) {
+        super(useDatabase);
+        initializeSubControllers();
+    }
+    
+    private void initializeSubControllers() {
+        this.loginController = new LoginController(this);
+        this.adminController = new AdminController(this);
+        this.profileController = new ProfileController(this);
+        this.membershipController = new MembershipController(this);
+        this.classController = new ClassController(this);
+        this.bookingController = new BookingController(this);
+        this.attendanceController = new AttendanceController(this);
+        this.paymentController = new PaymentController(this);
+        this.reportController = new ReportController(this);
+    }
+    
+    // ============================================================
+    // GETTERS FOR SUB-CONTROLLERS
+    // ============================================================
+    
     public LoginController getLoginController() { return loginController; }
     public AdminController getAdminController() { return adminController; }
+    public ProfileController getProfileController() { return profileController; }
     public MembershipController getMembershipController() { return membershipController; }
     public ClassController getClassController() { return classController; }
     public BookingController getBookingController() { return bookingController; }
@@ -60,66 +64,193 @@ public class GymController {
     public PaymentController getPaymentController() { return paymentController; }
     public ReportController getReportController() { return reportController; }
     
-    // ===== DATABASE METHODS =====
+    // ============================================================
+    // DATA ACCESS METHODS (Primary Database, Fallback JSON)
+    // ============================================================
     
     /**
-     * Get all members using Database
+     * Get all profiles - Primary: Database, Fallback: JSON
      */
-    public List<Profile> getAllMembersDatabase() {
-        return profileDatabaseManager.findAllProfiles();
-    }
-    
-    /**
-     * Create member using Database
-     */
-    public Profile createMemberDatabase(String name, String email, String phone, String address) {
-        return profileDatabaseManager.createProfile(name, email, phone, address);
-    }
-    
-    /**
-     * Find member by ID using Database
-     */
-    public Profile getMemberDatabase(int id) {
-        return profileDatabaseManager.findProfileById(id);
+    public List<Profile> getAllProfiles() {
+        try {
+            if (useDatabase) {
+                List<Profile> profiles = databaseManager.findAllProfiles();
+                if (!profiles.isEmpty()) {
+                    return profiles;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getProfiles();
     }
     
     /**
-     * Update member using Database
+     * Get profile by ID - Primary: Database, Fallback: JSON
      */
-    public boolean updateMemberDatabase(Profile profile) {
-        return profileDatabaseManager.updateProfile(profile);
+    public Profile getProfileById(String id) {
+        try {
+            if (useDatabase) {
+                Profile profile = databaseManager.findProfileById(id);
+                if (profile != null) {
+                    return profile;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.findProfileById(id);
     }
     
     /**
-     * Delete member using Database
+     * Create profile - Primary: Database, Fallback: JSON
      */
-    public boolean deleteMemberDatabase(String id) {
-        return profileDatabaseManager.deleteProfile(id);
+    public Profile createProfile(Profile profile) {
+        try {
+            if (useDatabase) {
+                Profile created = databaseManager.createProfile(profile);
+                if (created != null) {
+                    return created;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        jsonDataManager.addProfile(profile);
+        jsonDataManager.saveAllData();
+        return profile;
     }
     
-    // ===== FILE-BASED METHODS (Legacy) =====
-    
-    public List<Profile> getAllMembers() {
-        return dataManager.getProfiles();
+    /**
+     * Update profile - Primary: Database, Fallback: JSON
+     */
+    public boolean updateProfile(Profile profile) {
+        try {
+            if (useDatabase) {
+                databaseManager.updateProfile(profile);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        jsonDataManager.updateProfile(profile); // Add this method to JsonDataManager
+        jsonDataManager.saveAllData();
+        return true;
     }
     
+    /**
+     * Delete profile - Primary: Database, Fallback: JSON
+     */
+    public boolean deleteProfile(String id) {
+        try {
+            if (useDatabase) {
+                databaseManager.deleteProfile(id);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        jsonDataManager.removeProfile(id);
+        jsonDataManager.saveAllData();
+        return true;
+    }
+    
+    /**
+     * Get all classes - Primary: Database, Fallback: JSON
+     */
+    public List<GymClass> getAllClasses() {
+        try {
+            if (useDatabase) {
+                return databaseManager.findAllClasses();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getGymClasses();
+    }
+    
+    /**
+     * Get all bookings - Primary: Database, Fallback: JSON
+     */
+    public List<Booking> getAllBookings() {
+        try {
+            if (useDatabase) {
+                return databaseManager.findAllBookings();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getBookings();
+    }
+    
+    /**
+     * Get all sessions - Primary: Database, Fallback: JSON
+     */
+    public List<Session> getAllSessions() {
+        try {
+            if (useDatabase) {
+                return databaseManager.findAllSessions();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getSessions();
+    }
+    
+    /**
+     * Get all attendance - Primary: Database, Fallback: JSON
+     */
+    public List<Attendance> getAllAttendance() {
+        try {
+            if (useDatabase) {
+                return databaseManager.findAllAttendance();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getAttendanceRecords();
+    }
+    
+    /**
+     * Get all trainers - Primary: Database, Fallback: JSON
+     */
+    public List<Trainer> getAllTrainers() {
+        try {
+            if (useDatabase) {
+                return databaseManager.findAllTrainers();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Database error, falling back to JSON...");
+        }
+        return jsonDataManager.getTrainers();
+    }
+    
+    // ============================================================
+    // SAVE & LOAD (Override BaseController)
+    // ============================================================
+    
+    @Override
     public void saveAllData() {
-        dataManager.saveAllData();
+        try {
+            if (useDatabase) {
+                databaseManager.saveAllData();
+                System.out.println("✅ Data saved to Database");
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Could not save to Database, saving to JSON...");
+        }
+        jsonDataManager.saveAllData();
     }
     
-    // ===== SWITCH METHODS =====
-    
-    public void switchToDatabase() {
-        useDatabase = true;
-        System.out.println("✅ Switched to Database mode");
-    }
-    
-    public void switchToFile() {
-        useDatabase = false;
-        System.out.println("✅ Switched to File mode");
-    }
-    
-    public boolean isUsingDatabase() {
-        return useDatabase;
+    @Override
+    public void clearAllData() {
+        try {
+            if (useDatabase) {
+                databaseManager.clearAllData();
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Could not clear Database, clearing JSON...");
+        }
+        jsonDataManager.clearAllData();
     }
 }

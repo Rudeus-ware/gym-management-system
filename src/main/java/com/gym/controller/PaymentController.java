@@ -2,7 +2,7 @@ package com.gym.controller;
 
 import com.gym.model.Payment;
 import com.gym.model.Profile;
-import com.gym.persistence.DataManager;
+import com.gym.database.DatabaseManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  */
 public class PaymentController {
     
-    private DataManager dataManager;
+    private DatabaseManager dataManager;
     
-    public PaymentController(DataManager dataManager) {
+    public PaymentController(JsonDataManager dataManager) {
         this.dataManager = dataManager;
     }
     
@@ -24,7 +24,7 @@ public class PaymentController {
      * Process a payment for a membership
      */
     public Payment processPayment(String profileId, double amount, String method) {
-        Profile profile = dataManager.findProfileById(profileId);
+        Profile profile = databaseManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);
             return null;
@@ -40,8 +40,8 @@ public class PaymentController {
         String paymentDate = LocalDate.now().toString();
         
         Payment payment = new Payment(paymentId, amount, paymentDate, method, "Completed");
-        dataManager.addPayment(payment);
-        dataManager.saveAllData();
+        databaseManager.addPayment(payment);
+        databaseManager.saveAllData();
         
         // Generate receipt
         String receipt = generateReceipt(payment, profile);
@@ -54,11 +54,11 @@ public class PaymentController {
      * Process a refund
      */
     public boolean refundPayment(int paymentId) {
-        List<Payment> payments = dataManager.getPayments();
+        List<Payment> payments = databaseManager.getPayments();
         for (Payment payment : payments) {
             if (payment.getPaymentId() == paymentId) {
                 payment.setPaymentStatus("Refunded");
-                dataManager.saveAllData();
+                databaseManager.saveAllData();
                 System.out.println("✅ Payment refunded: " + paymentId);
                 return true;
             }
@@ -93,7 +93,7 @@ public class PaymentController {
      * Get all payments for a profile
      */
     public List<Payment> getPaymentsForProfile(int profileId) {
-        List<Payment> allPayments = dataManager.getPayments();
+        List<Payment> allPayments = databaseManager.getPayments();
         if (allPayments == null) {
             return new ArrayList<>();
         }
@@ -115,7 +115,7 @@ public class PaymentController {
      * Get total revenue from all payments
      */
     public double getTotalRevenue() {
-        List<Payment> payments = dataManager.getPayments();
+        List<Payment> payments = databaseManager.getPayments();
         if (payments == null) {
             return 0.0;
         }
@@ -129,7 +129,7 @@ public class PaymentController {
      * Get next payment ID
      */
     private int getNextPaymentId() {
-        List<Payment> payments = dataManager.getPayments();
+        List<Payment> payments = databaseManager.getPayments();
         if (payments == null || payments.isEmpty()) {
             return 1001;
         }
