@@ -1,6 +1,7 @@
 package com.gym.controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,29 +13,36 @@ import com.gym.model.classes.Spin;
 import com.gym.model.classes.Strength;
 import com.gym.model.classes.Yoga;
 import com.gym.persistence.DataManager;
+import com.gym.util.IdGenerator;
 
 /**
  * Controller for Class operations
  * Handles all gym class-related business logic
+ * Updated to use String-based IDs
  */
 public class ClassController {
     
     private DataManager dataManager;
+    private IdGenerator idGenerator;
     
     public ClassController(DataManager dataManager) {
         this.dataManager = dataManager;
+        this.idGenerator = new IdGenerator(null); // Will be initialized properly
     }
     
-    // ===== CREATE CLASS =====
+    // ============================================================
+    // CREATE CLASS
+    // ============================================================
     
     /**
      * Create a new Yoga class
      */
     public GymClass createYogaClass(String name, String schedule, int capacity, 
                                     String trainer, String style, String difficulty) {
-        int classId = dataManager.getGymClasses().size() + 101;
+        String classId = generateClassId("YGA");
         Yoga yogaClass = new Yoga(classId, name, schedule, capacity, trainer, style, difficulty);
         dataManager.addGymClass(yogaClass);
+        System.out.println("✅ Yoga class created: " + name + " (ID: " + classId + ")");
         return yogaClass;
     }
     
@@ -43,9 +51,10 @@ public class ClassController {
      */
     public GymClass createSpinClass(String name, String schedule, int capacity,
                                     String trainer, String intensity, int duration) {
-        int classId = dataManager.getGymClasses().size() + 102;
+        String classId = generateClassId("SPN");
         Spin spinClass = new Spin(classId, name, schedule, capacity, trainer, intensity, duration, "EDM");
         dataManager.addGymClass(spinClass);
+        System.out.println("✅ Spin class created: " + name + " (ID: " + classId + ")");
         return spinClass;
     }
     
@@ -54,18 +63,25 @@ public class ClassController {
      */
     public GymClass createStrengthClass(String name, String schedule, int capacity,
                                         String trainer, String focusArea, String intensity) {
-        int classId = dataManager.getGymClasses().size() + 103;
+        String classId = generateClassId("STR");
         Strength strengthClass = new Strength(classId, name, schedule, capacity, trainer, focusArea, intensity);
         dataManager.addGymClass(strengthClass);
+        System.out.println("✅ Strength class created: " + name + " (ID: " + classId + ")");
         return strengthClass;
     }
     
-    // ===== FIND CLASSES =====
+    // ============================================================
+    // FIND CLASSES
+    // ============================================================
     
     /**
      * Find a class by ID
      */
-    public GymClass findClassById(int classId) {
+    public GymClass findClassById(String classId) {  // ✅ Changed to String
+        if (classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid class ID");
+            return null;
+        }
         return dataManager.findClassById(classId);
     }
     
@@ -80,6 +96,9 @@ public class ClassController {
      * Get classes by type
      */
     public List<GymClass> getClassesByType(String type) {
+        if (type == null || type.isEmpty()) {
+            return getAllClasses();
+        }
         return dataManager.getGymClasses().stream()
             .filter(c -> c.getClass().getSimpleName().equalsIgnoreCase(type))
             .collect(Collectors.toList());
@@ -89,6 +108,9 @@ public class ClassController {
      * Get classes by trainer
      */
     public List<GymClass> getClassesByTrainer(String trainerName) {
+        if (trainerName == null || trainerName.isEmpty()) {
+            return getAllClasses();
+        }
         return dataManager.getGymClasses().stream()
             .filter(c -> c.getTrainer().equalsIgnoreCase(trainerName))
             .collect(Collectors.toList());
@@ -103,12 +125,17 @@ public class ClassController {
             .collect(Collectors.toList());
     }
     
-    // ===== CLASS MANAGEMENT =====
+    // ============================================================
+    // CLASS MANAGEMENT
+    // ============================================================
     
     /**
      * Check if a class has available spots
      */
-    public boolean isClassAvailable(int classId) {
+    public boolean isClassAvailable(String classId) {  // ✅ Changed to String
+        if (classId == null || classId.isEmpty()) {
+            return false;
+        }
         GymClass gymClass = findClassById(classId);
         if (gymClass == null) return false;
         return !gymClass.isFull();
@@ -117,7 +144,10 @@ public class ClassController {
     /**
      * Get available spots in a class
      */
-    public int getAvailableSpots(int classId) {
+    public int getAvailableSpots(String classId) {  // ✅ Changed to String
+        if (classId == null || classId.isEmpty()) {
+            return 0;
+        }
         GymClass gymClass = findClassById(classId);
         if (gymClass == null) return 0;
         return gymClass.getCapacity() - gymClass.getCurrentBookings();
@@ -126,11 +156,21 @@ public class ClassController {
     /**
      * Book a member into a class
      */
-    public boolean bookMemberInClass(int profileId, int classId) {
+    public boolean bookMemberInClass(String profileId, String classId) {  // ✅ Changed to String
+        if (profileId == null || profileId.isEmpty() || classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID or class ID");
+            return false;
+        }
+        
         Profile profile = dataManager.findProfileById(profileId);
         GymClass gymClass = findClassById(classId);
         
-        if (profile == null || gymClass == null) {
+        if (profile == null) {
+            System.out.println("❌ Profile not found: " + profileId);
+            return false;
+        }
+        if (gymClass == null) {
+            System.out.println("❌ Class not found: " + classId);
             return false;
         }
         
@@ -149,24 +189,35 @@ public class ClassController {
         // Add booking to class
         gymClass.addBooking(profile.getName());
         
-        // Create booking record
-        int bookingId = dataManager.getBookings().size() + 1;
+        // Create booking record with String ID
+        String bookingId = generateBookingId();
         String bookingDate = LocalDate.now().toString();
-        Booking booking = new Booking(bookingId, profileId, classId, 0, bookingDate, "Confirmed");
+        Booking booking = new Booking(bookingId, profileId, classId, "", bookingDate, "Confirmed");
         dataManager.addBooking(booking);
         dataManager.saveAllData();
         
+        System.out.println("✅ Member " + profile.getName() + " booked into " + gymClass.getClassName());
         return true;
     }
     
     /**
      * Cancel a member's booking in a class
      */
-    public boolean cancelBooking(int profileId, int classId) {
+    public boolean cancelBooking(String profileId, String classId) {  // ✅ Changed to String
+        if (profileId == null || profileId.isEmpty() || classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID or class ID");
+            return false;
+        }
+        
         Profile profile = dataManager.findProfileById(profileId);
         GymClass gymClass = findClassById(classId);
         
-        if (profile == null || gymClass == null) {
+        if (profile == null) {
+            System.out.println("❌ Profile not found: " + profileId);
+            return false;
+        }
+        if (gymClass == null) {
+            System.out.println("❌ Class not found: " + classId);
             return false;
         }
         
@@ -175,36 +226,50 @@ public class ClassController {
         
         // Remove booking record
         dataManager.getBookings().removeIf(b -> 
-            b.getProfileId() == profileId && b.getClassId() == classId
+            b.getProfileId().equals(profileId) && b.getClassId().equals(classId)  // ✅ Use .equals()
         );
         
         dataManager.saveAllData();
+        System.out.println("✅ Booking cancelled for " + profile.getName());
         return true;
     }
     
-    // ===== SESSION MANAGEMENT =====
+    // ============================================================
+    // SESSION MANAGEMENT
+    // ============================================================
     
     /**
      * Create a session for a class
      */
-    public Session createSession(int classId, String date, String startTime, 
-                                 String endTime, String duration, int trainerId) {
-        int sessionId = dataManager.getSessions().size() + 1;
+    public Session createSession(String classId, String date, String startTime,  // ✅ Changed classId to String
+                                 String endTime, String duration, String trainerId) {  // ✅ Changed trainerId to String
+        if (classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid class ID");
+            return null;
+        }
+        
+        String sessionId = generateSessionId();
         Session session = new Session(sessionId, classId, date, startTime, endTime, duration, trainerId);
         dataManager.addSession(session);
+        System.out.println("✅ Session created: " + sessionId + " for class " + classId);
         return session;
     }
     
     /**
      * Get all sessions for a class
      */
-    public List<Session> getSessionsForClass(int classId) {
+    public List<Session> getSessionsForClass(String classId) {  // ✅ Changed to String
+        if (classId == null || classId.isEmpty()) {
+            return List.of();
+        }
         return dataManager.getSessions().stream()
-            .filter(s -> s.getClassId() == classId)
+            .filter(s -> s.getClassId().equals(classId))  // ✅ Use .equals()
             .collect(Collectors.toList());
     }
     
-    // ===== STATISTICS =====
+    // ============================================================
+    // STATISTICS
+    // ============================================================
     
     /**
      * Get class utilization rate
@@ -231,5 +296,52 @@ public class ClassController {
         return dataManager.getGymClasses().stream()
             .sorted((c1, c2) -> Integer.compare(c2.getCurrentBookings(), c1.getCurrentBookings()))
             .collect(Collectors.toList());
+    }
+    
+    /**
+     * Get class count by type
+     */
+    public long getClassCountByType(String type) {
+        if (type == null || type.isEmpty()) {
+            return 0;
+        }
+        return dataManager.getGymClasses().stream()
+            .filter(c -> c.getClass().getSimpleName().equalsIgnoreCase(type))
+            .count();
+    }
+    
+    // ============================================================
+    // HELPER METHODS
+    // ============================================================
+    
+    /**
+     * Generate a unique class ID
+     */
+    private String generateClassId(String prefix) {
+        if (idGenerator != null) {
+            return idGenerator.generateId("class", prefix, LocalDate.now());
+        }
+        // Fallback
+        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("MMdd"));
+        int count = dataManager.getGymClasses().size() + 1;
+        return prefix + timestamp + String.format("%04d", count);
+    }
+    
+    /**
+     * Generate a unique session ID
+     */
+    private String generateSessionId() {
+        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        int count = dataManager.getSessions().size() + 1;
+        return "SES" + timestamp + String.format("%04d", count);
+    }
+    
+    /**
+     * Generate a unique booking ID
+     */
+    private String generateBookingId() {
+        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        int count = dataManager.getBookings().size() + 1;
+        return "BKG" + timestamp + String.format("%04d", count);
     }
 }

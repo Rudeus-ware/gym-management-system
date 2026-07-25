@@ -1,15 +1,15 @@
 package com.gym.model.booking;
 
 public class Booking {
-    private int bookingId;
-    private int profileId;      // Who is booking
-    private int classId;        // Which class
-    private int sessionId;      // Which session
+    private String bookingId;
+    private String profileId;      // Who is booking
+    private String classId;        // Which class
+    private String sessionId;      // Which session
     private String bookingDate; // When they booked
     private String status;      // Confirmed, Cancelled, Completed, Waitlisted
     
     // Constructor
-    public Booking(int bookingId, int profileId, int classId, int sessionId, String bookingDate, String status) {
+    public Booking(String bookingId, String profileId, String classId, String sessionId, String bookingDate, String status) {
         this.bookingId = bookingId;
         this.profileId = profileId;
         this.classId = classId;
@@ -19,18 +19,18 @@ public class Booking {
     }
     
     // GETTERS
-    public int getBookingId() { return bookingId; }
-    public int getProfileId() { return profileId; }
-    public int getClassId() { return classId; }
-    public int getSessionId() { return sessionId; }
+    public String getBookingId() { return bookingId; }
+    public String getProfileId() { return profileId; }
+    public String getClassId() { return classId; }
+    public String getSessionId() { return sessionId; }
     public String getBookingDate() { return bookingDate; }
     public String getStatus() { return status; }
     
     // SETTERS
-    public void setBookingId(int bookingId) { this.bookingId = bookingId; }
-    public void setProfileId(int profileId) { this.profileId = profileId; }
-    public void setClassId(int classId) { this.classId = classId; }
-    public void setSessionId(int sessionId) { this.sessionId = sessionId; }
+    public void setBookingId(String bookingId) { this.bookingId = bookingId; }
+    public void setProfileId(String profileId) { this.profileId = profileId; }
+    public void setClassId(String classId) { this.classId = classId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
     public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
     public void setStatus(String status) { this.status = status; }
     

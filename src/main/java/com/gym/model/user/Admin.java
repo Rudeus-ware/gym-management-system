@@ -5,7 +5,7 @@ public class Admin extends User {
     private String adminLevel; // e.g., "Super", "Manager", "Staff"
     
     // Constructor
-    public Admin(int profileId, String name, String email, String phone, String address,
+    public Admin(String profileId, String name, String email, String phone, String address,
                  String userId, String password, String adminLevel) {
         super(profileId, name, email, phone, address, userId, password);
         this.adminId = userId; // Admin ID can be same as User ID

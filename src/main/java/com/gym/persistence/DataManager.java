@@ -1,18 +1,23 @@
 package com.gym.persistence;
 
+import com.gym.model.Payment;
 import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
 import com.gym.model.membership.Membership;
+import com.gym.model.user.Admin;
+import com.gym.model.user.Trainer;
+import com.gym.model.booking.Attendance;
 import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
-import com.gym.model.booking.Attendance;
-import com.gym.model.user.Trainer;
-import com.gym.model.user.Admin;
-import com.gym.model.Payment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DataManager - Central data management class
+ * Manages all data lists and operations
+ * Updated to use String-based IDs
+ */
 public class DataManager {
     
     private FileManager fileManager;
@@ -42,7 +47,10 @@ public class DataManager {
         loadAllData();
     }
     
-    // ===== GETTERS =====
+    // ============================================================
+    // GETTERS
+    // ============================================================
+    
     public List<Profile> getProfiles() { return profiles; }
     public List<Membership> getMemberships() { return memberships; }
     public List<GymClass> getGymClasses() { return gymClasses; }
@@ -53,45 +61,75 @@ public class DataManager {
     public List<Admin> getAdmins() { return admins; }
     public List<Payment> getPayments() { return payments; }
     
-    // ===== ADD METHODS =====
+    // ============================================================
+    // ADD METHODS
+    // ============================================================
+    
     public void addProfile(Profile profile) { profiles.add(profile); }
     public void addMembership(Membership membership) { memberships.add(membership); }
     public void addGymClass(GymClass gymClass) { gymClasses.add(gymClass); }
     public void addSession(Session session) { sessions.add(session); }
     public void addBooking(Booking booking) { bookings.add(booking); }
     public void addAttendance(Attendance attendance) { attendanceRecords.add(attendance); }
+    
+    // ✅ FIXED: Changed parameter from 'Trainer trainers' to 'Trainer trainer'
     public void addTrainer(Trainer trainer) { trainers.add(trainer); }
+    
     public void addAdmin(Admin admin) { admins.add(admin); }
     public void addPayment(Payment payment) { payments.add(payment); }
     
-    // ===== REMOVE METHODS =====
-    public void removeProfile(int profileId) { profiles.removeIf(p -> p.getProfileId() == profileId); }
-    public void removeGymClass(int classId) { gymClasses.removeIf(c -> c.getClassId() == classId); }
-    public void removeBooking(int bookingId) { bookings.removeIf(b -> b.getBookingId() == bookingId); }
+    // ============================================================
+    // REMOVE METHODS
+    // ============================================================
     
-    // ===== FIND METHODS =====
-    public Profile findProfileById(int id) {
+    // ✅ FIXED: Using .equals() for String comparison
+    public void removeProfile(String profileId) { 
+        profiles.removeIf(p -> p.getProfileId().equals(profileId)); 
+    }
+    
+    public void removeGymClass(String classId) { 
+        gymClasses.removeIf(c -> c.getClassId().equals(classId)); 
+    }
+    
+    public void removeBooking(String bookingId) { 
+        bookings.removeIf(b -> b.getBookingId().equals(bookingId)); 
+    }
+    
+    // ============================================================
+    // FIND METHODS
+    // ============================================================
+    
+    public Profile findProfileById(String id) {
         for (Profile p : profiles) {
-            if (p.getProfileId() == id) return p;
+            if (p.getProfileId().equals(id)) {  // ✅ FIXED: .equals() and added return
+                return p;
+            }
         }
         return null;
     }
     
-    public GymClass findClassById(int id) {
+    public GymClass findClassById(String id) {
         for (GymClass c : gymClasses) {
-            if (c.getClassId() == id) return c;
+            if (c.getClassId().equals(id)) {  // ✅ FIXED: .equals()
+                return c;
+            }
         }
         return null;
     }
     
-    public Booking findBookingById(int id) {
+    public Booking findBookingById(String id) {
         for (Booking b : bookings) {
-            if (b.getBookingId() == id) return b;
+            if (b.getBookingId().equals(id)) {  // ✅ FIXED: .equals()
+                return b;
+            }
         }
         return null;
     }
     
-    // ===== SAVE & LOAD =====
+    // ============================================================
+    // SAVE & LOAD
+    // ============================================================
+    
     public void saveAllData() {
         fileManager.saveData(profiles, "profiles.json");
         fileManager.saveData(memberships, "memberships.json");
@@ -121,5 +159,6 @@ public class DataManager {
         admins.clear();
         payments.clear();
         fileManager.clearAllData();
+        System.out.println("✅ All data cleared!");
     }
 }

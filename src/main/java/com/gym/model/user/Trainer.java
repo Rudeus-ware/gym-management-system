@@ -8,7 +8,7 @@ public class Trainer extends User {
     private List<String> assignedClasses;
     
     // Constructor
-    public Trainer(int profileId, String name, String email, String phone, String address,
+    public Trainer(String profileId, String name, String email, String phone, String address,
                    String userId, String password, String specialization) {
         super(profileId, name, email, phone, address, userId, password);
         this.specialization = specialization;

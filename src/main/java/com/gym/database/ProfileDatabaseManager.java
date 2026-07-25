@@ -1,11 +1,14 @@
 package com.gym.database;
 
-import com.gym.model.Profile;
-import com.gym.model.membership.Membership;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.gym.model.Profile;
 
 /**
  * ProfileDatabaseManager - Handles all Profile CRUD operations
@@ -179,7 +182,7 @@ public class ProfileDatabaseManager {
             stmt.setString(2, profile.getEmail());
             stmt.setString(3, profile.getPhone());
             stmt.setString(4, profile.getAddress());
-            stmt.setInt(5, profile.getProfileId());
+            stmt.setString(5, profile.getProfileId());
             
             int rowsAffected = stmt.executeUpdate();
             System.out.println("✅ Profile updated: " + rowsAffected + " row(s) affected");
@@ -194,12 +197,12 @@ public class ProfileDatabaseManager {
     /**
      * Update profile status (active/inactive)
      */
-    public boolean updateProfileStatus(int profileId, boolean isActive) {
+    public boolean updateProfileStatus(String profileId, boolean isActive) {
         String sql = "UPDATE profiles SET is_active = ? WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setBoolean(1, isActive);
-            stmt.setInt(2, profileId);
+            stmt.setString(2, profileId);
             
             int rowsAffected = stmt.executeUpdate();
             String status = isActive ? "activated" : "deactivated";
@@ -219,18 +222,18 @@ public class ProfileDatabaseManager {
     /**
      * Soft delete profile (set is_active = FALSE)
      */
-    public boolean deleteProfile(int profileId) {
+    public boolean deleteProfile(String profileId) {
         return updateProfileStatus(profileId, false);
     }
     
     /**
      * Hard delete profile (permanent removal)
      */
-    public boolean hardDeleteProfile(int profileId) {
+    public boolean hardDeleteProfile(String profileId) {
         String sql = "DELETE FROM profiles WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, profileId);
+            stmt.setString(1, profileId);
             int rowsAffected = stmt.executeUpdate();
             System.out.println("✅ Profile permanently deleted: " + rowsAffected + " row(s) affected");
             return rowsAffected > 0;
@@ -280,7 +283,7 @@ public class ProfileDatabaseManager {
      */
     private Profile mapResultSetToProfile(ResultSet rs) throws SQLException {
         Profile profile = new Profile(
-            rs.getInt("profile_id"),
+            rs.getString("profile_id"),
             rs.getString("name"),
             rs.getString("email"),
             rs.getString("phone"),

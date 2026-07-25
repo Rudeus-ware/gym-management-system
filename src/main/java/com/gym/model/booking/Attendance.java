@@ -1,5 +1,7 @@
 package com.gym.model.booking;
 
+import java.time.LocalDateTime;
+
 /**
  * Attendance Model - Tracks member attendance for gym sessions
  * 
@@ -15,10 +17,10 @@ public class Attendance {
     // ATTRIBUTES
     // ============================================================
     
-    private int attendanceId;      // Unique identifier for this attendance record
-    private int profileId;          // ID of the member (Profile)
-    private int sessionId;          // ID of the session attended
-    private String attendanceDate;  // Date of attendance (YYYY-MM-DD)
+    private String attendanceId;      // Unique identifier for this attendance record
+    private String profileId;          // ID of the member (Profile)
+    private String sessionId;          // ID of the session attended
+    private LocalDateTime attendanceDate;  // Date of attendance (YYYY-MM-DD)
     private String status;          // Present, Absent, Late, Excused
     
     // ============================================================
@@ -34,8 +36,8 @@ public class Attendance {
      * @param attendanceDate Date of attendance
      * @param status         Attendance status (Present/Absent/Late/Excused)
      */
-    public Attendance(int attendanceId, int profileId, int sessionId, 
-                      String attendanceDate, String status) {
+    public Attendance(String attendanceId, String profileId, String sessionId, 
+                      LocalDateTime attendanceDate, String status) {
         this.attendanceId = attendanceId;
         this.profileId = profileId;
         this.sessionId = sessionId;
@@ -51,19 +53,19 @@ public class Attendance {
      * @param sessionId      ID of the session
      * @param status         Attendance status (Present/Absent/Late/Excused)
      */
-    public Attendance(int attendanceId, int profileId, int sessionId, String status) {
-        this(attendanceId, profileId, sessionId, 
-             java.time.LocalDate.now().toString(), status);
-    }
+   public Attendance(String attendanceId, String profileId, String sessionId, String status) {
+    this(attendanceId, profileId, sessionId, 
+         java.time.LocalDateTime.now(), status);
+}
     
     /**
      * Default constructor
      */
     public Attendance() {
-        this.attendanceId = 0;
-        this.profileId = 0;
-        this.sessionId = 0;
-        this.attendanceDate = java.time.LocalDate.now().toString();
+        this.attendanceId = "0";
+        this.profileId = "0";
+        this.sessionId = "0";
+        this.attendanceDate = java.time.LocalDateTime.now();
         this.status = "Present";
     }
     
@@ -75,7 +77,7 @@ public class Attendance {
      * Get the attendance record ID
      * @return attendanceId
      */
-    public int getAttendanceId() { 
+    public String getAttendanceId() { 
         return attendanceId; 
     }
     
@@ -83,7 +85,7 @@ public class Attendance {
      * Get the profile ID (member)
      * @return profileId
      */
-    public int getProfileId() { 
+    public String getProfileId() { 
         return profileId; 
     }
     
@@ -91,7 +93,7 @@ public class Attendance {
      * Get the session ID
      * @return sessionId
      */
-    public int getSessionId() { 
+    public String getSessionId() { 
         return sessionId; 
     }
     
@@ -99,7 +101,7 @@ public class Attendance {
      * Get the attendance date
      * @return attendanceDate as String
      */
-    public String getAttendanceDate() { 
+    public LocalDateTime getAttendanceDate() { 
         return attendanceDate; 
     }
     
@@ -119,7 +121,7 @@ public class Attendance {
      * Set the attendance record ID
      * @param attendanceId new ID
      */
-    public void setAttendanceId(int attendanceId) { 
+    public void setAttendanceId(String attendanceId) { 
         this.attendanceId = attendanceId; 
     }
     
@@ -127,7 +129,7 @@ public class Attendance {
      * Set the profile ID (member)
      * @param profileId new profile ID
      */
-    public void setProfileId(int profileId) { 
+    public void setProfileId(String profileId) { 
         this.profileId = profileId; 
     }
     
@@ -135,7 +137,7 @@ public class Attendance {
      * Set the session ID
      * @param sessionId new session ID
      */
-    public void setSessionId(int sessionId) { 
+    public void setSessionId(String sessionId) { 
         this.sessionId = sessionId; 
     }
     
@@ -143,7 +145,7 @@ public class Attendance {
      * Set the attendance date
      * @param attendanceDate new date (YYYY-MM-DD)
      */
-    public void setAttendanceDate(String attendanceDate) { 
+    public void setAttendanceDate(LocalDateTime attendanceDate) { 
         this.attendanceDate = attendanceDate; 
     }
     
@@ -322,6 +324,6 @@ public class Attendance {
     
     @Override
     public int hashCode() {
-        return Integer.hashCode(attendanceId);
+        return attendanceId.hashCode();  // ✅ String.hashCode()
     }
 }

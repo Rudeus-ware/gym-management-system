@@ -1,6 +1,7 @@
 package com.gym.controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,20 +17,24 @@ import com.gym.model.membership.Premium;
 import com.gym.model.user.Admin;
 import com.gym.model.user.Trainer;
 import com.gym.persistence.DataManager;
+import com.gym.util.IdGenerator;
 
 /**
  * AdminController - Handles all administrative operations
  * This controller manages: members, trainers, classes, and system operations
+ * Updated to use String-based IDs
  */
 public class AdminController {
     
     private DataManager dataManager;
     private Admin currentAdmin;
+    private IdGenerator idGenerator;
     
     // ===== CONSTRUCTOR =====
     
     public AdminController(DataManager dataManager) {
         this.dataManager = dataManager;
+        this.idGenerator = new IdGenerator(null); // Will be initialized properly
     }
     
     /**
@@ -54,7 +59,6 @@ public class AdminController {
     /**
      * Create a new member profile
      */
-    
     public Profile createMember(String name, String email, String phone, String address, 
                                String membershipType) {
         // Validate admin permissions
@@ -63,20 +67,31 @@ public class AdminController {
             return null;
         }
         
+        // Validate input
+        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            System.out.println("❌ Name and email are required");
+            return null;
+        }
+        
+        String trimmedName = name.trim();
+        String trimmedEmail = email.trim();
+        String trimmedPhone = phone != null ? phone.trim() : "";
+        String trimmedAddress = address != null ? address.trim() : "";
+        
         // Check for duplicate email
         for (Profile p : dataManager.getProfiles()) {
-            if (p.getEmail().equalsIgnoreCase(email)) {
-                System.out.println("❌ Email already exists: " + email);
+            if (p.getEmail().equalsIgnoreCase(trimmedEmail)) {
+                System.out.println("❌ Email already exists: " + trimmedEmail);
                 return null;
             }
         }
         
-        // Create profile
-        int profileId = dataManager.getProfiles().size() + 1;
-        Profile profile = new Profile(profileId, name, email, phone, address);
+        // ✅ Generate String profile ID (Member role = "22")
+        String profileId = generateProfileId("22");
+        Profile profile = new Profile(profileId, trimmedName, trimmedEmail, trimmedPhone, trimmedAddress);
         
         // Add membership
-        Membership membership = createMembershipByType(profileId, membershipType);
+        Membership membership = createMembershipByType(membershipType);
         if (membership != null) {
             profile.setMembership(membership);
             dataManager.addMembership(membership);
@@ -88,8 +103,8 @@ public class AdminController {
         
         System.out.println("✅ Member created successfully!");
         System.out.println("   ID: " + profileId);
-        System.out.println("   Name: " + name);
-        System.out.println("   Membership: " + membershipType);
+        System.out.println("   Name: " + trimmedName);
+        System.out.println("   Membership: " + (membershipType != null ? membershipType : "None"));
         
         return profile;
     }
@@ -97,9 +112,14 @@ public class AdminController {
     /**
      * Remove a member by ID
      */
-    public boolean removeMember(int profileId) {
+    public boolean removeMember(String profileId) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
             return false;
         }
         
@@ -113,14 +133,14 @@ public class AdminController {
         
         // Remove all bookings for this member
         List<Booking> memberBookings = dataManager.getBookings().stream()
-            .filter(b -> b.getProfileId() == profileId)
+            .filter(b -> b.getProfileId().equals(profileId))  // ✅ Use .equals()
             .collect(Collectors.toList());
         for (Booking booking : memberBookings) {
             dataManager.getBookings().remove(booking);
         }
         
         // Remove attendance records
-        dataManager.getAttendanceRecords().removeIf(a -> a.getProfileId() == profileId);
+        dataManager.getAttendanceRecords().removeIf(a -> a.getProfileId().equals(profileId));  // ✅ Use .equals()
         
         // Remove membership
         if (profile.getMembership() != null) {
@@ -140,9 +160,14 @@ public class AdminController {
     /**
      * Update a member's details
      */
-    public boolean updateMember(int profileId, String name, String email, String phone, String address) {
+    public boolean updateMember(String profileId, String name, String email, String phone, String address) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
             return false;
         }
         
@@ -169,7 +194,10 @@ public class AdminController {
     /**
      * Get member by ID
      */
-    public Profile getMember(int profileId) {
+    public Profile getMember(String profileId) {
+        if (profileId == null || profileId.isEmpty()) {
+            return null;
+        }
         return dataManager.findProfileById(profileId);
     }
     
@@ -177,6 +205,9 @@ public class AdminController {
      * Search members by name or email
      */
     public List<Profile> searchMembers(String searchTerm) {
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            return getAllMembers();
+        }
         String search = searchTerm.toLowerCase();
         return dataManager.getProfiles().stream()
             .filter(p -> p.getName().toLowerCase().contains(search) ||
@@ -198,6 +229,11 @@ public class AdminController {
             return null;
         }
         
+        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            System.out.println("❌ Name and email are required");
+            return null;
+        }
+        
         // Check for duplicate email
         for (Trainer t : dataManager.getTrainers()) {
             if (t.getEmail().equalsIgnoreCase(email)) {
@@ -206,14 +242,18 @@ public class AdminController {
             }
         }
         
-        int profileId = dataManager.getProfiles().size() + 1;
-        Trainer trainer = new Trainer(profileId, name, email, phone, address, 
+        // ✅ Generate String profile ID (Trainer role = "11")
+        String profileId = generateProfileId("11");
+        Trainer trainer = new Trainer(profileId, name.trim(), email.trim(), 
+                                      phone != null ? phone.trim() : "", 
+                                      address != null ? address.trim() : "", 
                                       userId, password, specialization);
         
         dataManager.addTrainer(trainer);
         dataManager.saveAllData();
         
         System.out.println("✅ Trainer created successfully!");
+        System.out.println("   ID: " + profileId);
         System.out.println("   Name: " + name);
         System.out.println("   Specialization: " + specialization);
         
@@ -226,6 +266,11 @@ public class AdminController {
     public boolean removeTrainer(String trainerId) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (trainerId == null || trainerId.isEmpty()) {
+            System.out.println("❌ Invalid trainer ID");
             return false;
         }
         
@@ -242,7 +287,6 @@ public class AdminController {
         // Remove from classes they teach
         for (GymClass gymClass : dataManager.getGymClasses()) {
             if (gymClass.getTrainer().equals(trainer.getName())) {
-                // Assign to "Unassigned" instead
                 gymClass.setTrainer("Unassigned");
             }
         }
@@ -257,9 +301,14 @@ public class AdminController {
     /**
      * Assign a trainer to a class
      */
-    public boolean assignTrainerToClass(String trainerId, int classId) {
+    public boolean assignTrainerToClass(String trainerId, String classId) {  // ✅ Changed classId to String
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (trainerId == null || trainerId.isEmpty() || classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid trainer ID or class ID");
             return false;
         }
         
@@ -298,6 +347,9 @@ public class AdminController {
      * Get trainer by ID
      */
     public Trainer getTrainer(String trainerId) {
+        if (trainerId == null || trainerId.isEmpty()) {
+            return null;
+        }
         return dataManager.getTrainers().stream()
             .filter(t -> t.getUserId().equals(trainerId))
             .findFirst()
@@ -354,8 +406,8 @@ public class AdminController {
     /**
      * Create a session for a class
      */
-    public Session createSession(int classId, String date, String startTime, 
-                                String endTime, String duration, int trainerId) {
+    public Session createSession(String classId, String date, String startTime,  // ✅ Changed classId to String
+                                String endTime, String duration, String trainerId) {  // ✅ Changed trainerId to String
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
             return null;
@@ -374,9 +426,14 @@ public class AdminController {
     /**
      * Remove a class
      */
-    public boolean removeClass(int classId) {
+    public boolean removeClass(String classId) {  // ✅ Changed to String
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (classId == null || classId.isEmpty()) {
+            System.out.println("❌ Invalid class ID");
             return false;
         }
         
@@ -389,10 +446,10 @@ public class AdminController {
         String className = gymClass.getClassName();
         
         // Remove all sessions for this class
-        dataManager.getSessions().removeIf(s -> s.getClassId() == classId);
+        dataManager.getSessions().removeIf(s -> s.getClassId().equals(classId));  // ✅ Use .equals()
         
         // Remove all bookings for this class
-        dataManager.getBookings().removeIf(b -> b.getClassId() == classId);
+        dataManager.getBookings().removeIf(b -> b.getClassId().equals(classId));  // ✅ Use .equals()
         
         // Remove class
         dataManager.removeGymClass(classId);
@@ -409,9 +466,14 @@ public class AdminController {
     /**
      * Assign membership to a member
      */
-    public boolean assignMembership(int profileId, String membershipType) {
+    public boolean assignMembership(String profileId, String membershipType) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
             return false;
         }
         
@@ -427,7 +489,7 @@ public class AdminController {
         }
         
         // Create new membership
-        Membership membership = createMembershipByType(profileId, membershipType);
+        Membership membership = createMembershipByType(membershipType);
         if (membership == null) {
             System.out.println("❌ Invalid membership type: " + membershipType);
             return false;
@@ -446,9 +508,14 @@ public class AdminController {
     /**
      * Renew membership for a member
      */
-    public boolean renewMembership(int profileId) {
+    public boolean renewMembership(String profileId) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
             return false;
         }
         
@@ -499,6 +566,11 @@ public class AdminController {
             return false;
         }
         
+        if (trainerId == null || trainerId.isEmpty()) {
+            System.out.println("❌ Invalid trainer ID");
+            return false;
+        }
+        
         Trainer trainer = getTrainer(trainerId);
         if (trainer == null) {
             System.out.println("❌ Trainer not found: " + trainerId);
@@ -515,9 +587,14 @@ public class AdminController {
     /**
      * Reset member password (if member has user account)
      */
-    public boolean resetMemberPassword(int profileId, String newPassword) {
+    public boolean resetMemberPassword(String profileId, String newPassword) {
         if (!isAuthorized()) {
             System.out.println("❌ Unauthorized: No admin logged in!");
+            return false;
+        }
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
             return false;
         }
         
@@ -527,8 +604,6 @@ public class AdminController {
             return false;
         }
         
-        // Check if profile is actually a User (has password)
-        // For now, we'll just confirm
         System.out.println("✅ Password reset for member: " + profile.getName());
         return true;
     }
@@ -635,12 +710,29 @@ public class AdminController {
     }
     
     /**
+     * Generate a unique profile ID
+     */
+    private String generateProfileId(String roleCode) {
+        if (idGenerator != null) {
+            return idGenerator.generateProfileId(roleCode, LocalDate.now());
+        }
+        // Fallback
+        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("MMdd"));
+        int count = dataManager.getProfiles().size() + 1;
+        return String.format("%03d", count) + timestamp + roleCode;
+    }
+    
+    /**
      * Create membership by type
      */
-    private Membership createMembershipByType(int profileId, String type) {
+    private Membership createMembershipByType(String type) {
+        if (type == null) {
+            return null;
+        }
+        
         String startDate = LocalDate.now().toString();
         String expiryDate = LocalDate.now().plusYears(1).toString();
-        int membershipId = dataManager.getMemberships().size() + 1000;
+        String membershipId = generateMembershipId(type);
         
         switch (type) {
             case "Basic":
@@ -652,6 +744,16 @@ public class AdminController {
             default:
                 return null;
         }
+    }
+    
+    /**
+     * Generate a unique membership ID
+     */
+    private String generateMembershipId(String type) {
+        String prefix = type.substring(0, 3).toUpperCase();
+        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        int count = dataManager.getMemberships().size() + 1;
+        return prefix + timestamp + String.format("%04d", count);
     }
     
     // ============================================================

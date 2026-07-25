@@ -25,7 +25,7 @@ public class BookingController {
 
     public void addSession(Session session) {
         boolean exists = dataManager.getSessions().stream()
-            .anyMatch(existing -> existing.getSessionId().equals(session.getSessionId());)
+            .anyMatch(existing -> existing.getSessionId() == session.getSessionId());
 
         if (!exists) {
             dataManager.addSession(session);
@@ -55,7 +55,7 @@ public class BookingController {
         // Check if session exists
         Session session = null;
         for (Session s : dataManager.getSessions()) {
-            if (s.getSessionId().equals(sessionId)) {
+            if (s.getSessionId() == sessionId) {
                 session = s;
                 break;
             }
@@ -79,7 +79,7 @@ public class BookingController {
         
         // Check if already booked
         boolean alreadyBooked = dataManager.getBookings().stream()
-            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId);)
+            .anyMatch(b -> b.getProfileId() == profileId && b.getSessionId() == sessionId);
         if (alreadyBooked) {
             System.out.println("❌ Already booked for this session!");
             return null;
@@ -121,7 +121,7 @@ public class BookingController {
         
         // Remove from session
         for (Session session : dataManager.getSessions()) {
-            if (session.getSessionId().equals(booking.getSessionId())) {
+            if (session.getSessionId() == booking.getSessionId()) {
                 session.removeAttendee();
                 break;
             }
@@ -189,7 +189,7 @@ public class BookingController {
      */
     public List<Booking> getBookingsForProfile(String profileId) {
         return dataManager.getBookings().stream()
-            .filter(b -> b.getProfileId().equals(profileId))
+            .filter(b -> b.getProfileId() == profileId)
             .collect(Collectors.toList());
     }
     
@@ -198,7 +198,7 @@ public class BookingController {
      */
     public List<Booking> getBookingsForClass(String classId) {
         return dataManager.getBookings().stream()
-            .filter(b -> b.getClassId().equals(classId))
+            .filter(b -> b.getClassId() == classId)
             .collect(Collectors.toList());
     }
     
@@ -207,7 +207,7 @@ public class BookingController {
      */
     public List<Booking> getBookingsForSession(String sessionId) {
         return dataManager.getBookings().stream()
-            .filter(b -> b.getSessionId().equals(sessionId))
+            .filter(b -> b.getSessionId() == sessionId)
             .collect(Collectors.toList());
     }
     
@@ -216,7 +216,7 @@ public class BookingController {
      */
     public List<Booking> getActiveBookingsForProfile(String profileId) {
         return dataManager.getBookings().stream()
-            .filter(b -> b.getProfileId().equals(profileId) && b.isActive())
+            .filter(b -> b.getProfileId() == profileId && b.isActive())
             .collect(Collectors.toList());
     }
     
@@ -234,7 +234,7 @@ public class BookingController {
      */
     public boolean isBookedForSession(String profileId, String sessionId) {
         return dataManager.getBookings().stream()
-            .anyMatch(b -> b.getProfileId().equals(profileId) && b.getSessionId().equals(sessionId);)
+            .anyMatch(b -> b.getProfileId() == profileId && b.getSessionId() == sessionId);
     }
     
     // ===== STATISTICS =====

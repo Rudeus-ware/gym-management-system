@@ -1,8 +1,7 @@
 -- =============================================================================
--- GYM MANAGEMENT SYSTEM - COMPLETE DATABASE SCHEMA
+-- GYM MANAGEMENT SYSTEM - COMPLETE DATABASE SCHEMA with Custom IDs
 -- =============================================================================
 
--- Drop tables in reverse order to avoid foreign key conflicts
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS attendance;
@@ -21,7 +20,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- 1. PROFILES TABLE (Base for all users)
 -- =============================================================================
 CREATE TABLE profiles (
-    profile_id INT PRIMARY KEY AUTO_INCREMENT,
+    profile_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(20),
@@ -36,10 +35,9 @@ CREATE TABLE profiles (
 -- 2. ADMINS TABLE
 -- =============================================================================
 CREATE TABLE admins (
-    admin_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
+    admin_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,   -- ✅ References profiles
     admin_level VARCHAR(50) DEFAULT 'Staff',
-    user_id VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,10 +48,9 @@ CREATE TABLE admins (
 -- 3. TRAINERS TABLE
 -- =============================================================================
 CREATE TABLE trainers (
-    trainer_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
+    trainer_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,     -- ✅ References profiles
     specialization VARCHAR(100) NOT NULL,
-    user_id VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     hire_date DATE NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
@@ -65,8 +62,8 @@ CREATE TABLE trainers (
 -- 4. MEMBERSHIPS TABLE
 -- =============================================================================
 CREATE TABLE memberships (
-    membership_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
+    membership_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,        -- ✅ References profiles
     membership_type ENUM('Basic', 'Premium', 'Family') NOT NULL,
     fee DECIMAL(10,2) NOT NULL,
     start_date DATE NOT NULL,
@@ -83,12 +80,12 @@ CREATE TABLE memberships (
 -- 5. GYM CLASSES TABLE
 -- =============================================================================
 CREATE TABLE gym_classes (
-    class_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
     class_name VARCHAR(100) NOT NULL,
     class_type ENUM('Yoga', 'Spin', 'Strength') NOT NULL,
     schedule VARCHAR(100) NOT NULL,
     capacity INT NOT NULL DEFAULT 15,
-    trainer_id INT NOT NULL,
+    trainer_id VARCHAR(20) NOT NULL,   -- ✅ References trainers
     is_active BOOLEAN DEFAULT TRUE,
     yoga_style VARCHAR(50),
     difficulty VARCHAR(20),
@@ -105,13 +102,13 @@ CREATE TABLE gym_classes (
 -- 6. SESSIONS TABLE
 -- =============================================================================
 CREATE TABLE sessions (
-    session_id INT PRIMARY KEY AUTO_INCREMENT,
-    class_id INT NOT NULL,
+    session_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    class_id VARCHAR(20) NOT NULL,       -- ✅ References gym_classes
     session_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     duration VARCHAR(20),
-    trainer_id INT NOT NULL,
+    trainer_id VARCHAR(20) NOT NULL,     -- ✅ References trainers
     max_attendees INT DEFAULT 30,
     current_attendees INT DEFAULT 0,
     status ENUM('Scheduled', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Scheduled',
@@ -126,9 +123,9 @@ CREATE TABLE sessions (
 -- 7. BOOKINGS TABLE
 -- =============================================================================
 CREATE TABLE bookings (
-    booking_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
-    session_id INT NOT NULL,
+    booking_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,     -- ✅ References profiles
+    session_id VARCHAR(20) NOT NULL,     -- ✅ References sessions
     booking_date DATE NOT NULL,
     status ENUM('Confirmed', 'Pending', 'Cancelled', 'Completed', 'Waitlisted') DEFAULT 'Pending',
     notes TEXT,
@@ -143,9 +140,9 @@ CREATE TABLE bookings (
 -- 8. ATTENDANCE TABLE
 -- =============================================================================
 CREATE TABLE attendance (
-    attendance_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
-    session_id INT NOT NULL,
+    attendance_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,        -- ✅ References profiles
+    session_id VARCHAR(20) NOT NULL,        -- ✅ References sessions
     attendance_date DATE NOT NULL,
     status ENUM('Present', 'Absent', 'Late', 'Excused') DEFAULT 'Present',
     check_in_time TIME,
@@ -161,8 +158,8 @@ CREATE TABLE attendance (
 -- 9. PAYMENTS TABLE
 -- =============================================================================
 CREATE TABLE payments (
-    payment_id INT PRIMARY KEY AUTO_INCREMENT,
-    profile_id INT NOT NULL,
+    payment_id VARCHAR(20) PRIMARY KEY,  -- ✅ Custom ID format
+    profile_id VARCHAR(20) NOT NULL,     -- ✅ References profiles
     amount DECIMAL(10,2) NOT NULL,
     payment_date DATE NOT NULL,
     payment_method VARCHAR(50) NOT NULL,
@@ -176,39 +173,66 @@ CREATE TABLE payments (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =============================================================================
--- 10. INSERT SAMPLE DATA
+-- 10. COUNTER TABLE FOR ID GENERATION
 -- =============================================================================
+CREATE TABLE id_counter (
+    id_type VARCHAR(20) PRIMARY KEY,
+    last_sequence INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Sample Profiles
-INSERT INTO profiles (name, email, phone, address, registration_date) VALUES
-('John Doe', 'john@email.com', '555-123-4567', '123 Main St, City', CURDATE()),
-('Sarah Smith', 'sarah@email.com', '555-987-6543', '456 Oak Ave, Town', CURDATE()),
-('Admin User', 'admin@gym.com', '555-000-0000', 'Admin Office, Gym HQ', CURDATE());
-
--- Sample Admin
-INSERT INTO admins (profile_id, admin_level, user_id, password_hash) VALUES
-(3, 'Super Admin', 'A001', 'admin123_hash');
-
--- Sample Trainer
-INSERT INTO trainers (profile_id, specialization, user_id, password_hash, hire_date) VALUES
-(1, 'Yoga', 'T001', 'trainer123_hash', CURDATE());
-
--- Sample Memberships
-INSERT INTO memberships (profile_id, membership_type, fee, start_date, expiry_date, status) VALUES
-(1, 'Basic', 49.99, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 'Active'),
-(2, 'Premium', 99.99, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 'Active');
-
--- Sample Gym Class
-INSERT INTO gym_classes (class_name, class_type, schedule, capacity, trainer_id, yoga_style, difficulty) VALUES
-('Morning Yoga', 'Yoga', 'Mon/Wed/Fri 7:00 AM', 15, 1, 'Hatha', 'Beginner');
-
--- Sample Sessions
-INSERT INTO sessions (class_id, session_date, start_time, end_time, duration, trainer_id, max_attendees) VALUES
-(1, CURDATE(), '07:00:00', '08:00:00', '1 hour', 1, 15),
-(1, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '07:00:00', '08:00:00', '1 hour', 1, 15);
+-- Initialize counters
+INSERT INTO id_counter (id_type, last_sequence) VALUES
+('profile', 0),
+('membership', 0),
+('class', 0),
+('session', 0),
+('booking', 0),
+('attendance', 0),
+('payment', 0);
 
 -- =============================================================================
--- 11. USEFUL VIEWS
+-- 11. STORED PROCEDURE: Generate Custom ID
+-- =============================================================================
+DELIMITER //
+
+CREATE PROCEDURE generate_custom_id(
+    IN p_id_type VARCHAR(20),
+    IN p_role_code VARCHAR(2),
+    IN p_registration_date DATE,
+    OUT p_new_id VARCHAR(20)
+)
+BEGIN
+    DECLARE v_sequence INT;
+    DECLARE v_mmdd VARCHAR(4);
+    
+    -- Get next sequence number
+    UPDATE id_counter 
+    SET last_sequence = last_sequence + 1 
+    WHERE id_type = p_id_type;
+    
+    SELECT last_sequence INTO v_sequence 
+    FROM id_counter 
+    WHERE id_type = p_id_type;
+    
+    -- Format MMDD from registration date
+    SET v_mmdd = DATE_FORMAT(p_registration_date, '%m%d');
+    
+    -- Generate ID: COUNTER(3) + MMDD(4) + ROLE_CODE(2)
+    SET p_new_id = CONCAT(
+        LPAD(v_sequence, 3, '0'),
+        v_mmdd,
+        p_role_code
+    );
+END //
+
+DELIMITER ;
+
+-- =============================================================================
+-- 12. INSERT SAMPLE DATA
+-- =============================================================================
+
+-- =============================================================================
+-- 13. USEFUL VIEWS
 -- =============================================================================
 
 -- Active Members View
@@ -238,7 +262,7 @@ SELECT
     s.session_date,
     s.start_time,
     s.end_time,
-    t.user_id AS trainer,
+    t.trainer_id AS trainer,
     s.current_attendees,
     s.max_attendees,
     (s.max_attendees - s.current_attendees) AS available_spots

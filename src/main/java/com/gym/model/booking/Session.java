@@ -4,19 +4,19 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Session {
-    private int sessionId;
-    private int classId;          // Which class this session belongs to
+    private String sessionId;
+    private String classId;          // Which class this session belongs to
     private String sessionDate;   // Date of the session
     private String startTime;     // When it starts
     private String expiryTime;    // When it ends (should be called endTime)
     private String duration;      // How long it lasts
-    private int trainerId;        // Who is teaching
+    private String trainerId;        // Who is teaching
     private int currentAttendees;
     private boolean isActive;
     
     // Constructor
-    public Session(int sessionId, int classId, String sessionDate, String startTime, 
-                   String expiryTime, String duration, int trainerId) {
+    public Session(String sessionId, String classId, String sessionDate, String startTime, 
+                   String expiryTime, String duration, String trainerId) {
         this.sessionId = sessionId;
         this.classId = classId;
         this.sessionDate = sessionDate;
@@ -29,24 +29,24 @@ public class Session {
     }
     
     // GETTERS
-    public int getSessionId() { return sessionId; }
-    public int getClassId() { return classId; }
+    public String getSessionId() { return sessionId; }
+    public String getClassId() { return classId; }
     public String getSessionDate() { return sessionDate; }
     public String getStartTime() { return startTime; }
     public String getExpiryTime() { return expiryTime; }
     public String getDuration() { return duration; }
-    public int getTrainerId() { return trainerId; }
+    public String getTrainerId() { return trainerId; }
     public int getCurrentAttendees() { return currentAttendees; }
     public boolean isActive() { return isActive; }
     
     // SETTERS
-    public void setSessionId(int sessionId) { this.sessionId = sessionId; }
-    public void setClassId(int classId) { this.classId = classId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public void setClassId(String classId) { this.classId = classId; }
     public void setSessionDate(String sessionDate) { this.sessionDate = sessionDate; }
     public void setStartTime(String startTime) { this.startTime = startTime; }
     public void setExpiryTime(String expiryTime) { this.expiryTime = expiryTime; }
     public void setDuration(String duration) { this.duration = duration; }
-    public void setTrainerId(int trainerId) { this.trainerId = trainerId; }
+    public void setTrainerId(String trainerId) { this.trainerId = trainerId; }
     public void setActive(boolean active) { isActive = active; }
     
     // SESSION METHODS

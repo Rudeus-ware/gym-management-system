@@ -10,7 +10,7 @@ public class Strength extends GymClass {
     private String intensityLevel;
     
     // Constructor
-    public Strength(int classId, String className, String schedule, int capacity, 
+    public Strength(String classId, String className, String schedule, int capacity, 
                     String trainer, String focusArea, String intensityLevel) {
         super(classId, className, schedule, capacity, trainer);
         this.focusArea = focusArea;

@@ -23,7 +23,7 @@ public class PaymentController {
     /**
      * Process a payment for a membership
      */
-    public Payment processPayment(int profileId, double amount, String method) {
+    public Payment processPayment(String profileId, double amount, String method) {
         Profile profile = dataManager.findProfileById(profileId);
         if (profile == null) {
             System.out.println("❌ Profile not found: " + profileId);

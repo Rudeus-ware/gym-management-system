@@ -6,7 +6,7 @@ public class Yoga extends GymClass {
     private String difficulty;  // Beginner, Intermediate, Advanced
     
     // Constructor
-    public Yoga(int classId, String className, String schedule, int capacity, 
+    public Yoga(String classId, String className, String schedule, int capacity, 
                 String trainer, String yogaStyle, String difficulty) {
         super(classId, className, schedule, capacity, trainer);
         this.yogaStyle = yogaStyle;

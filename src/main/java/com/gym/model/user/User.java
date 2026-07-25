@@ -12,7 +12,7 @@ public class User extends Profile {
     // isActive is inherited from Profile - DO NOT redeclare!
     
     // Constructor
-    public User(int profileId, String name, String email, String phone, String address,
+    public User(String profileId, String name, String email, String phone, String address,
                 String userId, String password) {
         super(profileId, name, email, phone, address);
         this.userId = userId;

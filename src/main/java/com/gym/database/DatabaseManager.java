@@ -1,40 +1,51 @@
 package com.gym.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.gym.model.Profile;
+import com.gym.util.IdGenerator;
+
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.gym.model.Profile;
 
 public class DatabaseManager {
     
     private Connection connection;
+    private IdGenerator idGenerator;
     
     public DatabaseManager() {
         this.connection = DatabaseConnection.getInstance().getConnection();
+        this.idGenerator = new IdGenerator(connection);
     }
     
     // ===== PROFILE CRUD =====
     
-    public Profile createProfile(String name, String email, String phone, String address) {
-        String sql = "INSERT INTO profiles (name, email, phone, address, registration_date) VALUES (?, ?, ?, ?, CURDATE())";
+    public Profile createProfile(String name, String email, String phone, String address, 
+                                 String roleCode) {
+        LocalDate registrationDate = LocalDate.now();
         
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, name);
-            stmt.setString(2, email);
-            stmt.setString(3, phone);
-            stmt.setString(4, address);
+        // ✅ Generate custom ID
+        String profileId = idGenerator.generateProfileId(roleCode, registrationDate);
+        
+        if (profileId == null) {
+            System.err.println("❌ Failed to generate profile ID");
+            return null;
+        }
+        
+        String sql = "INSERT INTO profiles (profile_id, name, email, phone, address, registration_date) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, profileId);
+            stmt.setString(2, name);
+            stmt.setString(3, email);
+            stmt.setString(4, phone);
+            stmt.setString(5, address);
+            stmt.setDate(6, Date.valueOf(registrationDate));
             
             int affected = stmt.executeUpdate();
             if (affected > 0) {
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) {
-                    return findProfileById(rs.getInt(1));
-                }
+                return findProfileById(profileId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,15 +53,15 @@ public class DatabaseManager {
         return null;
     }
     
-    public Profile findProfileById(int id) {
+    public Profile findProfileById(String id) {
         String sql = "SELECT * FROM profiles WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Profile profile = new Profile(
-                    rs.getInt("profile_id"),
+                    rs.getString("profile_id"),
                     rs.getString("name"),
                     rs.getString("email"),
                     rs.getString("phone"),
@@ -67,13 +78,13 @@ public class DatabaseManager {
     
     public List<Profile> findAllProfiles() {
         List<Profile> profiles = new ArrayList<>();
-        String sql = "SELECT * FROM profiles ORDER BY name";
+        String sql = "SELECT * FROM profiles ORDER BY profile_id";
         
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 Profile profile = new Profile(
-                    rs.getInt("profile_id"),
+                    rs.getString("profile_id"),
                     rs.getString("name"),
                     rs.getString("email"),
                     rs.getString("phone"),
@@ -89,14 +100,15 @@ public class DatabaseManager {
     }
     
     public boolean updateProfile(Profile profile) {
-        String sql = "UPDATE profiles SET name = ?, email = ?, phone = ?, address = ? WHERE profile_id = ?";
+        String sql = "UPDATE profiles SET name = ?, email = ?, phone = ?, address = ? " +
+                     "WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, profile.getName());
             stmt.setString(2, profile.getEmail());
             stmt.setString(3, profile.getPhone());
             stmt.setString(4, profile.getAddress());
-            stmt.setInt(5, profile.getProfileId());
+            stmt.setString(5, profile.getProfileId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,11 +116,11 @@ public class DatabaseManager {
         }
     }
     
-    public boolean deleteProfile(int id) {
+    public boolean deleteProfile(String id) {
         String sql = "DELETE FROM profiles WHERE profile_id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+            stmt.setString(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

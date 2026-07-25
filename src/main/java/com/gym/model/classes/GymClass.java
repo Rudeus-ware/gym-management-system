@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class GymClass {
     // Common attributes for ALL class types
-    protected int classId;
+    protected String classId;
     protected String className;
     protected String schedule;
     protected int capacity;
@@ -14,7 +14,7 @@ public abstract class GymClass {
     protected int currentBookings;
     
     // Constructor
-    public GymClass(int classId, String className, String schedule, int capacity, String trainer) {
+    public GymClass(String classId, String className, String schedule, int capacity, String trainer) {
         this.classId = classId;
         this.className = className;
         this.schedule = schedule;
@@ -25,7 +25,7 @@ public abstract class GymClass {
     }
     
     // GETTERS
-    public int getClassId() { return classId; }
+    public String getClassId() { return classId; }
     public String getClassName() { return className; }
     public String getSchedule() { return schedule; }
     public int getCapacity() { return capacity; }
@@ -36,7 +36,7 @@ public abstract class GymClass {
     }
     
     // SETTERS
-    public void setClassId(int classId) { this.classId = classId; }
+    public void setClassId(String classId) { this.classId = classId; }
     public void setClassName(String className) { this.className = className; }
     public void setSchedule(String schedule) { this.schedule = schedule; }
     public void setCapacity(int capacity) { this.capacity = capacity; }

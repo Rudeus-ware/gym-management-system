@@ -7,7 +7,7 @@ public class Spin extends GymClass {
     private String musicType;
     
     // Constructor
-    public Spin(int classId, String className, String schedule, int capacity, 
+    public Spin(String classId, String className, String schedule, int capacity, 
                 String trainer, String intensity, int durationMinutes, String musicType) {
         super(classId, className, schedule, capacity, trainer);
         this.intensity = intensity;
