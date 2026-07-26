@@ -1,38 +1,62 @@
 package com.gym.controller;
 
+import com.gym.model.booking.Session;
+import com.gym.database.DatabaseManager;
+import com.gym.persistence.JsonDataManager;
+import com.gym.util.IdGenerator;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.gym.model.booking.Session;
-import com.gym.database.DatabaseManager;
-
 public class SessionController {
-
-    private DatabaseManager dataManager;
-
+    
+    private final DatabaseManager databaseManager;
+    private final IdGenerator idGenerator;
+    
+    public SessionController(DatabaseManager dataManager) {
+        this.databaseManager = dataManager;
+        if (dataManager != null && dataManager.getConnection() != null) {
+            this.idGenerator = new IdGenerator(dataManager.getConnection());
+        } else {
+            this.idGenerator = new IdGenerator("SESS");
+        }
+    }
+    
     public SessionController(JsonDataManager dataManager) {
-        this.dataManager = dataManager;
+        this.databaseManager = dataManager;
+        this.idGenerator = new IdGenerator("SESS");
     }
-
-    public void setDataManager(JsonDataManager dataManager) {
-        this.dataManager = dataManager;
+    
+    // ============================================================
+    // SESSION OPERATIONS
+    // ============================================================
+    
+    public Session createSession(String classId, String trainerId, String sessionDate, 
+                                  String startTime, String endTime, int maxCapacity) {
+        String sessionId = idGenerator.generateSessionId(LocalDate.now());
+        Session session = new Session(sessionId, classId, trainerId, sessionDate, startTime, endTime, maxCapacity);
+        databaseManager.addSession(session);
+        databaseManager.saveAllData();
+        return session;
     }
-
+    
     public List<Session> getAllSessions() {
-        return dataManager.getSessions();
+        return databaseManager.findAllSessions();
     }
-
-    public List<Session> getSessionsForClass(int classId) {
-        return dataManager.getSessions().stream()
-            .filter(session -> session.getClassId() == classId)
+    
+    public List<Session> getSessionsForClass(String classId) {
+        if (classId == null || classId.isEmpty()) return List.of();
+        return databaseManager.getSessions().stream()
+            .filter(s -> s.getClassId().equals(classId))
             .collect(Collectors.toList());
     }
-
-    public long getActiveSessionCount() {
-        return dataManager.getSessions().size();
-    }
-
-    public long getEndedSessionCount() {
-        return 0;
+    
+    public Session getSessionById(String id) {
+        if (id == null || id.isEmpty()) return null;
+        return databaseManager.getSessions().stream()
+            .filter(s -> s.getSessionId().equals(id))
+            .findFirst()
+            .orElse(null);
     }
 }

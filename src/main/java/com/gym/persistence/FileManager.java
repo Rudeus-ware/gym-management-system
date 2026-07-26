@@ -9,11 +9,16 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * FileManager - Handles reading and writing JSON files for data persistence
+ */
 public class FileManager {
+    
     private static final String DATA_DIR = "data/";
     private Gson gson;
     
     public FileManager() {
+        // Create data directory if it doesn't exist
         File dataDir = new File(DATA_DIR);
         if (!dataDir.exists()) {
             dataDir.mkdirs();
@@ -21,9 +26,10 @@ public class FileManager {
         
         this.gson = new GsonBuilder()
             .setPrettyPrinting()
-            .addSerializationExclusionStrategy(new JsonExclusionStrategy())
             .create();
     }
+    
+    // ===== SAVE METHODS =====
     
     public <T> void saveData(List<T> data, String filename) {
         try (Writer writer = new FileWriter(DATA_DIR + filename)) {
@@ -34,6 +40,8 @@ public class FileManager {
             e.printStackTrace();
         }
     }
+    
+    // ===== LOAD METHODS =====
     
     public <T> List<T> loadData(String filename, Type type) {
         File file = new File(DATA_DIR + filename);
@@ -54,6 +62,8 @@ public class FileManager {
         }
     }
     
+    // ===== UTILITY METHODS =====
+    
     public boolean fileExists(String filename) {
         return new File(DATA_DIR + filename).exists();
     }
@@ -73,7 +83,8 @@ public class FileManager {
             "sessions.json",
             "bookings.json",
             "attendance.json",
-            "trainers.json"
+            "trainers.json",
+            "payments.json"
         };
         
         for (String file : files) {

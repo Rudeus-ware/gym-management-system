@@ -14,6 +14,10 @@ import com.gym.model.booking.Booking;
 import com.gym.model.classes.GymClass;
 import com.gym.model.user.Admin;
 import com.gym.model.user.Trainer;
+import com.gym.model.booking.Session;
+import com.gym.model.membership.Membership;
+import com.gym.model.user.User;
+import com.gym.model.payment.Payment;
 
 /**
  * ProfileDatabaseManager - Handles all Profile CRUD operations
@@ -31,9 +35,6 @@ public class ProfileDatabaseManager {
     // CREATE OPERATIONS
     // ============================================================
     
-    /**
-     * Create a new profile in the database
-     */
     public Profile createProfile(String name, String email, String phone, String address) {
         String sql = "INSERT INTO profiles (name, email, phone, address, registration_date) " +
                      "VALUES (?, ?, ?, ?, CURDATE())";
@@ -69,9 +70,6 @@ public class ProfileDatabaseManager {
     // READ OPERATIONS
     // ============================================================
     
-    /**
-     * Find profile by ID
-     */
     public Profile findProfileById(int id) {
         String sql = "SELECT * FROM profiles WHERE profile_id = ? AND is_active = TRUE";
         
@@ -88,9 +86,6 @@ public class ProfileDatabaseManager {
         return null;
     }
     
-    /**
-     * Find profile by email
-     */
     public Profile findProfileByEmail(String email) {
         String sql = "SELECT * FROM profiles WHERE email = ? AND is_active = TRUE";
         
@@ -107,9 +102,6 @@ public class ProfileDatabaseManager {
         return null;
     }
     
-    /**
-     * Get all profiles
-     */
     public List<Profile> findAllProfiles() {
         List<Profile> profiles = new ArrayList<>();
         String sql = "SELECT * FROM profiles WHERE is_active = TRUE ORDER BY name";
@@ -126,9 +118,6 @@ public class ProfileDatabaseManager {
         return profiles;
     }
     
-    /**
-     * Search profiles by name or email
-     */
     public List<Profile> searchProfiles(String searchTerm) {
         List<Profile> profiles = new ArrayList<>();
         String sql = "SELECT * FROM profiles WHERE is_active = TRUE AND " +
@@ -149,9 +138,6 @@ public class ProfileDatabaseManager {
         return profiles;
     }
     
-    /**
-     * Get active members with valid memberships
-     */
     public List<Profile> findActiveMembers() {
         List<Profile> profiles = new ArrayList<>();
         String sql = "SELECT p.* FROM profiles p " +
@@ -175,9 +161,6 @@ public class ProfileDatabaseManager {
     // UPDATE OPERATIONS
     // ============================================================
     
-    /**
-     * Update profile
-     */
     public boolean updateProfile(Profile profile) {
         String sql = "UPDATE profiles SET name = ?, email = ?, phone = ?, address = ? " +
                      "WHERE profile_id = ?";
@@ -199,9 +182,6 @@ public class ProfileDatabaseManager {
         }
     }
     
-    /**
-     * Update profile status (active/inactive)
-     */
     public boolean updateProfileStatus(String profileId, boolean isActive) {
         String sql = "UPDATE profiles SET is_active = ? WHERE profile_id = ?";
         
@@ -224,16 +204,10 @@ public class ProfileDatabaseManager {
     // DELETE OPERATIONS
     // ============================================================
     
-    /**
-     * Soft delete profile (set is_active = FALSE)
-     */
     public boolean deleteProfile(String profileId) {
         return updateProfileStatus(profileId, false);
     }
     
-    /**
-     * Hard delete profile (permanent removal)
-     */
     public boolean hardDeleteProfile(String profileId) {
         String sql = "DELETE FROM profiles WHERE profile_id = ?";
         
@@ -253,9 +227,6 @@ public class ProfileDatabaseManager {
     // STATISTICS
     // ============================================================
     
-    /**
-     * Get profile statistics
-     */
     public ProfileStats getStatistics() {
         String sql = "SELECT " +
                      "COUNT(*) as total, " +
@@ -280,28 +251,160 @@ public class ProfileDatabaseManager {
     }
     
     // ============================================================
+    // ADDITIONAL FIND ALL METHODS - MOVED HERE FROM STATIC CLASS
+    // ============================================================
+    
+    public List<GymClass> findAllClasses() {  // ← MOVED HERE
+        List<GymClass> classes = new ArrayList<>();
+        String sql = "SELECT * FROM gym_classes WHERE is_active = TRUE";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                // Map to GymClass - adjust based on your constructor
+                GymClass gymClass = new GymClass(
+                    rs.getString("class_id"),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getInt("duration"),
+                    rs.getString("category")
+                );
+                classes.add(gymClass);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all classes: " + e.getMessage());
+        }
+        return classes;
+    }
+    
+    public List<Booking> findAllBookings() {  // ← MOVED HERE
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT * FROM bookings";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Booking booking = new Booking(
+                    rs.getString("booking_id"),
+                    rs.getString("profile_id"),
+                    rs.getString("session_id"),
+                    rs.getString("booking_date"),
+                    rs.getString("status")
+                );
+                bookings.add(booking);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all bookings: " + e.getMessage());
+        }
+        return bookings;
+    }
+    
+    public List<Session> findAllSessions() {  // ← MOVED HERE
+        List<Session> sessions = new ArrayList<>();
+        String sql = "SELECT * FROM sessions";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Session session = new Session(
+                    rs.getString("session_id"),
+                    rs.getString("class_id"),
+                    rs.getString("trainer_id"),
+                    rs.getString("session_date"),
+                    rs.getString("start_time"),
+                    rs.getString("end_time"),
+                    rs.getInt("max_capacity")
+                );
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all sessions: " + e.getMessage());
+        }
+        return sessions;
+    }
+    
+    public List<Attendance> findAllAttendance() {  // ← MOVED HERE
+        List<Attendance> attendance = new ArrayList<>();
+        String sql = "SELECT * FROM attendance";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Attendance att = new Attendance(
+                    rs.getString("attendance_id"),
+                    rs.getString("profile_id"),
+                    rs.getString("session_id"),
+                    rs.getString("attendance_date"),
+                    rs.getString("status")
+                );
+                attendance.add(att);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all attendance: " + e.getMessage());
+        }
+        return attendance;
+    }
+    
+    public List<Trainer> findAllTrainers() {  // ← MOVED HERE
+        List<Trainer> trainers = new ArrayList<>();
+        String sql = "SELECT * FROM trainers WHERE is_active = TRUE";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Trainer trainer = new Trainer(
+                    rs.getString("trainer_id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("specialization"),
+                    rs.getString("hire_date"),
+                    rs.getString("status")
+                );
+                trainers.add(trainer);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all trainers: " + e.getMessage());
+        }
+        return trainers;
+    }
+    
+    public List<Admin> findAllAdmins() {  // ← MOVED HERE
+        List<Admin> admins = new ArrayList<>();
+        String sql = "SELECT * FROM admins";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Admin admin = new Admin(
+                    rs.getString("admin_id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("password")
+                );
+                admins.add(admin);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error finding all admins: " + e.getMessage());
+        }
+        return admins;
+    }
+    
+    // ============================================================
     // HELPER METHODS
     // ============================================================
     
-    /**
-     * Map ResultSet to Profile object
-     */
     private Profile mapResultSetToProfile(ResultSet rs) throws SQLException {
+        // Adjust this based on your Profile constructor
         Profile profile = new Profile(
             rs.getString("profile_id"),
             rs.getString("name"),
             rs.getString("email"),
             rs.getString("phone"),
-            rs.getString("address")
+            rs.getString("membership_type") // or "address"
         );
         profile.setActive(rs.getBoolean("is_active"));
-        // Note: Membership is loaded separately
         return profile;
     }
     
-    /**
-     * Inner class for statistics
-     */
+    // ============================================================
+    // INNER CLASS FOR STATISTICS - KEEP THIS CLEAN
+    // ============================================================
+    
     public static class ProfileStats {
         public final int total;
         public final int active;
@@ -312,107 +415,6 @@ public class ProfileDatabaseManager {
             this.active = active;
             this.inactive = inactive;
         }
-
-        // ============================================================
-// ADDITIONAL METHODS FOR DATABASE MANAGER
-// ============================================================
-
-                public List<GymClass> findAllClasses() {
-                    List<GymClass> classes = new ArrayList<>();
-                    String sql = "SELECT * FROM gym_classes WHERE is_active = TRUE";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            // Map to appropriate GymClass type
-                            // Implementation depends on your class structure
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return classes;
-                }
-
-                public List<Booking> findAllBookings() {
-                    List<Booking> bookings = new ArrayList<>();
-                    String sql = "SELECT * FROM bookings";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            Booking booking = new Booking(
-                                rs.getString("booking_id"),
-                                rs.getString("profile_id"),
-                                rs.getString("class_id"),
-                                rs.getString("session_id"),
-                                rs.getString("booking_date"),
-                                rs.getString("status")
-                            );
-                            bookings.add(booking);
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return bookings;
-                }
-
-                public List<Session> findAllSessions() {
-                    List<Session> sessions = new ArrayList<>();
-                    String sql = "SELECT * FROM sessions";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            // Map to Session
-                            // Implementation depends on your Session constructor
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return sessions;
-                }
-
-                public List<Attendance> findAllAttendance() {
-                    List<Attendance> attendance = new ArrayList<>();
-                    String sql = "SELECT * FROM attendance";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            // Map to Attendance
-                            // Implementation depends on your Attendance constructor
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return attendance;
-                }
-
-                public List<Trainer> findAllTrainers() {
-                    List<Trainer> trainers = new ArrayList<>();
-                    String sql = "SELECT * FROM trainers WHERE is_active = TRUE";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            // Map to Trainer
-                            // Implementation depends on your Trainer constructor
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return trainers;
-                }
-
-                public List<Admin> findAllAdmins() {
-                    List<Admin> admins = new ArrayList<>();
-                    String sql = "SELECT * FROM admins";
-                    try (Statement stmt = connection.createStatement()) {
-                        ResultSet rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-                            // Map to Admin
-                            // Implementation depends on your Admin constructor
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    return admins;
-                }
         
         @Override
         public String toString() {

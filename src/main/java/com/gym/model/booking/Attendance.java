@@ -1,335 +1,114 @@
 package com.gym.model.booking;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-/**
- * Attendance Model - Tracks member attendance for gym sessions
- * 
- * This class represents a record of whether a member attended a specific session.
- * It links a Profile (member) to a Session (class time) with a status.
- * 
- * @author Gym Management System
- * @version 1.0
- */
 public class Attendance {
     
-    // ============================================================
-    // ATTRIBUTES
-    // ============================================================
+    private String attendanceId;
+    private String profileId;
+    private String sessionId;
+    private LocalDateTime attendanceDate;
+    private String status;
+    private boolean present;
+    private boolean absent;
+    private boolean late;
+    private boolean excused;
     
-    private String attendanceId;      // Unique identifier for this attendance record
-    private String profileId;          // ID of the member (Profile)
-    private String sessionId;          // ID of the session attended
-    private LocalDateTime attendanceDate;  // Date of attendance (YYYY-MM-DD)
-    private String status;          // Present, Absent, Late, Excused
-    
     // ============================================================
-    // CONSTRUCTORS
+    // CONSTRUCTORS - THESE BELONG IN Attendance.java
     // ============================================================
     
     /**
-     * Full constructor - creates a new attendance record
-     * 
-     * @param attendanceId   Unique ID for this attendance record
-     * @param profileId      ID of the member (Profile)
-     * @param sessionId      ID of the session
-     * @param attendanceDate Date of attendance
-     * @param status         Attendance status (Present/Absent/Late/Excused)
+     * Constructor with LocalDateTime
      */
     public Attendance(String attendanceId, String profileId, String sessionId, 
                       LocalDateTime attendanceDate, String status) {
         this.attendanceId = attendanceId;
         this.profileId = profileId;
         this.sessionId = sessionId;
-        this.attendanceDate = attendanceDate;
+        this.attendanceDate = attendanceDate != null ? attendanceDate : LocalDateTime.now();
         this.status = status;
+        this.present = false;
+        this.absent = false;
+        this.late = false;
+        this.excused = false;
     }
-    // Add this constructor next to your existing one
+    
+    /**
+     * Constructor with String date
+     */
     public Attendance(String attendanceId, String profileId, String sessionId, 
-                    String attendanceDate, String status) {
+                      String attendanceDate, String status) {
         this(attendanceId, profileId, sessionId, 
-            LocalDateTime.parse(attendanceDate + "T00:00:00"), status);
-    }
-        
-    /**
-     * Simplified constructor - uses current date
-     * 
-     * @param attendanceId   Unique ID for this attendance record
-     * @param profileId      ID of the member (Profile)
-     * @param sessionId      ID of the session
-     * @param status         Attendance status (Present/Absent/Late/Excused)
-     */
-   public Attendance(String attendanceId, String profileId, String sessionId, String status) {
-    this(attendanceId, profileId, sessionId, 
-         java.time.LocalDateTime.now(), status);
-}
-    
-    /**
-     * Default constructor
-     */
-    public Attendance() {
-        this.attendanceId = "0";
-        this.profileId = "0";
-        this.sessionId = "0";
-        this.attendanceDate = java.time.LocalDateTime.now();
-        this.status = "Present";
+             attendanceDate != null ? LocalDateTime.parse(attendanceDate) : LocalDateTime.now(), 
+             status);
     }
     
     // ============================================================
-    // GETTERS
+    // GETTERS & SETTERS
     // ============================================================
     
-    /**
-     * Get the attendance record ID
-     * @return attendanceId
-     */
-    public String getAttendanceId() { 
-        return attendanceId; 
-    }
+    public String getAttendanceId() { return attendanceId; }
+    public String getProfileId() { return profileId; }
+    public String getSessionId() { return sessionId; }
+    public LocalDateTime getAttendanceDate() { return attendanceDate; }
+    public String getStatus() { return status; }
+    public boolean isPresent() { return present; }
+    public boolean isAbsent() { return absent; }
+    public boolean isLate() { return late; }
+    public boolean isExcused() { return excused; }
     
-    /**
-     * Get the profile ID (member)
-     * @return profileId
-     */
-    public String getProfileId() { 
-        return profileId; 
-    }
-    
-    /**
-     * Get the session ID
-     * @return sessionId
-     */
-    public String getSessionId() { 
-        return sessionId; 
-    }
-    
-    /**
-     * Get the attendance date
-     * @return attendanceDate as String
-     */
-    public LocalDateTime getAttendanceDate() { 
-        return attendanceDate; 
-    }
-    
-    /**
-     * Get the attendance status
-     * @return status (Present/Absent/Late/Excused)
-     */
-    public String getStatus() { 
-        return status; 
-    }
-    
-    // ============================================================
-    // SETTERS
-    // ============================================================
-    
-    /**
-     * Set the attendance record ID
-     * @param attendanceId new ID
-     */
-    public void setAttendanceId(String attendanceId) { 
-        this.attendanceId = attendanceId; 
-    }
-    
-    /**
-     * Set the profile ID (member)
-     * @param profileId new profile ID
-     */
-    public void setProfileId(String profileId) { 
-        this.profileId = profileId; 
-    }
-    
-    /**
-     * Set the session ID
-     * @param sessionId new session ID
-     */
-    public void setSessionId(String sessionId) { 
-        this.sessionId = sessionId; 
-    }
-    
-    /**
-     * Set the attendance date
-     * @param attendanceDate new date (YYYY-MM-DD)
-     */
-    public void setAttendanceDate(LocalDateTime attendanceDate) { 
-        this.attendanceDate = attendanceDate; 
-    }
-    
-    /**
-     * Set the attendance status
-     * @param status new status (Present/Absent/Late/Excused)
-     */
-    public void setStatus(String status) { 
-        this.status = status; 
-    }
+    public void setAttendanceId(String attendanceId) { this.attendanceId = attendanceId; }
+    public void setProfileId(String profileId) { this.profileId = profileId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public void setAttendanceDate(LocalDateTime attendanceDate) { this.attendanceDate = attendanceDate; }
+    public void setStatus(String status) { this.status = status; }
     
     // ============================================================
     // BUSINESS METHODS
     // ============================================================
     
-    /**
-     * Mark attendance as Present
-     * This method updates the status to "Present" and provides confirmation
-     */
     public void markPresent() {
-        this.status = "Present";
-        System.out.println("✅ Attendance marked as Present");
-        System.out.println("   Profile ID: " + profileId);
-        System.out.println("   Session ID: " + sessionId);
-        System.out.println("   Date: " + attendanceDate);
+        this.present = true;
+        this.absent = false;
+        this.late = false;
+        this.excused = false;
+        this.status = "PRESENT";
     }
     
-    /**
-     * Mark attendance as Absent
-     * This method updates the status to "Absent" and provides confirmation
-     */
     public void markAbsent() {
-        this.status = "Absent";
-        System.out.println("❌ Attendance marked as Absent");
-        System.out.println("   Profile ID: " + profileId);
-        System.out.println("   Session ID: " + sessionId);
-        System.out.println("   Date: " + attendanceDate);
+        this.present = false;
+        this.absent = true;
+        this.late = false;
+        this.excused = false;
+        this.status = "ABSENT";
     }
     
-    /**
-     * Mark attendance as Late
-     * This method updates the status to "Late" and provides confirmation
-     */
     public void markLate() {
-        this.status = "Late";
-        System.out.println("⏰ Attendance marked as Late");
-        System.out.println("   Profile ID: " + profileId);
-        System.out.println("   Session ID: " + sessionId);
-        System.out.println("   Date: " + attendanceDate);
+        this.present = false;
+        this.absent = false;
+        this.late = true;
+        this.excused = false;
+        this.status = "LATE";
     }
     
-    /**
-     * Mark attendance as Excused
-     * This method updates the status to "Excused" and provides confirmation
-     */
     public void markExcused() {
-        this.status = "Excused";
-        System.out.println("📝 Attendance marked as Excused");
-        System.out.println("   Profile ID: " + profileId);
-        System.out.println("   Session ID: " + sessionId);
-        System.out.println("   Date: " + attendanceDate);
+        this.present = false;
+        this.absent = false;
+        this.late = false;
+        this.excused = true;
+        this.status = "EXCUSED";
     }
     
-    // ============================================================
-    // QUERY METHODS
-    // ============================================================
-    
-    /**
-     * Check if the member was present
-     * @return true if status is "Present", false otherwise
-     */
-    public boolean isPresent() {
-        return "Present".equalsIgnoreCase(status);
+    public String getAttendanceDateAsString() {
+        if (attendanceDate == null) return "";
+        return attendanceDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-    
-    /**
-     * Check if the member was absent
-     * @return true if status is "Absent", false otherwise
-     */
-    public boolean isAbsent() {
-        return "Absent".equalsIgnoreCase(status);
-    }
-    
-    /**
-     * Check if the member was late
-     * @return true if status is "Late", false otherwise
-     */
-    public boolean isLate() {
-        return "Late".equalsIgnoreCase(status);
-    }
-    
-    /**
-     * Check if the member was excused
-     * @return true if status is "Excused", false otherwise
-     */
-    public boolean isExcused() {
-        return "Excused".equalsIgnoreCase(status);
-    }
-    
-    /**
-     * Check if the attendance status is valid
-     * @return true if status is one of: Present, Absent, Late, Excused
-     */
-    public boolean isValidStatus() {
-        String[] validStatuses = {"Present", "Absent", "Late", "Excused"};
-        for (String valid : validStatuses) {
-            if (valid.equalsIgnoreCase(status)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // ============================================================
-    // UTILITY METHODS
-    // ============================================================
-    
-    /**
-     * Get a formatted string with all attendance details
-     * @return Formatted attendance information
-     */
-    public String getAttendanceDetails() {
-        return "Attendance ID: " + attendanceId +
-               "\nProfile ID: " + profileId +
-               "\nSession ID: " + sessionId +
-               "\nDate: " + attendanceDate +
-               "\nStatus: " + status;
-    }
-    
-    /**
-     * Get a summary string (one line)
-     * @return Short summary
-     */
-    public String getSummary() {
-        return "Attendance #" + attendanceId + 
-               " | Member: " + profileId +
-               " | Session: " + sessionId +
-               " | " + status;
-    }
-    
-    /**
-     * Get status with emoji for visual representation
-     * @return Status with emoji
-     */
-    public String getStatusWithEmoji() {
-        switch (status.toLowerCase()) {
-            case "present":
-                return "✅ Present";
-            case "absent":
-                return "❌ Absent";
-            case "late":
-                return "⏰ Late";
-            case "excused":
-                return "📝 Excused";
-            default:
-                return "❓ Unknown";
-        }
-    }
-    
-    // ============================================================
-    // OVERRIDDEN METHODS
-    // ============================================================
     
     @Override
     public String toString() {
-        return getSummary();
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Attendance that = (Attendance) obj;
-        return attendanceId == that.attendanceId;
-    }
-    
-    @Override
-    public int hashCode() {
-        return attendanceId.hashCode();  // ✅ String.hashCode()
+        return String.format("Attendance{id='%s', profile='%s', session='%s', date='%s', status='%s'}",
+            attendanceId, profileId, sessionId, getAttendanceDateAsString(), status);
     }
 }

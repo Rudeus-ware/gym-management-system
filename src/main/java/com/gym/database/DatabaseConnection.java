@@ -6,6 +6,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * DatabaseConnection - Singleton database connection manager
+ */
 public class DatabaseConnection {
     
     private static DatabaseConnection instance;
@@ -25,7 +28,6 @@ public class DatabaseConnection {
             if (input != null) {
                 props.load(input);
             } else {
-                // Fallback to default values
                 System.out.println("⚠️ " + PROPERTIES_FILE + " not found. Using defaults.");
                 setDefaults();
             }
@@ -52,10 +54,9 @@ public class DatabaseConnection {
             );
             System.out.println("✅ Database connected successfully!");
         } catch (ClassNotFoundException e) {
-            System.err.println("❌ MySQL Driver not found! Add to pom.xml");
+            System.err.println("❌ MySQL Driver not found!");
         } catch (SQLException e) {
             System.err.println("❌ Connection failed: " + e.getMessage());
-            System.err.println("   Make sure MySQL is running in XAMPP");
         }
     }
     

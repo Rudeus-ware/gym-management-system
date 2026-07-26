@@ -1,80 +1,79 @@
 package com.gym.controller;
 
-import java.util.List;
-
 import com.gym.model.Profile;
 import com.gym.model.classes.GymClass;
 import com.gym.database.DatabaseManager;
+import com.gym.persistence.JsonDataManager;
 
-/**
- * Controller for reports and statistics.
- */
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ReportController {
-
-    private final DatabaseManager dataManager;
-
+    
+    private final DatabaseManager databaseManager;
+    
+    public ReportController(DatabaseManager dataManager) {
+        this.databaseManager = dataManager;
+    }
+    
     public ReportController(JsonDataManager dataManager) {
-        this.dataManager = dataManager;
+        this.databaseManager = dataManager;
     }
-
-    public String getMemberReport() {
-        List<Profile> profiles = databaseManager.getProfiles();
-        long active = profiles.stream()
-            .filter(p -> p.getMembership() != null && p.getMembership().isValid())
-            .count();
-
-        return String.format(
-            "📊 MEMBER REPORT\n" +
-            "=================\n" +
-            "Total Members: %d\n" +
-            "Active Members: %d\n" +
-            "Inactive Members: %d\n" +
-            "Membership Types:\n" +
-            "  - Basic: %d\n" +
-            "  - Premium: %d\n" +
-            "  - Family: %d",
-            profiles.size(),
-            active,
-            profiles.size() - active,
-            countMembershipType("Basic"),
-            countMembershipType("Premium"),
-            countMembershipType("Family")
-        );
+    
+    // ============================================================
+    // PROFILE REPORTS
+    // ============================================================
+    
+    public void generateProfileReport() {
+        List<Profile> profiles = databaseManager.findAllProfiles();
+        System.out.println("=".repeat(60));
+        System.out.println("📊 PROFILE REPORT");
+        System.out.println("=".repeat(60));
+        System.out.printf("%-15s %-25s %-20s%n", "ID", "Name", "Email");
+        System.out.println("-".repeat(60));
+        for (Profile p : profiles) {
+            System.out.printf("%-15s %-25s %-20s%n", 
+                p.getProfileId(), 
+                truncate(p.getName(), 25), 
+                truncate(p.getEmail(), 20)
+            );
+        }
+        System.out.println("-".repeat(60));
+        System.out.printf("Total Profiles: %d%n", profiles.size());
+        System.out.println("=".repeat(60));
     }
-
-    public String getClassReport() {
-        List<GymClass> classes = databaseManager.getGymClasses();
-        int totalCapacity = classes.stream().mapToInt(GymClass::getCapacity).sum();
-        int totalBookings = classes.stream().mapToInt(GymClass::getCurrentBookings).sum();
-        double utilization = totalCapacity > 0 ? (double) totalBookings / totalCapacity * 100 : 0;
-
-        return String.format(
-            "📊 CLASS REPORT\n" +
-            "================\n" +
-            "Total Classes: %d\n" +
-            "Total Capacity: %d\n" +
-            "Total Bookings: %d\n" +
-            "Utilization Rate: %.1f%%",
-            classes.size(),
-            totalCapacity,
-            totalBookings,
-            utilization
-        );
+    
+    // ============================================================
+    // CLASS REPORTS
+    // ============================================================
+    
+    public void generateClassReport() {
+        List<GymClass> classes = databaseManager.findAllClasses();
+        System.out.println("=".repeat(60));
+        System.out.println("📊 CLASS REPORT");
+        System.out.println("=".repeat(60));
+        System.out.printf("%-10s %-20s %-15s %-10s%n", "ID", "Name", "Category", "Duration");
+        System.out.println("-".repeat(60));
+        for (GymClass c : classes) {
+            System.out.printf("%-10s %-20s %-15s %-10d%n", 
+                c.getClassId(), 
+                truncate(c.getName(), 20), 
+                c.getCategory() != null ? truncate(c.getCategory(), 15) : "N/A",
+                c.getDuration()
+            );
+        }
+        System.out.println("-".repeat(60));
+        System.out.printf("Total Classes: %d%n", classes.size());
+        System.out.println("=".repeat(60));
     }
-
-    public String getBookingReport() {
-        return String.format(
-            "📊 BOOKING REPORT\n" +
-            "=================\n" +
-            "Total Bookings: %d",
-            databaseManager.getBookings().size()
-        );
-    }
-
-    private long countMembershipType(String type) {
-        return databaseManager.getProfiles().stream()
-            .filter(profile -> profile.getMembership() != null)
-            .filter(profile -> profile.getMembership().getClass().getSimpleName().equalsIgnoreCase(type))
-            .count();
+    
+    // ============================================================
+    // UTILITY METHODS
+    // ============================================================
+    
+    private String truncate(String str, int length) {
+        if (str == null) return "N/A";
+        if (str.length() <= length) return str;
+        return str.substring(0, length - 3) + "...";
     }
 }

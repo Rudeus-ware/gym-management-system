@@ -1,256 +1,157 @@
 package com.gym.controller;
 
-import com.gym.database.DatabaseManager;
-import com.gym.persistence.JsonDataManager;
-import com.gym.model.Profile;
-import com.gym.model.classes.GymClass;
-import com.gym.model.booking.Booking;
-import com.gym.model.booking.Session;
-import com.gym.model.booking.Attendance;
-import com.gym.model.user.Trainer;
-
 import java.util.List;
 
+import com.gym.database.DatabaseManager;
+import com.gym.model.Profile;
+import com.gym.model.booking.Attendance;
+import com.gym.model.booking.Booking;
+import com.gym.model.booking.Session;
+import com.gym.model.classes.GymClass;
+import com.gym.model.membership.Membership;  // ← ADD THIS IMPORT
+import com.gym.model.payment.Payment;
+import com.gym.model.user.Trainer;
+import com.gym.persistence.JsonDataManager;
+import com.gym.util.IdGenerator;
+
 /**
- * GymController - Main orchestrator for the application
- * Uses DatabaseManager as primary, JsonDataManager as backup
+ * Main Gym Controller - Central controller for the application
  */
-public class GymController extends BaseController {
+public class GymController {
     
-    // Sub-controllers
-    private LoginController loginController;
-    private AdminController adminController;
-    private ProfileController profileController;
-    private MembershipController membershipController;
-    private ClassController classController;
-    private BookingController bookingController;
-    private AttendanceController attendanceController;
-    private PaymentController paymentController;
-    private ReportController reportController;
+    private final DatabaseManager dataManager;
+    private final IdGenerator idGenerator;
+    private final LoginController loginController;
+    private final ProfileController profileController;
+    private final AdminController adminController;
+    private final MembershipController membershipController;
+    private final ClassController classController;
+    private final BookingController bookingController;
+    private final AttendanceController attendanceController;
+    private final PaymentController paymentController;    // ← ADD THIS FIELD
+    private final ReportController reportController;      // ← ADD THIS FIELD
     
-    public GymController() {
-        super();
-        initializeSubControllers();
+    public GymController(DatabaseManager dataManager) {
+        this.dataManager = dataManager;
+        
+        if (dataManager != null && dataManager.getConnection() != null) {
+            this.idGenerator = new IdGenerator(dataManager.getConnection());
+        } else {
+            this.idGenerator = new IdGenerator("GYM");
+        }
+        
+        // Initialize all controllers
+        this.loginController = new LoginController(dataManager);
+        this.profileController = new ProfileController(dataManager);
+        this.adminController = new AdminController(dataManager);
+        this.membershipController = new MembershipController(dataManager);
+        this.classController = new ClassController(dataManager);
+        this.bookingController = new BookingController(dataManager);
+        this.attendanceController = new AttendanceController(dataManager);
+        this.paymentController = new PaymentController(dataManager);    // ← ADD THIS
+        this.reportController = new ReportController(dataManager);      // ← ADD THIS
     }
     
-    public GymController(boolean useDatabase) {
-        super(useDatabase);
-        initializeSubControllers();
-    }
-    
-    private void initializeSubControllers() {
-        this.loginController = new LoginController(this);
-        this.adminController = new AdminController(this);
-        this.profileController = new ProfileController(this);
-        this.membershipController = new MembershipController(this);
-        this.classController = new ClassController(this);
-        this.bookingController = new BookingController(this);
-        this.attendanceController = new AttendanceController(this);
-        this.paymentController = new PaymentController(this);
-        this.reportController = new ReportController(this);
+    // Constructor for JSON fallback
+    public GymController(JsonDataManager dataManager) {
+        this((DatabaseManager) dataManager);
     }
     
     // ============================================================
-    // GETTERS FOR SUB-CONTROLLERS
+    // GETTERS
     // ============================================================
     
-    public LoginController getLoginController() { return loginController; }
-    public AdminController getAdminController() { return adminController; }
-    public ProfileController getProfileController() { return profileController; }
-    public MembershipController getMembershipController() { return membershipController; }
-    public ClassController getClassController() { return classController; }
-    public BookingController getBookingController() { return bookingController; }
-    public AttendanceController getAttendanceController() { return attendanceController; }
-    public PaymentController getPaymentController() { return paymentController; }
-    public ReportController getReportController() { return reportController; }
+    public DatabaseManager getDataManager() {
+        return dataManager;
+    }
+    
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
+    
+    public LoginController getLoginController() {
+        return loginController;
+    }
+    
+    public ProfileController getProfileController() {
+        return profileController;
+    }
+    
+    public AdminController getAdminController() {
+        return adminController;
+    }
+    
+    public MembershipController getMembershipController() {
+        return membershipController;
+    }
+    
+    public ClassController getClassController() {
+        return classController;
+    }
+    
+    public BookingController getBookingController() {
+        return bookingController;
+    }
+    
+    public AttendanceController getAttendanceController() {
+        return attendanceController;
+    }
+    
+    public PaymentController getPaymentController() {    // ← ADD THIS
+        return paymentController;
+    }
+    
+    public ReportController getReportController() {      // ← ADD THIS
+        return reportController;
+    }
     
     // ============================================================
-    // DATA ACCESS METHODS (Primary Database, Fallback JSON)
+    // DATA ACCESS METHODS
     // ============================================================
     
-    /**
-     * Get all profiles - Primary: Database, Fallback: JSON
-     */
     public List<Profile> getAllProfiles() {
-        try {
-            if (useDatabase) {
-                List<Profile> profiles = databaseManager.findAllProfiles();
-                if (!profiles.isEmpty()) {
-                    return profiles;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getProfiles();
+        return dataManager.findAllProfiles();
     }
     
-    /**
-     * Get profile by ID - Primary: Database, Fallback: JSON
-     */
     public Profile getProfileById(String id) {
-        try {
-            if (useDatabase) {
-                Profile profile = databaseManager.findProfileById(id);
-                if (profile != null) {
-                    return profile;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.findProfileById(id);
+        return dataManager.findProfileById(id);
     }
     
-    /**
-     * Create profile - Primary: Database, Fallback: JSON
-     */
-    public Profile createProfile(Profile profile) {
-        try {
-            if (useDatabase) {
-                Profile created = databaseManager.createProfile(profile);
-                if (created != null) {
-                    return created;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        jsonDataManager.addProfile(profile);
-        jsonDataManager.saveAllData();
-        return profile;
-    }
-    
-    /**
-     * Update profile - Primary: Database, Fallback: JSON
-     */
-    public boolean updateProfile(Profile profile) {
-        try {
-            if (useDatabase) {
-                databaseManager.updateProfile(profile);
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        jsonDataManager.updateProfile(profile); // Add this method to JsonDataManager
-        jsonDataManager.saveAllData();
-        return true;
-    }
-    
-    /**
-     * Delete profile - Primary: Database, Fallback: JSON
-     */
-    public boolean deleteProfile(String id) {
-        try {
-            if (useDatabase) {
-                databaseManager.deleteProfile(id);
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        jsonDataManager.removeProfile(id);
-        jsonDataManager.saveAllData();
-        return true;
-    }
-    
-    /**
-     * Get all classes - Primary: Database, Fallback: JSON
-     */
     public List<GymClass> getAllClasses() {
-        try {
-            if (useDatabase) {
-                return databaseManager.findAllClasses();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getGymClasses();
+        return dataManager.findAllClasses();
     }
     
-    /**
-     * Get all bookings - Primary: Database, Fallback: JSON
-     */
     public List<Booking> getAllBookings() {
-        try {
-            if (useDatabase) {
-                return databaseManager.findAllBookings();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getBookings();
+        return dataManager.findAllBookings();
     }
     
-    /**
-     * Get all sessions - Primary: Database, Fallback: JSON
-     */
     public List<Session> getAllSessions() {
-        try {
-            if (useDatabase) {
-                return databaseManager.findAllSessions();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getSessions();
+        return dataManager.findAllSessions();
     }
     
-    /**
-     * Get all attendance - Primary: Database, Fallback: JSON
-     */
     public List<Attendance> getAllAttendance() {
-        try {
-            if (useDatabase) {
-                return databaseManager.findAllAttendance();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getAttendanceRecords();
+        return dataManager.findAllAttendance();
     }
     
-    /**
-     * Get all trainers - Primary: Database, Fallback: JSON
-     */
     public List<Trainer> getAllTrainers() {
-        try {
-            if (useDatabase) {
-                return databaseManager.findAllTrainers();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Database error, falling back to JSON...");
-        }
-        return jsonDataManager.getTrainers();
+        return dataManager.findAllTrainers();
+    }
+    
+    public List<Membership> getAllMemberships() {
+        return dataManager.findAllMemberships();
+    }
+    
+    public List<Payment> getAllPayments() {              // ← ADD THIS
+        return dataManager.getPayments();
     }
     
     // ============================================================
-    // SAVE & LOAD (Override BaseController)
+    // SAVE OPERATIONS
     // ============================================================
     
-    @Override
     public void saveAllData() {
-        try {
-            if (useDatabase) {
-                databaseManager.saveAllData();
-                System.out.println("✅ Data saved to Database");
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Could not save to Database, saving to JSON...");
+        if (dataManager != null) {
+            dataManager.saveAllData();
         }
-        jsonDataManager.saveAllData();
-    }
-    
-    @Override
-    public void clearAllData() {
-        try {
-            if (useDatabase) {
-                databaseManager.clearAllData();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Could not clear Database, clearing JSON...");
-        }
-        jsonDataManager.clearAllData();
     }
 }

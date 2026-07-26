@@ -1,96 +1,92 @@
 package com.gym.model.classes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Spin extends GymClass {
-    // Spin-specific attributes
-    private String intensity;  // Low, Medium, High
-    private int durationMinutes;
-    private String musicType;
     
-    // Constructor
-    public Spin(String classId, String className, String schedule, int capacity, 
-                String trainer, String intensity, int durationMinutes, String musicType) {
-        super(classId, className, schedule, capacity, trainer);
-        this.intensity = intensity;
-        this.durationMinutes = durationMinutes;
-        this.musicType = musicType;
+    private int bikesAvailable;
+    private String instructor;
+    private int resistanceLevel;
+    private List<String> bookedMembers;
+    
+    public Spin(String classId, String name, String description, int duration, 
+                String category, int maxCapacity, String instructor, int resistanceLevel) {
+        super(classId, name, description, duration, category, maxCapacity);
+        this.instructor = instructor;
+        this.resistanceLevel = resistanceLevel;
+        this.bikesAvailable = maxCapacity;
+        this.bookedMembers = new ArrayList<>();
     }
     
+    // ============================================================
     // GETTERS & SETTERS
-    public String getIntensity() { return intensity; }
-    public void setIntensity(String intensity) { this.intensity = intensity; }
-    public int getDurationMinutes() { return durationMinutes; }
-    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
-    public String getMusicType() { return musicType; }
-    public void setMusicType(String musicType) { this.musicType = musicType; }
+    // ============================================================
     
-    // IMPLEMENT ABSTRACT METHODS
-    @Override
-    public void addBooking(String memberName) {
-        if (checkAvailability()) {
-            bookedMembers.add(memberName);
-            currentBookings++;
-            System.out.println("🚴 " + memberName + " booked Spin class: " + className);
-            System.out.println("   Intensity: " + intensity + " | Duration: " + durationMinutes + " min");
-            System.out.println("   Music: " + musicType);
-            System.out.println("   Spots remaining: " + (capacity - currentBookings));
+    public int getBikesAvailable() { return bikesAvailable; }
+    public String getInstructor() { return instructor; }
+    public int getResistanceLevel() { return resistanceLevel; }
+    public List<String> getBookedMembers() { return bookedMembers; }
+    
+    public void setBikesAvailable(int bikesAvailable) { this.bikesAvailable = bikesAvailable; }
+    public void setInstructor(String instructor) { this.instructor = instructor; }
+    public void setResistanceLevel(int resistanceLevel) { this.resistanceLevel = resistanceLevel; }
+    public void setBookedMembers(List<String> bookedMembers) { this.bookedMembers = bookedMembers; }
+    
+    // ============================================================
+    // BUSINESS METHODS
+    // ============================================================
+    
+    public void addBooking(String memberId) {
+        if (bikesAvailable > 0 && !bookedMembers.contains(memberId)) {
+            bookedMembers.add(memberId);
+            bikesAvailable--;
+            setCurrentBookings(getCurrentBookings() + 1);
+            System.out.println("✅ Member " + memberId + " booked " + getName() + " class. Bikes remaining: " + bikesAvailable);
+        } else if (bookedMembers.contains(memberId)) {
+            System.out.println("⚠️ Member " + memberId + " already booked this class.");
         } else {
-            System.out.println("❌ Spin class is full! Cannot book " + memberName);
+            System.out.println("❌ No bikes available for " + getName() + " class!");
         }
     }
     
-    @Override
-    public void removeBooking(String memberName) {
-        if (bookedMembers.remove(memberName)) {
-            currentBookings--;
-            System.out.println("🗑️ " + memberName + " removed from Spin class: " + className);
-            System.out.println("   Spots now available: " + (capacity - currentBookings));
+    public void removeBooking(String memberId) {
+        if (bookedMembers.remove(memberId)) {
+            bikesAvailable++;
+            setCurrentBookings(getCurrentBookings() - 1);
+            System.out.println("✅ Member " + memberId + " removed from " + getName() + " class. Bikes available: " + bikesAvailable);
         } else {
-            System.out.println("⚠️ " + memberName + " not found in this Spin class");
+            System.out.println("❌ Member " + memberId + " not found in this class.");
         }
     }
     
-    @Override
     public boolean checkAvailability() {
-        boolean available = currentBookings < capacity;
-        if (available) {
-            System.out.println("✅ Spin class has " + (capacity - currentBookings) + " spots available");
-        } else {
-            System.out.println("❌ Spin class is fully booked");
-        }
-        return available;
+        return bikesAvailable > 0;
     }
     
-    // SPIN-SPECIFIC METHODS
-    public void increaseIntensity() {
-        if (intensity.equals("Low")) {
-            intensity = "Medium";
-        } else if (intensity.equals("Medium")) {
-            intensity = "High";
-        } else {
-            System.out.println("Already at maximum intensity!");
-            return;
-        }
-        System.out.println("⚡ Spin class intensity increased to: " + intensity);
+    public int getBookedCount() {
+        return bookedMembers.size();
     }
     
-    public void decreaseIntensity() {
-        if (intensity.equals("High")) {
-            intensity = "Medium";
-        } else if (intensity.equals("Medium")) {
-            intensity = "Low";
+    public void adjustResistance(int level) {
+        if (level >= 1 && level <= 10) {
+            this.resistanceLevel = level;
+            System.out.println("✅ Spin resistance adjusted to level: " + level);
         } else {
-            System.out.println("Already at minimum intensity!");
-            return;
+            System.out.println("❌ Invalid resistance level. Must be between 1-10.");
         }
-        System.out.println("⚡ Spin class intensity decreased to: " + intensity);
+    }
+    
+    public String getClassDetails() {
+        // ✅ FIXED: Use getName() instead of className
+        return String.format("Spin Class: %s | Instructor: %s | Bikes Available: %d/%d | Resistance: %d | Booked: %d",
+            getName(), instructor, bikesAvailable, getMaxCapacity(), resistanceLevel, getBookedCount());
     }
     
     @Override
-    public String getClassDetails() {
-        return super.getClassDetails() +
-               "\nIntensity: " + intensity +
-               "\nDuration: " + durationMinutes + " minutes" +
-               "\nMusic Type: " + musicType +
-               "\nClass Type: Spin";
+    public String toString() {
+        // ✅ FIXED: Use getName() instead of className
+        return String.format("Spin{id='%s', name='%s', instructor='%s', bikes=%d/%d, resistance=%d, booked=%d}",
+            getClassId(), getName(), instructor, bikesAvailable, getMaxCapacity(), resistanceLevel, getBookedCount());
     }
 }

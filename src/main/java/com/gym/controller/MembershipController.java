@@ -2,311 +2,327 @@ package com.gym.controller;
 
 import com.gym.model.Profile;
 import com.gym.model.membership.Membership;
-import com.gym.model.membership.Basic;
-import com.gym.model.membership.Premium;
-import com.gym.model.membership.Family;
 import com.gym.database.DatabaseManager;
+import com.gym.persistence.JsonDataManager;
 import com.gym.util.IdGenerator;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controller for Membership operations
- * Handles all membership-related business logic
- * Updated to use String-based IDs
- */
 public class MembershipController {
     
-    private DatabaseManager dataManager;
-    private IdGenerator idGenerator;
+    private final DatabaseManager databaseManager;
+    private final IdGenerator idGenerator;
+    
+    public MembershipController(DatabaseManager dataManager) {
+        this.databaseManager = dataManager;
+        if (dataManager != null && dataManager.getConnection() != null) {
+            this.idGenerator = new IdGenerator(dataManager.getConnection());
+        } else {
+            this.idGenerator = new IdGenerator("MEM");
+        }
+    }
     
     public MembershipController(JsonDataManager dataManager) {
-        this.dataManager = dataManager;
-        this.idGenerator = new IdGenerator(null); // Will be initialized properly
+        this.databaseManager = dataManager;
+        this.idGenerator = new IdGenerator("MEM");
     }
     
     // ============================================================
-    // CREATE MEMBERSHIP
+    // CREATE OPERATIONS
     // ============================================================
     
     /**
-     * Create a Basic membership for a profile
+     * Create a new membership for a profile
+     * @param profileId The ID of the profile (PARAMETER DECLARED HERE)
+     * @param type The membership type (BASIC, PREMIUM, FAMILY)
+     * @param price The membership price
+     * @param duration The duration in days
      */
+    public Membership createMembership(String profileId, String type, double price, int duration) {
+        // ✅ profileId is declared as a parameter above
+        
+        if (profileId == null || profileId.isEmpty()) {
+            System.out.println("❌ Invalid profile ID");
+            return null;
+        }
+        
+        Profile profile = databaseManager.findProfileById(profileId);  // ✅ profileId is now defined
+        if (profile == null) {
+            System.out.println("❌ Profile not found: " + profileId);
+            return null;
+        }
+        
+        String membershipId = idGenerator.generateMembershipId(LocalDate.now());
+        Membership membership = databaseManager.createMembership(membershipId, profileId, type, price, duration);
+        
+        profile.setMembershipType(type);
+        databaseManager.updateProfile(profile);
+        databaseManager.saveAllData();
+        
+        System.out.println("✅ Membership created for: " + profile.getName());
+        return membership;
+    }
+    
+    // Convenience methods with fixed types
     public Membership createBasicMembership(String profileId) {
-        // ✅ Generate String membership ID
-        String membershipId = generateMembershipId("BASIC");
-        String startDate = LocalDate.now().toString();
-        String expiryDate = LocalDate.now().plusYears(1).toString();
-        
-        Basic membership = new Basic(membershipId, 49.99, startDate, expiryDate, "Active");
-        databaseManager.addMembership(membership);
-        
-        // Associate with profile
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile != null) {
-            profile.setMembership(membership);
-            databaseManager.saveAllData();
-            System.out.println("✅ Basic membership created for: " + profile.getName());
-        } else {
-            System.out.println("❌ Profile not found: " + profileId);
-        }
-        
-        return membership;
+        return createMembership(profileId, "BASIC", 29.99, 30);  // ✅ profileId passed as parameter
     }
     
-    /**
-     * Create a Premium membership for a profile
-     */
     public Membership createPremiumMembership(String profileId) {
-        // ✅ Generate String membership ID
-        String membershipId = generateMembershipId("PREMIUM");
-        String startDate = LocalDate.now().toString();
-        String expiryDate = LocalDate.now().plusYears(1).toString();
-        
-        Premium membership = new Premium(membershipId, 99.99, startDate, expiryDate, "Active", "VIP Access");
-        databaseManager.addMembership(membership);
-        
-        // Associate with profile
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile != null) {
-            profile.setMembership(membership);
-            databaseManager.saveAllData();
-            System.out.println("✅ Premium membership created for: " + profile.getName());
-        } else {
-            System.out.println("❌ Profile not found: " + profileId);
-        }
-        
-        return membership;
+        return createMembership(profileId, "PREMIUM", 59.99, 30);  // ✅ profileId passed as parameter
     }
     
-    /**
-     * Create a Family membership for a profile
-     */
-    public Membership createFamilyMembership(String profileId, int numberOfMembers) {  // ✅ Changed String to int
-        // ✅ Generate String membership ID
-        String membershipId = generateMembershipId("FAMILY");
-        String startDate = LocalDate.now().toString();
-        String expiryDate = LocalDate.now().plusYears(1).toString();
-        
-        Family membership = new Family(membershipId, 69.99, startDate, expiryDate, "Active", numberOfMembers);
-        databaseManager.addMembership(membership);
-        
-        // Associate with profile
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile != null) {
-            profile.setMembership(membership);
-            databaseManager.saveAllData();
-            System.out.println("✅ Family membership created for: " + profile.getName());
-        } else {
-            System.out.println("❌ Profile not found: " + profileId);
-        }
-        
-        return membership;
+    public Membership createFamilyMembership(String profileId) {
+        return createMembership(profileId, "FAMILY", 89.99, 30);  // ✅ profileId passed as parameter
     }
     
     // ============================================================
-    // RENEW MEMBERSHIP
+    // READ OPERATIONS
+    // ============================================================
+    
+    /**
+     * Get membership by ID
+     * @param membershipId The membership ID (PARAMETER DECLARED HERE)
+     */
+    public Membership getMembershipById(String membershipId) {
+        // ✅ membershipId is declared as a parameter above
+        if (membershipId == null || membershipId.isEmpty()) return null;
+        return databaseManager.getMemberships().stream()
+            .filter(m -> m.getMembershipId().equals(membershipId))
+            .findFirst()
+            .orElse(null);
+    }
+    
+    /**
+     * Get all memberships
+     */
+    public List<Membership> getAllMemberships() {
+        return databaseManager.findAllMemberships();
+    }
+    
+    /**
+     * Get memberships for a specific profile
+     * @param profileId The profile ID (PARAMETER DECLARED HERE)
+     */
+    public List<Membership> getMembershipsForProfile(String profileId) {
+        // ✅ profileId is declared as a parameter above
+        if (profileId == null || profileId.isEmpty()) return List.of();
+        return databaseManager.getMemberships().stream()
+            .filter(m -> m.getProfileId().equals(profileId))  // ✅ profileId is defined
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Get active memberships
+     */
+    public List<Membership> getActiveMemberships() {
+        return databaseManager.getMemberships().stream()
+            .filter(Membership::isActive)
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Get memberships by type
+     * @param type The membership type (PARAMETER DECLARED HERE)
+     */
+    public List<Membership> getMembershipsByType(String type) {
+        // ✅ type is declared as a parameter above
+        if (type == null || type.isEmpty()) return List.of();
+        return databaseManager.getMemberships().stream()
+            .filter(m -> m.getType().equalsIgnoreCase(type))
+            .collect(Collectors.toList());
+    }
+    
+    // ============================================================
+    // UPDATE OPERATIONS
     // ============================================================
     
     /**
      * Renew a membership
+     * @param membershipId The membership ID (PARAMETER DECLARED HERE)
      */
     public boolean renewMembership(String membershipId) {
+        // ✅ membershipId is declared as a parameter above
         if (membershipId == null || membershipId.isEmpty()) {
             System.out.println("❌ Invalid membership ID");
             return false;
         }
         
-        for (Membership m : databaseManager.getMemberships()) {
-            if (m.getMembershipId().equals(membershipId)) {  // ✅ Use .equals()
-                m.renew();
-                databaseManager.saveAllData();
-                System.out.println("✅ Membership renewed: " + membershipId);
-                return true;
-            }
-        }
-        System.out.println("❌ Membership not found: " + membershipId);
-        return false;
-    }
-    
-    /**
-     * Renew membership for a profile
-     */
-    public boolean renewMembershipForProfile(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
+        Membership membership = getMembershipById(membershipId);
+        if (membership == null) {
+            System.out.println("❌ Membership not found: " + membershipId);
             return false;
         }
         
+        if (membership.isCancelled()) {
+            System.out.println("❌ Cannot renew a cancelled membership");
+            return false;
+        }
+        
+        membership.renew();
+        databaseManager.saveAllData();
+        System.out.println("✅ Membership renewed: " + membershipId);
+        return true;
+    }
+    
+    /**
+     * Cancel a membership
+     * @param membershipId The membership ID (PARAMETER DECLARED HERE)
+     */
+    public boolean cancelMembership(String membershipId) {
+        // ✅ membershipId is declared as a parameter above
+        if (membershipId == null || membershipId.isEmpty()) {
+            System.out.println("❌ Invalid membership ID");
+            return false;
+        }
+        
+        Membership membership = getMembershipById(membershipId);
+        if (membership == null) {
+            System.out.println("❌ Membership not found: " + membershipId);
+            return false;
+        }
+        
+        if (membership.isCancelled()) {
+            System.out.println("❌ Membership already cancelled");
+            return false;
+        }
+        
+        membership.cancel();
+        
+        // Get profileId from the membership
+        String profileId = membership.getProfileId();  // ✅ profileId is declared here
         Profile profile = databaseManager.findProfileById(profileId);
-        if (profile != null && profile.getMembership() != null) {
-            profile.getMembership().renew();
+        if (profile != null) {
+            profile.setMembershipType("NONE");
+            databaseManager.updateProfile(profile);
+        }
+        
+        databaseManager.saveAllData();
+        System.out.println("✅ Membership cancelled: " + membershipId);
+        return true;
+    }
+    
+    /**
+     * Upgrade a membership to a new type
+     * @param membershipId The membership ID (PARAMETER DECLARED HERE)
+     * @param newType The new membership type (PARAMETER DECLARED HERE)
+     */
+    public boolean upgradeMembership(String membershipId, String newType) {
+        // ✅ Both parameters are declared above
+        if (membershipId == null || membershipId.isEmpty()) {
+            System.out.println("❌ Invalid membership ID");
+            return false;
+        }
+        if (newType == null || newType.isEmpty()) {
+            System.out.println("❌ Invalid membership type");
+            return false;
+        }
+        
+        Membership membership = getMembershipById(membershipId);
+        if (membership == null) {
+            System.out.println("❌ Membership not found: " + membershipId);
+            return false;
+        }
+        
+        if (membership.isCancelled() || membership.isExpired()) {
+            System.out.println("❌ Cannot upgrade a cancelled or expired membership");
+            return false;
+        }
+        
+        double newPrice = getMembershipPrice(newType);
+        if (newPrice <= 0) {
+            System.out.println("❌ Invalid membership type: " + newType);
+            return false;
+        }
+        
+        membership.setType(newType);
+        membership.setPrice(newPrice);
+        
+        // Get profileId from the membership
+        String profileId = membership.getProfileId();  // ✅ profileId is declared here
+        Profile profile = databaseManager.findProfileById(profileId);
+        if (profile != null) {
+            profile.setMembershipType(newType);
+            databaseManager.updateProfile(profile);
+        }
+        
+        databaseManager.saveAllData();
+        System.out.println("✅ Membership upgraded to: " + newType);
+        return true;
+    }
+    
+    // ============================================================
+    // DELETE OPERATIONS
+    // ============================================================
+    
+    /**
+     * Delete a membership
+     * @param membershipId The membership ID (PARAMETER DECLARED HERE)
+     */
+    public boolean deleteMembership(String membershipId) {
+        // ✅ membershipId is declared as a parameter above
+        if (membershipId == null || membershipId.isEmpty()) {
+            System.out.println("❌ Invalid membership ID");
+            return false;
+        }
+        
+        Membership membership = getMembershipById(membershipId);
+        if (membership == null) {
+            System.out.println("❌ Membership not found: " + membershipId);
+            return false;
+        }
+        
+        // Get profileId from the membership
+        String profileId = membership.getProfileId();  // ✅ profileId is declared here
+        Profile profile = databaseManager.findProfileById(profileId);
+        if (profile != null) {
+            profile.setMembershipType("NONE");
+            databaseManager.updateProfile(profile);
+        }
+        
+        boolean removed = databaseManager.getMemberships().removeIf(m -> m.getMembershipId().equals(membershipId));
+        if (removed) {
             databaseManager.saveAllData();
-            System.out.println("✅ Membership renewed for profile: " + profile.getName());
+            System.out.println("✅ Membership deleted: " + membershipId);
             return true;
         }
-        System.out.println("❌ No membership found for profile: " + profileId);
+        
+        System.out.println("❌ Failed to delete membership: " + membershipId);
         return false;
     }
     
     // ============================================================
-    // VALIDATION
+    // STATISTICS
     // ============================================================
     
-    /**
-     * Check if a profile has a valid membership
-     */
-    public boolean hasValidMembership(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            return false;
-        }
-        
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile == null || profile.getMembership() == null) {
-            return false;
-        }
-        return profile.getMembership().isValid();
+    public int getTotalMemberships() {
+        return databaseManager.getMemberships().size();
     }
     
-    /**
-     * Get membership status for a profile
-     */
-    public String getMembershipStatus(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            return "Invalid profile ID";
-        }
-        
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile == null) {
-            return "Profile not found";
-        }
-        if (profile.getMembership() == null) {
-            return "No membership";
-        }
-        if (profile.getMembership().isValid()) {
-            return "Active";
-        }
-        return "Expired";
+    public int getActiveMembershipsCount() {
+        return (int) databaseManager.getMemberships().stream()
+            .filter(Membership::isActive)
+            .count();
     }
     
-    /**
-     * Get membership type for a profile
-     */
-    public String getMembershipType(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            return "Invalid profile ID";
-        }
-        
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile == null || profile.getMembership() == null) {
-            return "None";
-        }
-        return profile.getMembership().getClass().getSimpleName();
+    public int getExpiredMembershipsCount() {
+        return (int) databaseManager.getMemberships().stream()
+            .filter(Membership::isExpired)
+            .count();
     }
     
-    // ============================================================
-    // UPGRADE/DOWNGRADE
-    // ============================================================
-    
-    /**
-     * Upgrade a membership to Premium
-     */
-    public Membership upgradeToPremium(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return null;
-        }
-        
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile == null) {
-            System.out.println("❌ Profile not found: " + profileId);
-            return null;
-        }
-        
-        // Remove existing membership
-        Membership oldMembership = profile.getMembership();
-        if (oldMembership != null) {
-            databaseManager.getMemberships().remove(oldMembership);
-        }
-        
-        // Create new Premium membership
-        Membership newMembership = createPremiumMembership(profileId);
-        System.out.println("✅ Upgraded to Premium: " + profile.getName());
-        return newMembership;
+    public int getCancelledMembershipsCount() {
+        return (int) databaseManager.getMemberships().stream()
+            .filter(Membership::isCancelled)
+            .count();
     }
     
-    /**
-     * Downgrade a membership to Basic
-     */
-    public Membership downgradeToBasic(String profileId) {
-        if (profileId == null || profileId.isEmpty()) {
-            System.out.println("❌ Invalid profile ID");
-            return null;
-        }
-        
-        Profile profile = databaseManager.findProfileById(profileId);
-        if (profile == null) {
-            System.out.println("❌ Profile not found: " + profileId);
-            return null;
-        }
-        
-        // Remove existing membership
-        Membership oldMembership = profile.getMembership();
-        if (oldMembership != null) {
-            databaseManager.getMemberships().remove(oldMembership);
-        }
-        
-        // Create new Basic membership
-        Membership newMembership = createBasicMembership(profileId);
-        System.out.println("✅ Downgraded to Basic: " + profile.getName());
-        return newMembership;
-    }
-    
-    // ============================================================
-    // QUERIES
-    // ============================================================
-    
-    /**
-     * Get all members with active memberships
-     */
-    public List<Profile> getActiveMembers() {
-        return databaseManager.getProfiles().stream()
-            .filter(p -> p.getMembership() != null && p.getMembership().isValid())
-            .collect(Collectors.toList());
-    }
-    
-    /**
-     * Get all members with expired memberships
-     */
-    public List<Profile> getExpiredMembers() {
-        return databaseManager.getProfiles().stream()
-            .filter(p -> p.getMembership() == null || !p.getMembership().isValid())
-            .collect(Collectors.toList());
-    }
-    
-    /**
-     * Get revenue from all memberships
-     */
-    public double getTotalRevenue() {
-        double total = 0;
-        for (Membership m : databaseManager.getMemberships()) {
-            if (m.isValid()) {
-                total += m.calculateFee();
-            }
-        }
-        return total;
-    }
-    
-    /**
-     * Count members by membership type
-     */
-    public long countByType(String type) {
-        return databaseManager.getProfiles().stream()
-            .filter(p -> p.getMembership() != null)
-            .filter(p -> p.getMembership().getClass().getSimpleName().equalsIgnoreCase(type))
+    public int getMembershipCountByType(String type) {
+        if (type == null || type.isEmpty()) return 0;
+        return (int) databaseManager.getMemberships().stream()
+            .filter(m -> m.getType().equalsIgnoreCase(type))
             .count();
     }
     
@@ -314,13 +330,13 @@ public class MembershipController {
     // HELPER METHODS
     // ============================================================
     
-    /**
-     * Generate a unique membership ID
-     */
-    private String generateMembershipId(String type) {
-        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String prefix = type.substring(0, 3).toUpperCase();
-        int count = databaseManager.getMemberships().size() + 1;
-        return prefix + timestamp + String.format("%04d", count);
+    private double getMembershipPrice(String type) {
+        if (type == null) return 0.0;
+        return switch (type.toLowerCase()) {
+            case "basic" -> 29.99;
+            case "premium" -> 59.99;
+            case "family" -> 89.99;
+            default -> 0.0;
+        };
     }
 }

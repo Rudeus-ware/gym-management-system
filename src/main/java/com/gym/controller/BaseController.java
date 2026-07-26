@@ -1,69 +1,31 @@
 package com.gym.controller;
 
 import com.gym.database.DatabaseManager;
-import com.gym.persistence.JsonDataManager;
+import com.gym.util.IdGenerator;
 
 /**
- * BaseController - Abstract base controller with dual data sources
- * Primary: DatabaseManager (MySQL)
- * Secondary: JsonDataManager (JSON files - fallback)
+ * Base controller class with common functionality
  */
-public abstract class BaseController {
+public class BaseController {
     
-    protected DatabaseManager databaseManager;
-    protected JsonDataManager jsonDataManager;
-    protected boolean useDatabase = true;
+    protected final DatabaseManager dataManager;
+    protected final IdGenerator idGenerator;
     
-    public BaseController() {
-        this.databaseManager = new DatabaseManager();
-        this.jsonDataManager = new JsonDataManager();
-    }
-    
-    public BaseController(boolean useDatabase) {
-        this();
-        this.useDatabase = useDatabase;
-    }
-    
-    /**
-     * Switch to database mode
-     */
-    public void switchToDatabase() {
-        this.useDatabase = true;
-        System.out.println("✅ Switched to Database mode");
-    }
-    
-    /**
-     * Switch to JSON mode
-     */
-    public void switchToJson() {
-        this.useDatabase = false;
-        System.out.println("✅ Switched to JSON mode");
-    }
-    
-    /**
-     * Check if using database
-     */
-    public boolean isUsingDatabase() {
-        return useDatabase;
-    }
-    
-    /**
-     * Save all data (to both sources if possible)
-     */
-    public void saveAllData() {
-        if (useDatabase) {
-            databaseManager.saveAllData();
+    public BaseController(DatabaseManager dataManager) {
+        this.dataManager = dataManager;
+        // Fix: Check if connection is available
+        if (dataManager != null && dataManager.getConnection() != null) {
+            this.idGenerator = new IdGenerator(dataManager.getConnection());
+        } else {
+            this.idGenerator = new IdGenerator("BASE");
         }
-        jsonDataManager.saveAllData();
     }
     
-    /**
-     * Clear all data
-     */
-    public void clearAllData() {
-        if (useDatabase) {
-            databaseManager.clearAllData();
-        }
-        jsonDataManager.clearAllData();
+    public DatabaseManager getDataManager() {
+        return dataManager;
+    }
+    
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
     }
 }

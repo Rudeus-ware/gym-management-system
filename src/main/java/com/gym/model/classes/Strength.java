@@ -4,97 +4,77 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Strength extends GymClass {
-    // Strength-specific attributes
-    private String focusArea;  // Upper body, Lower body, Full body, Core
-    private List<String> equipment;
+    
+    private String equipment;
     private String intensityLevel;
+    private List<String> bookedMembers;
     
-    // Constructor
-    public Strength(String classId, String className, String schedule, int capacity, 
-                    String trainer, String focusArea, String intensityLevel) {
-        super(classId, className, schedule, capacity, trainer);
-        this.focusArea = focusArea;
+    public Strength(String classId, String name, String description, int duration, 
+                    String category, int maxCapacity, String equipment, String intensityLevel) {
+        super(classId, name, description, duration, category, maxCapacity);
+        this.equipment = equipment;
         this.intensityLevel = intensityLevel;
-        this.equipment = new ArrayList<>();
-        // Add default equipment
-        this.equipment.add("Dumbbells");
-        this.equipment.add("Resistance Bands");
-        this.equipment.add("Weight Machines");
+        this.bookedMembers = new ArrayList<>();
     }
     
+    // ============================================================
     // GETTERS & SETTERS
-    public String getFocusArea() { return focusArea; }
-    public void setFocusArea(String focusArea) { this.focusArea = focusArea; }
+    // ============================================================
+    
+    public String getEquipment() { return equipment; }
     public String getIntensityLevel() { return intensityLevel; }
+    public List<String> getBookedMembers() { return bookedMembers; }
+    
+    public void setEquipment(String equipment) { this.equipment = equipment; }
     public void setIntensityLevel(String intensityLevel) { this.intensityLevel = intensityLevel; }
-    public List<String> getEquipment() { return new ArrayList<>(equipment); }
+    public void setBookedMembers(List<String> bookedMembers) { this.bookedMembers = bookedMembers; }
     
-    // IMPLEMENT ABSTRACT METHODS
-    @Override
-    public void addBooking(String memberName) {
-        if (checkAvailability()) {
-            bookedMembers.add(memberName);
-            currentBookings++;
-            System.out.println("💪 " + memberName + " booked Strength class: " + className);
-            System.out.println("   Focus: " + focusArea + " | Intensity: " + intensityLevel);
-            System.out.println("   Equipment: " + equipment);
-            System.out.println("   Spots remaining: " + (capacity - currentBookings));
+    // ============================================================
+    // BUSINESS METHODS
+    // ============================================================
+    
+    public void addBooking(String memberId) {
+        if (bookedMembers == null) {
+            bookedMembers = new ArrayList<>();
+        }
+        if (!bookedMembers.contains(memberId)) {
+            bookedMembers.add(memberId);
+            setCurrentBookings(getCurrentBookings() + 1);
+            // ✅ FIXED: Use getName() instead of className
+            System.out.println("✅ Member " + memberId + " booked " + getName() + " class.");
         } else {
-            System.out.println("❌ Strength class is full! Cannot book " + memberName);
+            System.out.println("⚠️ Member " + memberId + " already booked this class.");
         }
     }
     
-    @Override
-    public void removeBooking(String memberName) {
-        if (bookedMembers.remove(memberName)) {
-            currentBookings--;
-            System.out.println("🗑️ " + memberName + " removed from Strength class: " + className);
-            System.out.println("   Spots now available: " + (capacity - currentBookings));
+    public void removeBooking(String memberId) {
+        if (bookedMembers != null && bookedMembers.remove(memberId)) {
+            setCurrentBookings(getCurrentBookings() - 1);
+            // ✅ FIXED: Use getName() instead of className
+            System.out.println("✅ Member " + memberId + " removed from " + getName() + " class.");
         } else {
-            System.out.println("⚠️ " + memberName + " not found in this Strength class");
+            System.out.println("❌ Member " + memberId + " not found in this class.");
         }
     }
     
-    @Override
     public boolean checkAvailability() {
-        boolean available = currentBookings < capacity;
-        if (available) {
-            System.out.println("✅ Strength class has " + (capacity - currentBookings) + " spots available");
-        } else {
-            System.out.println("❌ Strength class is fully booked");
-        }
-        return available;
+        return bookedMembers != null && bookedMembers.size() < getMaxCapacity();
     }
     
-    // STRENGTH-SPECIFIC METHODS
-    public void addEquipment(String equipmentItem) {
-        equipment.add(equipmentItem);
-        System.out.println("🏋️ Equipment added: " + equipmentItem);
-        System.out.println("   Current equipment: " + equipment);
+    public int getBookedCount() {
+        return bookedMembers != null ? bookedMembers.size() : 0;
     }
     
-    public void removeEquipment(String equipmentItem) {
-        if (equipment.remove(equipmentItem)) {
-            System.out.println("🗑️ Equipment removed: " + equipmentItem);
-            System.out.println("   Current equipment: " + equipment);
-        } else {
-            System.out.println("⚠️ Equipment not found: " + equipmentItem);
-        }
-    }
-    
-    public void displayEquipment() {
-        System.out.println("🏋️ Equipment for " + className + ":");
-        for (String item : equipment) {
-            System.out.println("   • " + item);
-        }
+    public String getClassDetails() {
+        // ✅ FIXED: Use getName() instead of className
+        return String.format("Strength Class: %s | Equipment: %s | Intensity: %s | Booked: %d/%d",
+            getName(), equipment, intensityLevel, getBookedCount(), getMaxCapacity());
     }
     
     @Override
-    public String getClassDetails() {
-        return super.getClassDetails() +
-               "\nFocus Area: " + focusArea +
-               "\nIntensity Level: " + intensityLevel +
-               "\nEquipment: " + equipment +
-               "\nClass Type: Strength";
+    public String toString() {
+        // ✅ FIXED: Use getName() instead of className
+        return String.format("Strength{id='%s', name='%s', equipment='%s', intensity='%s', booked=%d}",
+            getClassId(), getName(), equipment, intensityLevel, getBookedCount());
     }
 }
