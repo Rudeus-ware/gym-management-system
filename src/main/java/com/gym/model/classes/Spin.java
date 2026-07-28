@@ -18,6 +18,13 @@ public class Spin extends GymClass {
         this.bikesAvailable = maxCapacity;
         this.bookedMembers = new ArrayList<>();
     }
+
+    public Spin(int classId, String name, String description, int capacity, String trainer,
+                String intensity, int resistanceLevel, String music) {
+        this(String.valueOf(classId), name, description, 45, "SPIN", capacity, trainer, resistanceLevel);
+        setTrainer(trainer);
+        setSchedule(description);
+    }
     
     // ============================================================
     // GETTERS & SETTERS
@@ -27,6 +34,7 @@ public class Spin extends GymClass {
     public String getInstructor() { return instructor; }
     public int getResistanceLevel() { return resistanceLevel; }
     public List<String> getBookedMembers() { return bookedMembers; }
+    public String getIntensity() { return String.valueOf(resistanceLevel); }
     
     public void setBikesAvailable(int bikesAvailable) { this.bikesAvailable = bikesAvailable; }
     public void setInstructor(String instructor) { this.instructor = instructor; }

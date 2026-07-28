@@ -16,6 +16,13 @@ public class Strength extends GymClass {
         this.intensityLevel = intensityLevel;
         this.bookedMembers = new ArrayList<>();
     }
+
+    public Strength(int classId, String name, String description, int capacity, String trainer,
+                    String focusArea, String intensityLevel) {
+        this(String.valueOf(classId), name, description, 45, "STRENGTH", capacity, focusArea, intensityLevel);
+        setTrainer(trainer);
+        setSchedule(description);
+    }
     
     // ============================================================
     // GETTERS & SETTERS
@@ -24,6 +31,7 @@ public class Strength extends GymClass {
     public String getEquipment() { return equipment; }
     public String getIntensityLevel() { return intensityLevel; }
     public List<String> getBookedMembers() { return bookedMembers; }
+    public String getFocusArea() { return equipment; }
     
     public void setEquipment(String equipment) { this.equipment = equipment; }
     public void setIntensityLevel(String intensityLevel) { this.intensityLevel = intensityLevel; }

@@ -6,7 +6,7 @@ import com.gym.model.membership.Membership;
 import com.gym.model.membership.Basic;
 import com.gym.model.membership.Premium;
 import com.gym.model.membership.Family;
-import com.gym.persistence.JsonDataManager;
+import com.gym.database.DatabaseManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,7 +38,7 @@ public class ProfileController {
     
     // ===== INSTANCE FIELDS =====
     private GymController gymController;
-    private JsonDatabaseManager dataManager;
+    private DatabaseManager dataManager;
     private ObservableList<Profile> profileList;
     
     // ===== SETTERS =====

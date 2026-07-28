@@ -9,7 +9,6 @@ import com.gym.model.booking.Attendance;
 import com.gym.model.booking.Booking;
 import com.gym.model.booking.Session;
 import com.gym.model.classes.GymClass;
-import com.gym.persistence.DataInitializer;
 import com.gym.persistence.JsonDataManager;
 
 /**
@@ -35,10 +34,10 @@ public class Main {
         scanner = new Scanner(System.in);
         
         // Check if data exists, if not, initialize test data
-        JsonDataManager dataManager = gymController.getDataManager();
+        com.gym.database.DatabaseManager dataManager = gymController.getDataManager();
         if (dataManager.getProfiles().isEmpty()) {
             System.out.println("📌 No data found. Loading test data...");
-            DataInitializer.initializeTestData(dataManager);
+            dataManager.addProfile(new Profile("DEFAULT", "Test User", "test@example.com", "000", "Main St"));
             System.out.println("✅ Test data loaded successfully!");
         }
         
@@ -209,7 +208,7 @@ public class Main {
             System.out.printf("%-5d | %-8d | %-8d | %-12s | %-10s%n",
                              b.getBookingId(),
                              b.getProfileId(),
-                             b.getClassId(),
+                             b.getSessionId(),
                              b.getBookingDate(),
                              truncate(b.getStatus(), 10));
         }
@@ -237,7 +236,7 @@ public class Main {
                              s.getClassId(),
                              s.getSessionDate(),
                              s.getStartTime(),
-                             s.getCurrentAttendees());
+                             s.getCurrentBookings());
         }
         System.out.println("-".repeat(60));
         System.out.println("Total: " + sessions.size() + " sessions");
@@ -450,7 +449,7 @@ public class Main {
         System.out.println("\n📊 SYSTEM STATISTICS");
         System.out.println("=".repeat(40));
         
-        JsonDataManager dm = gymController.getDataManager();
+        com.gym.database.DatabaseManager dm = gymController.getDataManager();
         System.out.println("👤 Members: " + dm.getProfiles().size());
         System.out.println("📚 Classes: " + dm.getGymClasses().size());
         System.out.println("📋 Bookings: " + dm.getBookings().size());
@@ -490,7 +489,15 @@ public class Main {
         String confirm = scanner.nextLine().trim();
         
         if ("CONFIRM".equalsIgnoreCase(confirm)) {
-            gymController.getDataManager().clearAllData();
+            com.gym.database.DatabaseManager manager = gymController.getDataManager();
+            manager.getProfiles().clear();
+            manager.getGymClasses().clear();
+            manager.getBookings().clear();
+            manager.getSessions().clear();
+            manager.getAttendanceRecords().clear();
+            manager.getTrainers().clear();
+            manager.getAdmins().clear();
+            manager.getPayments().clear();
             System.out.println("🧹 All data cleared!");
         } else {
             System.out.println("❌ Operation cancelled.");

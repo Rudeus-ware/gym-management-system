@@ -27,6 +27,7 @@ public class Booking {
     public String getBookingId() { return bookingId; }
     public String getProfileId() { return profileId; }
     public String getSessionId() { return sessionId; }
+    public String getClassId() { return sessionId; }
     public String getBookingDate() { return bookingDate; }
     public String getStatus() { return status; }
     public boolean isActive() { return active; }

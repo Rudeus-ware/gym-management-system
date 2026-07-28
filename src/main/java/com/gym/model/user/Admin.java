@@ -1,7 +1,5 @@
 package com.gym.model.user;
 
-import com.gym.model.Profile;
-
 /**
  * Admin - Represents a system administrator
  * Extends User to inherit profile information
@@ -46,6 +44,10 @@ public class Admin extends User {
      */
     public Admin(String profileId, String name, String email, String password) {
         this(profileId, name, email, "", "", "", password, "Staff");
+    }
+
+    public String getRole() {
+        return adminLevel;
     }
     
     // ============================================================

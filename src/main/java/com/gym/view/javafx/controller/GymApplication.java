@@ -1,7 +1,6 @@
 package com.gym.view.javafx.controller;
 
 import com.gym.controller.GymController;
-import com.gym.persistence.DataInitializer;
 import com.gym.persistence.JsonDataManager;
 
 import javafx.application.Application;
@@ -24,7 +23,7 @@ public class GymApplication extends Application {
         
         // Check if data exists, if not, initialize test data
         if (dataManager.getProfiles().isEmpty()) {
-            DataInitializer.initializeTestData(dataManager);
+            dataManager.addProfile(new com.gym.model.Profile("DEFAULT", "Test User", "test@example.com", "000", "Main St"));
         }
         
         // ✅ FIXED: Correct FXML path with leading slash and full package

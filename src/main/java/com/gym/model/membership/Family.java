@@ -56,6 +56,13 @@ public class Family extends Membership {
     // ============================================================
     
     /**
+     * Compatibility constructor used by tests
+     */
+    public Family(String membershipId, double price, String startDate, String endDate, String status, int familyMemberCount) {
+        this(membershipId, null, price, 30, startDate, endDate, status);
+    }
+
+    /**
      * Full constructor
      */
     public Family(String membershipId, String profileId, double price, int duration,

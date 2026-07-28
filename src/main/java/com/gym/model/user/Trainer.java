@@ -1,6 +1,5 @@
 package com.gym.model.user;
 
-import com.gym.model.Profile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +44,14 @@ public class Trainer extends User {
     public Trainer(String name, String email, String phone, String address,
                    String userId, String password, String specialization) {
         this("", name, email, phone, address, userId, password, specialization);
+    }
+
+    public String getTrainerId() {
+        return getUserId();
+    }
+
+    public String getHireDate() {
+        return getJoinDate();
     }
     
     // ============================================================

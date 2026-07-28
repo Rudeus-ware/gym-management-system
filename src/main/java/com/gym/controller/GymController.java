@@ -31,6 +31,10 @@ public class GymController {
     private final PaymentController paymentController;    // ← ADD THIS FIELD
     private final ReportController reportController;      // ← ADD THIS FIELD
     
+    public GymController() {
+        this(null);
+    }
+
     public GymController(DatabaseManager dataManager) {
         this.dataManager = dataManager;
         
@@ -45,7 +49,7 @@ public class GymController {
         this.profileController = new ProfileController(dataManager);
         this.adminController = new AdminController(dataManager);
         this.membershipController = new MembershipController(dataManager);
-        this.classController = new ClassController(dataManager);
+        this.classController = new ClassController(this);
         this.bookingController = new BookingController(dataManager);
         this.attendanceController = new AttendanceController(dataManager);
         this.paymentController = new PaymentController(dataManager);    // ← ADD THIS
@@ -54,7 +58,11 @@ public class GymController {
     
     // Constructor for JSON fallback
     public GymController(JsonDataManager dataManager) {
-        this((DatabaseManager) dataManager);
+        this((DatabaseManager) null);
+    }
+
+    public GymController(com.gym.persistence.JsonDataManager dataManager, boolean ignored) {
+        this((DatabaseManager) null);
     }
     
     // ============================================================

@@ -22,6 +22,13 @@ public class Premium extends Membership {
     // ============================================================
     
     /**
+     * Compatibility constructor used by tests
+     */
+    public Premium(String membershipId, double price, String startDate, String endDate, String status, String benefits) {
+        this(membershipId, null, price, 30, startDate, endDate, status);
+    }
+
+    /**
      * Full constructor
      */
     public Premium(String membershipId, String profileId, double price, int duration,

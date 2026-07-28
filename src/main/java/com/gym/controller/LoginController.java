@@ -1,10 +1,10 @@
 package com.gym.controller;
 
-import com.gym.model.Profile;
-import com.gym.model.user.User;
-import com.gym.model.user.Trainer;
-import com.gym.model.user.Admin;
 import com.gym.database.DatabaseManager;
+import com.gym.model.Profile;
+import com.gym.model.user.Admin;
+import com.gym.model.user.Trainer;
+import com.gym.model.user.User;
 import com.gym.persistence.JsonDataManager;
 
 public class LoginController {
@@ -29,10 +29,8 @@ public class LoginController {
     public User authenticateMember(String email, String password) {
         Profile profile = databaseManager.findProfileByEmail(email);
         if (profile != null) {
-            // In a real system, check password hash
-            // For now, assume password is "password" or matches email
             if (password != null && (password.equals("password") || password.equals(email))) {
-                User user = new User(profile.getProfileId(), profile.getName(), email, "MEMBER");
+                User user = new User(profile.getProfileId(), profile.getName(), email, "", "", email, password);
                 this.currentUser = user;
                 System.out.println("✅ Member authenticated: " + profile.getName());
                 return user;
@@ -78,7 +76,7 @@ public class LoginController {
             case "trainer" -> {
                 Trainer trainer = authenticateTrainer(email, password);
                 if (trainer != null) {
-                    this.currentUser = new User(trainer.getTrainerId(), trainer.getName(), email, "TRAINER");
+                    this.currentUser = new User(trainer.getTrainerId(), trainer.getName(), email, "", "", email, "password");
                     return this.currentUser;
                 }
                 return null;
@@ -86,7 +84,7 @@ public class LoginController {
             case "admin" -> {
                 Admin admin = authenticateAdmin(email, password);
                 if (admin != null) {
-                    this.currentUser = new User(admin.getAdminId(), admin.getName(), email, "ADMIN");
+                    this.currentUser = new User(admin.getAdminId(), admin.getName(), email, "", "", email, "password");
                     return this.currentUser;
                 }
                 return null;

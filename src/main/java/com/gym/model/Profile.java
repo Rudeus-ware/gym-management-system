@@ -2,6 +2,8 @@ package com.gym.model;
 
 import java.time.LocalDate;
 
+import com.gym.model.membership.Membership;
+
 public class Profile {
     
     // ✅ ONLY these fields belong in Profile
@@ -13,6 +15,7 @@ public class Profile {
     private String status;
     private String joinDate;
     private String address;
+    private Membership membership;
     
     // ============================================================
     // CONSTRUCTORS
@@ -63,6 +66,7 @@ public class Profile {
     public String getStatus() { return status; }
     public String getJoinDate() { return joinDate; }
     public String getAddress() { return address; }
+    public Membership getMembership() { return membership; }
     
     // ✅ CORRECT - uses status field
     public boolean isActive() {
@@ -80,6 +84,19 @@ public class Profile {
     public void setMembershipType(String membershipType) { this.membershipType = membershipType; }
     public void setStatus(String status) { this.status = status; }
     public void setJoinDate(String joinDate) { this.joinDate = joinDate; }
+    public void setAddress(String address) { this.address = address; }
+    public void setMembership(Membership membership) {
+        this.membership = membership;
+        if (membership != null) {
+            this.membershipType = membership.getClass().getSimpleName();
+        }
+    }
+    public void updateProfile(String name, String email, String phone, String address) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+    }
     
     // ✅ CORRECT - converts boolean to String
     public void setActive(boolean active) {
@@ -116,6 +133,12 @@ public class Profile {
     sb.append("Phone: ").append(phone != null ? phone : "N/A").append("\n");
     sb.append("Address: ").append(address != null ? address : "N/A").append("\n");
     sb.append("Status: ").append(isActive() ? "ACTIVE" : "INACTIVE");
+    if (membership != null) {
+        sb.append("\nMEMBERSHIP INFO\n");
+        sb.append("Membership ID: ").append(membership.getMembershipId()).append("\n");
+        sb.append("Membership Type: ").append(membership.getClass().getSimpleName()).append("\n");
+        sb.append("Fee: $").append(String.format("%.2f", membership.calculateFee()));
+    }
     return sb.toString();
 }
 }

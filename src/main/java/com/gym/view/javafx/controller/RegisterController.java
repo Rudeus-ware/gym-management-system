@@ -98,7 +98,7 @@ public class RegisterController {
         int profileId = gymController.getDataManager().getProfiles().size() + 1;
         
         // Create new profile
-        Profile newProfile = new Profile(profileId, name, email, phone, address);
+        Profile newProfile = new Profile(String.valueOf(profileId), name, email, phone, address);
         
         // ✅ AUTOMATIC: Assign default membership based on selection
         String membershipTypeValue = membership != null ? membership : "Basic";

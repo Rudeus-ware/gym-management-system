@@ -26,7 +26,7 @@ public class MainController {
         this.profileController = new ProfileController(dataManager);
         this.adminController = new AdminController(dataManager);
         this.membershipController = new MembershipController(dataManager);
-        this.classController = new ClassController(dataManager);
+        this.classController = new ClassController(new GymController(dataManager));
         this.bookingController = new BookingController(dataManager);
         this.attendanceController = new AttendanceController(dataManager);
         this.paymentController = new PaymentController(dataManager);

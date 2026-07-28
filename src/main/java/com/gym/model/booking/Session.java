@@ -1,7 +1,6 @@
 package com.gym.model.booking;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -70,6 +69,8 @@ public class Session {
     public int getMaxCapacity() { return maxCapacity; }
     public int getCurrentBookings() { return currentBookings; }
     public String getStatus() { return status; }
+    public boolean isActive() { return "SCHEDULED".equalsIgnoreCase(status) || "IN_PROGRESS".equalsIgnoreCase(status); }
+    public int getCurrentAttendees() { return currentBookings; }
     
     // ============================================================
     // SETTERS

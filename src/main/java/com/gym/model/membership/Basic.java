@@ -17,6 +17,17 @@ public class Basic extends Membership {
     // CONSTRUCTORS
     // ============================================================
     
+    public Basic() {
+        this("MEM-DEFAULT", null);
+    }
+
+    /**
+     * Compatibility constructor used by tests
+     */
+    public Basic(String membershipId, double price, String startDate, String endDate, String status) {
+        this(membershipId, null, price, 30, startDate, endDate, status);
+    }
+
     /**
      * Full constructor
      */

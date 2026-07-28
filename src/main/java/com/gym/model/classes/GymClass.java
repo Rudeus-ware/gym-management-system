@@ -12,12 +12,18 @@ public class GymClass {
     private String category;
     private String status;
     private int maxCapacity;
+    private String schedule;
+    private String trainer;
     protected int currentBookings;
     
     // ============================================================
     // CONSTRUCTORS
     // ============================================================
     
+    public GymClass() {
+        this("CLASS-DEFAULT", "Default Class", "Default description", 60, "GENERAL", 20, "ACTIVE");
+    }
+
     public GymClass(String classId, String name, String description, int duration, String category) {
         this.classId = classId;
         this.name = name;
@@ -26,6 +32,8 @@ public class GymClass {
         this.category = category;
         this.status = "ACTIVE";
         this.maxCapacity = 20;
+        this.schedule = description;
+        this.trainer = "TBD";
         this.currentBookings = 0;
     }
     
@@ -38,6 +46,8 @@ public class GymClass {
         this.category = category;
         this.status = "ACTIVE";
         this.maxCapacity = maxCapacity;
+        this.schedule = description;
+        this.trainer = "TBD";
         this.currentBookings = 0;
     }
     
@@ -50,6 +60,8 @@ public class GymClass {
         this.category = category;
         this.status = status != null ? status : "ACTIVE";
         this.maxCapacity = maxCapacity;
+        this.schedule = description;
+        this.trainer = "TBD";
         this.currentBookings = 0;
     }
     
@@ -59,6 +71,10 @@ public class GymClass {
     
     public String getClassId() { 
         return classId; 
+    }
+
+    public String getClassName() {
+        return name;
     }
     
     /**
@@ -87,7 +103,11 @@ public class GymClass {
     public int getMaxCapacity() { 
         return maxCapacity; 
     }
-    
+
+    public int getCapacity() {
+        return maxCapacity;
+    }
+
     public int getCurrentBookings() { 
         return currentBookings; 
     }
@@ -128,6 +148,15 @@ public class GymClass {
     public void setCurrentBookings(int currentBookings) { 
         this.currentBookings = currentBookings; 
     }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
+        this.description = schedule;
+    }
+
+    public void setTrainer(String trainer) {
+        this.trainer = trainer;
+    }
     
     // ============================================================
     // BUSINESS METHODS
@@ -147,6 +176,18 @@ public class GymClass {
     
     public int getAvailableSpots() {
         return maxCapacity - currentBookings;
+    }
+
+    public String getSchedule() {
+        return schedule != null ? schedule : description;
+    }
+
+    public String getTrainer() {
+        return trainer != null ? trainer : "TBD";
+    }
+
+    public boolean checkAvailability() {
+        return currentBookings < maxCapacity;
     }
     
     public boolean addBooking() {
@@ -193,6 +234,11 @@ public class GymClass {
     
     public String getCapacityDisplay() {
         return String.format("%d/%d", currentBookings, maxCapacity);
+    }
+
+    public String getClassDetails() {
+        return String.format("%s | Schedule: %s | Capacity: %d/%d",
+            getName(), getSchedule(), getCurrentBookings(), getCapacity());
     }
     
     @Override

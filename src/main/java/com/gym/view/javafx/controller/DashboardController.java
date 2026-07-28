@@ -202,7 +202,7 @@ public class DashboardController {
         List<Attendance> attendance = gymController.getDataManager().getAttendanceRecords();
         attendance.stream().limit(3).forEach(a -> {
             activities.add(new ActivityItem(
-                a.getAttendanceDate(),
+                a.getAttendanceDateAsString(),
                 "Attendance marked: " + a.getStatus(),
                 "Member " + a.getProfileId(),
                 a.getStatus()

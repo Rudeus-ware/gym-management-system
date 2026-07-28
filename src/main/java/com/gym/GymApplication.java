@@ -1,8 +1,9 @@
 package com.gym;
 
 import com.gym.controller.GymController;
-import com.gym.persistence.DataInitializer;
+import com.gym.persistence.JsonDataManager;
 import com.gym.view.javafx.controller.LoginController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,7 +21,8 @@ public class GymApplication extends Application {
         
         // Load test data if empty
         if (gymController.getDataManager().getProfiles().isEmpty()) {
-            DataInitializer.initializeTestData(gymController.getDataManager());
+            JsonDataManager dataManager = new JsonDataManager();
+            gymController.getDataManager().addProfile(new com.gym.model.Profile("DEFAULT", "Test User", "test@example.com", "000", "Main St"));
         }
         
         // Load the login FXML

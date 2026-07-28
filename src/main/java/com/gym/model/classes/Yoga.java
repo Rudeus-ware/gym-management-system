@@ -16,6 +16,13 @@ public class Yoga extends GymClass {
         this.maxParticipants = maxParticipants;
         this.bookedMembers = new ArrayList<>();
     }
+
+    public Yoga(int classId, String name, String description, int capacity, String trainer,
+                String style, String difficulty) {
+        this(String.valueOf(classId), name, description, 60, "YOGA", capacity, style, 20);
+        setTrainer(trainer);
+        setSchedule(description);
+    }
     
     // ============================================================
     // GETTERS & SETTERS
@@ -24,6 +31,8 @@ public class Yoga extends GymClass {
     public String getStyle() { return style; }
     public int getMaxParticipants() { return maxParticipants; }
     public List<String> getBookedMembers() { return bookedMembers; }
+    public String getYogaStyle() { return style; }
+    public String getDifficulty() { return maxParticipants > 10 ? "Intermediate" : "Beginner"; }
     
     public void setStyle(String style) { this.style = style; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }

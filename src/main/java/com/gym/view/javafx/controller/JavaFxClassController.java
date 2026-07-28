@@ -4,7 +4,7 @@ import com.gym.model.classes.GymClass;
 import com.gym.model.classes.Spin;
 import com.gym.model.classes.Strength;
 import com.gym.model.classes.Yoga;
-import com.gym.persistence.JsonDataManager;
+import com.gym.database.DatabaseManager;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -35,10 +35,10 @@ public class JavaFxClassController {
     @FXML private Text fullClasses;
     @FXML private Label statusLabel;
     
-    private JsonDataManager dataManager;
+    private DatabaseManager dataManager;
     private ObservableList<GymClass> classList;
     
-    public void setDataManager(JsonDataManager dataManager) {
+    public void setDataManager(DatabaseManager dataManager) {
         this.dataManager = dataManager;
         loadClasses();
         updateStats();

@@ -55,6 +55,7 @@ public class DatabaseManager {
         this.sessions = new ArrayList<>();
         this.attendanceRecords = new ArrayList<>();
         this.memberships = new ArrayList<>();
+        this.idGenerator = new IdGenerator();
 
         
         try {
@@ -321,13 +322,10 @@ public Profile createProfile(String name, String email, String phone, String add
             saveClassToDatabase(gymClass);
         }
     }
-    
-    public void addBooking(Booking booking) { 
-        if (booking != null) {
-            if (bookings == null) bookings = new ArrayList<>();
-            bookings.add(booking);
-            saveBookingToDatabase(booking);
-        }
+
+    public void removeGymClass(String classId) {
+        if (classId == null || gymClasses == null) return;
+        gymClasses.removeIf(c -> c.getClassId().equals(classId));
     }
     
     public void addTrainer(Trainer trainer) { 
@@ -380,6 +378,18 @@ public Profile createProfile(String name, String email, String phone, String add
             deleteProfileFromDatabase(profileId);
         }
         return removed;
+    }
+
+    public void clearAllData() {
+        if (profiles != null) profiles.clear();
+        if (attendanceRecords != null) attendanceRecords.clear();
+        if (sessions != null) sessions.clear();
+        if (memberships != null) memberships.clear();
+        if (gymClasses != null) gymClasses.clear();
+        if (bookings != null) bookings.clear();
+        if (trainers != null) trainers.clear();
+        if (admins != null) admins.clear();
+        if (payments != null) payments.clear();
     }
     
     // ============================================================

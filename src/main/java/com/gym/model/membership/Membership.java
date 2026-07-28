@@ -18,6 +18,10 @@ public class Membership {
     // CONSTRUCTORS
     // ============================================================
     
+    public Membership() {
+        this(null, null, "BASIC", 0.0, 30);
+    }
+
     public Membership(String membershipId, String profileId, String type, double price, int duration) {
         this.membershipId = membershipId;
         this.profileId = profileId;  // ← profileId is stored here
@@ -35,6 +39,10 @@ public class Membership {
     
     public String getMembershipId() { 
         return membershipId; 
+    }
+
+    public String getName() {
+        return getClass().getSimpleName();
     }
     
     /**
@@ -68,6 +76,19 @@ public class Membership {
     public String getStatus() { 
         return status; 
     }
+
+    public double calculateFee() {
+        return price;
+    }
+
+    public String getExpiryDate() {
+        return endDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.endDate = expiryDate;
+    }
+
     public String getMembershipDetails() {
     return String.format("Membership{id='%s', type='%s', price=%.2f, status='%s', endDate='%s'}",
         membershipId, type, price, status, endDate);
