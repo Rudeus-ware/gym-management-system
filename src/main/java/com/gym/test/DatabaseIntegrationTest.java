@@ -1,9 +1,10 @@
 package com.gym.test;
 
+import java.util.List;
+
 import com.gym.database.DatabaseManager;
 import com.gym.model.Profile;
-
-import java.util.List;
+import com.gym.util.IdGenerator;
 
 public class DatabaseIntegrationTest {
     
@@ -40,7 +41,7 @@ public class DatabaseIntegrationTest {
             "123 Test St"
         );
         testProfile.setActive(true);
-        db.createProfile(testProfile);
+        db.createProfile("John Doe", "john@email.com", "555-1234", "123 Main St", IdGenerator.ROLE_MEMBER);
         System.out.println("   Created profile: " + testProfile.getName());
         
         // Test 4: Verify creation

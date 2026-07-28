@@ -107,4 +107,16 @@ public class Profile {
         return String.format("Profile{id='%s', name='%s', email='%s', membership='%s', status='%s'}",
             profileId, name, email, membershipType, status);
     }
+
+    public String viewProfile() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Profile ID: ").append(profileId).append("\n");
+    sb.append("Name: ").append(name).append("\n");
+    sb.append("Email: ").append(email).append("\n");
+    sb.append("Phone: ").append(phone != null ? phone : "N/A").append("\n");
+    sb.append("Address: ").append(address != null ? address : "N/A").append("\n");
+    sb.append("Status: ").append(isActive() ? "ACTIVE" : "INACTIVE");
+    return sb.toString();
 }
+}
+

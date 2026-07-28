@@ -1,78 +1,105 @@
 package com.gym.controller;
 
-import com.gym.model.classes.GymClass;
-import com.gym.model.booking.Session;
 import com.gym.database.DatabaseManager;
-import com.gym.persistence.JsonDataManager;
+import com.gym.model.classes.GymClass;
+import com.gym.model.classes.Yoga;
+import com.gym.model.classes.Spin;
+import com.gym.model.classes.Strength;
+import com.gym.model.booking.Session;
 import com.gym.util.IdGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * ClassController - Handles gym class operations
+ */
 public class ClassController {
     
-    private final DatabaseManager databaseManager;
-    private final IdGenerator idGenerator;
+    private GymController gymController;
+    private DatabaseManager databaseManager;
+    private IdGenerator idGenerator;
     
-    public ClassController(DatabaseManager dataManager) {
-        this.databaseManager = dataManager;
-        if (dataManager != null && dataManager.getConnection() != null) {
-            this.idGenerator = new IdGenerator(dataManager.getConnection());
-        } else {
-            this.idGenerator = new IdGenerator("CLASS");
-        }
-    }
-    
-    public ClassController(JsonDataManager dataManager) {
-        this.databaseManager = dataManager;
-        this.idGenerator = new IdGenerator("CLASS");
+    public ClassController(GymController gymController) {
+        this.gymController = gymController;
+        this.databaseManager = gymController.databaseManager;
+        this.idGenerator = new IdGenerator();
     }
     
     // ============================================================
-    // CLASS OPERATIONS
+    // CREATE CLASS
     // ============================================================
     
-    public GymClass createClass(String name, String description, int duration, String category) {
+    public GymClass createClass(String name, String type, String schedule, int capacity, String trainerId) {
         String classId = idGenerator.generateClassId(LocalDate.now());
-        return databaseManager.createGymClass(classId, name, description, duration, category);
+        
+        GymClass gymClass = null;
+        switch (type) {
+            case "Yoga":
+                gymClass = new Yoga(classId, name, schedule, capacity, trainerId, "Hatha", "Beginner");
+                break;
+            case "Spin":
+                gymClass = new Spin(classId, name, schedule, capacity, trainerId, "Medium", 45, "EDM");
+                break;
+            case "Strength":
+                gymClass = new Strength(classId, name, schedule, capacity, trainerId, "Full Body", "Intermediate");
+                break;
+            default:
+                System.out.println("❌ Invalid class type: " + type);
+                return null;
+        }
+        
+        databaseManager.addGymClass(gymClass);
+        System.out.println("✅ Class created: " + name + " (ID: " + classId + ")");
+        return gymClass;
     }
+    
+    // ============================================================
+    // FIND CLASSES
+    // ============================================================
     
     public GymClass findClassById(String id) {
         return databaseManager.findClassById(id);
     }
     
-    public List<GymClass> getAllClasses() {
+    public List<GymClass> findAllClasses() {
         return databaseManager.findAllClasses();
     }
     
-    public boolean deleteClass(String classId) {
-        if (classId == null || classId.isEmpty()) return false;
-        boolean removed = databaseManager.getGymClasses().removeIf(c -> c.getClassId().equals(classId));
-        if (removed) {
-            databaseManager.saveAllData();
-            System.out.println("✅ Class deleted: " + classId);
+    public List<GymClass> getAllClasses() {
+        return databaseManager.getGymClasses();
+    }
+    
+    public boolean isClassAvailable(String classId) {
+        GymClass gymClass = findClassById(classId);
+        if (gymClass == null) {
+            return false;
         }
-        return removed;
+        return !gymClass.isFull();
     }
     
     // ============================================================
-    // SESSION OPERATIONS
+    // SESSION MANAGEMENT
     // ============================================================
     
-    public Session createSession(String classId, String trainerId, String sessionDate, 
-                                  String startTime, String endTime, int maxCapacity) {
+    public Session createSession(String classId, String date, String startTime, 
+                                String endTime, String duration, String trainerId) {
         String sessionId = idGenerator.generateSessionId(LocalDate.now());
-        Session session = new Session(sessionId, classId, trainerId, sessionDate, startTime, endTime, maxCapacity);
+        
+        Session session = new Session(
+            sessionId, classId, date, startTime, endTime, duration, trainerId
+        );
+        
         databaseManager.addSession(session);
-        databaseManager.saveAllData();
+        System.out.println("✅ Session created: " + sessionId + " for class " + classId);
         return session;
     }
     
     public List<Session> getSessionsForClass(String classId) {
-        if (classId == null || classId.isEmpty()) return List.of();
-        return databaseManager.getSessions().stream()
-            .filter(s -> s.getClassId().equals(classId))
-            .collect(Collectors.toList());
+        return databaseManager.getSessionsForClass(classId);
+    }
+    
+    public List<Session> getAllSessions() {
+        return databaseManager.getSessions();
     }
 }

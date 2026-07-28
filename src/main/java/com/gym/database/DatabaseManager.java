@@ -1,11 +1,13 @@
 package com.gym.database;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import com.gym.model.membership.Membership;
 import com.gym.model.payment.Payment;
 import com.gym.model.user.Admin;
 import com.gym.model.user.Trainer;
+import com.gym.util.IdGenerator;
 
 public class DatabaseManager {
     
@@ -36,6 +39,7 @@ public class DatabaseManager {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/gym_db";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "password";
+     private IdGenerator idGenerator;
     
     public DatabaseManager() {
         this.profiles = new ArrayList<>();
@@ -107,6 +111,11 @@ public class DatabaseManager {
     public List<Payment> getPayments() { 
         return payments != null ? payments : new ArrayList<>(); 
     }
+    public void addPayment(com.gym.model.Payment payment) {
+    // ...
+}
+
+    
     
     // ============================================================
     // FIND METHODS
@@ -215,13 +224,34 @@ public class DatabaseManager {
     // CREATE METHODS - ADD THESE
     // ============================================================
     
-    public Profile createProfile(String id, String name, String email, String phone, String membershipType) {
-        Profile profile = new Profile(id, name, email, phone, membershipType);
-        if (profiles == null) profiles = new ArrayList<>();
-        profiles.add(profile);
-        saveProfileToDatabase(profile);
+   // ============================================================
+// PROFILE OPERATIONS
+// ============================================================
+
+public Profile createProfile(String name, String email, String phone, String address, String roleCode) {
+    LocalDate registrationDate = LocalDate.now();
+    String profileId = idGenerator.generateProfileId(roleCode, registrationDate);
+    
+    Profile profile = new Profile(profileId, name, email, phone, address);
+    profile.setActive(true);
+    
+    String sql = "INSERT INTO profiles (profile_id, name, email, phone, address, registration_date, is_active) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setString(1, profileId);
+        stmt.setString(2, name);
+        stmt.setString(3, email);
+        stmt.setString(4, phone);
+        stmt.setString(5, address);
+        stmt.setDate(6, Date.valueOf(registrationDate));
+        stmt.setBoolean(7, true);
+        stmt.executeUpdate();
         return profile;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return null;
     }
+}
     
     public Trainer createTrainer(String id, String name, String email, String phone, 
                                  String specialization, String hireDate, String status) {
@@ -541,6 +571,16 @@ public class DatabaseManager {
             System.err.println("❌ Failed to update profile: " + e.getMessage());
         }
     }
+
+    public Profile createProfile(Profile profile) {
+    return createProfile(
+        profile.getName(),
+        profile.getEmail(),
+        profile.getPhone(),
+        profile.getAddress(),
+        IdGenerator.ROLE_MEMBER  // default role
+    );
+}
     
     // ============================================================
     // LOAD DATA FROM DATABASE

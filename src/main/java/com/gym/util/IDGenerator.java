@@ -1,12 +1,24 @@
 package com.gym.util;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * IdGenerator - Generates custom IDs for all entities
- * Format: [4-digit counter][YYMMDD][2-digit role code]
+ * IdGenerator - Generates custom IDs with format: [Counter][YYMMDD][Role]
+ * 
+ * Counter format:
+ * - 000 to 999 (numeric)
+ * - A00 to A99 (1000-1099)
+ * - B00 to B99 (1100-1199)
+ * - ...
+ * - Z00 to Z99 (2500-2599)
+ * 
+ * Total possible: 1000 + 26*100 = 3600 per role
  * 
  * Role Codes:
  * - Admin: 00
@@ -21,10 +33,22 @@ import java.time.format.DateTimeFormatter;
  */
 public class IdGenerator {
     
-    private Connection connection;
-    private String prefix; // Optional prefix for fallback
+    // ============================================================
+    // CONSTANTS
+    // ============================================================
     
-    // Entity types for counter
+    // Role Codes
+    public static final String ROLE_ADMIN = "00";
+    public static final String ROLE_TRAINER = "11";
+    public static final String ROLE_MEMBER = "22";
+    public static final String ROLE_MEMBERSHIP = "33";
+    public static final String ROLE_CLASS = "44";
+    public static final String ROLE_SESSION = "55";
+    public static final String ROLE_BOOKING = "66";
+    public static final String ROLE_ATTENDANCE = "77";
+    public static final String ROLE_PAYMENT = "88";
+    
+    // Entity types for counters
     public static final String COUNTER_PROFILE = "profile";
     public static final String COUNTER_MEMBERSHIP = "membership";
     public static final String COUNTER_CLASS = "class";
@@ -33,10 +57,28 @@ public class IdGenerator {
     public static final String COUNTER_ATTENDANCE = "attendance";
     public static final String COUNTER_PAYMENT = "payment";
     
-    // Role codes
-    public static final String ROLE_ADMIN = "00";
-    public static final String ROLE_TRAINER = "11";
-    public static final String ROLE_MEMBER = "22";
+    // ============================================================
+    // FIELDS
+    // ============================================================
+    
+    private Connection connection;
+    private boolean useDatabase = true;
+    
+    // In-memory counters for JSON fallback
+    private int profileCounter = -1;
+    private int membershipCounter = -1;
+    private int classCounter = -1;
+    private int sessionCounter = -1;
+    private int bookingCounter = -1;
+    private int attendanceCounter = -1;
+    private int paymentCounter = -1;
+    
+    // Optional prefix for fallback
+    private String prefix;
+    
+    // ============================================================
+    // CONSTRUCTORS
+    // ============================================================
     
     public IdGenerator(Connection connection) {
         this.connection = connection;
@@ -44,24 +86,27 @@ public class IdGenerator {
         initializeCounterTable();
     }
     
-    /**
-     * Constructor with prefix for fallback
-     */
+    public IdGenerator() {
+        this.connection = null;
+        this.prefix = null;
+    }
+    
     public IdGenerator(String prefix) {
         this.connection = null;
         this.prefix = prefix;
     }
     
-    /**
-     * Initialize the counter table if it doesn't exist
-     */
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    
     private void initializeCounterTable() {
         if (connection == null) return;
         try {
             String createTableSql = """
                 CREATE TABLE IF NOT EXISTS id_counter (
                     id_type VARCHAR(20) PRIMARY KEY,
-                    last_sequence INT DEFAULT 0,
+                    last_sequence INT DEFAULT -1,
                     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )
             """;
@@ -73,83 +118,63 @@ public class IdGenerator {
         }
     }
     
+    public void setUseDatabase(boolean useDatabase) {
+        this.useDatabase = useDatabase;
+    }
+    
     // ============================================================
-    // GENERATE SPECIFIC IDS
+    // PUBLIC GENERATE METHODS
     // ============================================================
     
-    /**
-     * Generate a profile ID
-     */
     public String generateProfileId(String roleCode, LocalDate registrationDate) {
-        String sequence = getNextSequence(COUNTER_PROFILE);
+        String counter = getNextSequence(COUNTER_PROFILE);
         String datePart = formatDate(registrationDate);
-        return sequence + datePart + roleCode;
+        return counter + datePart + roleCode;
     }
+
     
-    /**
-     * Generate a membership ID
-     */
+    
     public String generateMembershipId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_MEMBERSHIP);
+        String counter = getNextSequence(COUNTER_MEMBERSHIP);
         String datePart = formatDate(date);
-        return sequence + datePart + "33";
+        return counter + datePart + ROLE_MEMBERSHIP;
     }
     
-    /**
-     * Generate a class ID
-     */
     public String generateClassId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_CLASS);
+        String counter = getNextSequence(COUNTER_CLASS);
         String datePart = formatDate(date);
-        return sequence + datePart + "44";
+        return counter + datePart + ROLE_CLASS;
     }
     
-    /**
-     * Generate a session ID
-     */
     public String generateSessionId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_SESSION);
+        String counter = getNextSequence(COUNTER_SESSION);
         String datePart = formatDate(date);
-        return sequence + datePart + "55";
+        return counter + datePart + ROLE_SESSION;
     }
     
-    /**
-     * Generate a booking ID
-     */
     public String generateBookingId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_BOOKING);
+        String counter = getNextSequence(COUNTER_BOOKING);
         String datePart = formatDate(date);
-        return sequence + datePart + "66";
+        return counter + datePart + ROLE_BOOKING;
     }
     
-    /**
-     * Generate an attendance ID
-     */
     public String generateAttendanceId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_ATTENDANCE);
+        String counter = getNextSequence(COUNTER_ATTENDANCE);
         String datePart = formatDate(date);
-        return sequence + datePart + "77";
+        return counter + datePart + ROLE_ATTENDANCE;
     }
     
-    /**
-     * Generate a payment ID
-     */
     public String generatePaymentId(LocalDate date) {
-        String sequence = getNextSequence(COUNTER_PAYMENT);
+        String counter = getNextSequence(COUNTER_PAYMENT);
         String datePart = formatDate(date);
-        return sequence + datePart + "88";
+        return counter + datePart + ROLE_PAYMENT;
     }
     
     // ============================================================
-    // GENERIC ID GENERATOR (For AttendanceController compatibility)
+    // GENERIC ID GENERATOR (For Compatibility)
     // ============================================================
     
-    /**
-     * Generate a generic ID with prefix, suffix, and date
-     * This is the method that AttendanceController calls
-     */
     public String generateId(String type, String suffix, LocalDate date) {
-        // Map type to counter
         String counterType;
         switch (type.toLowerCase()) {
             case "attendance":
@@ -174,144 +199,202 @@ public class IdGenerator {
                 counterType = COUNTER_PAYMENT;
                 break;
             default:
-                // Fallback: use random
                 return generateFallbackId(type, date);
         }
         
-        String sequence = getNextSequence(counterType);
-        String dateStr = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        
-        // Format: PREFIX-DATE-SEQUENCE
-        // Example: ATT-20240615-0001
-        return String.format("%s-%s-%04d", 
-            type.substring(0, 3).toUpperCase(), 
-            dateStr, 
-            Integer.parseInt(sequence)
-        );
+        String counter = getNextSequence(counterType);
+        String datePart = formatDate(date);
+        return counter + datePart + suffix;
     }
     
-    /**
-     * Generate a fallback ID when database is not available
-     */
     private String generateFallbackId(String type, LocalDate date) {
         if (prefix != null) {
-            String dateStr = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
             int count = getNextCount();
-            return String.format("%s-%s-%04d", prefix, dateStr, count);
+            return String.format("%s%s%03d", prefix, dateStr, count);
         }
-        
-        // Ultimate fallback: timestamp-based
-        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        long random = System.currentTimeMillis() % 10000;
-        return String.format("%s-%s-%04d", 
-            type.substring(0, 3).toUpperCase(), 
-            timestamp, 
-            random
-        );
+        String dateStr = date.format(DateTimeFormatter.ofPattern("yyMMdd"));
+        long random = System.currentTimeMillis() % 1000;
+        return String.format("%s%s%03d", type.substring(0, 3).toUpperCase(), dateStr, random);
     }
     
-    /**
-     * Get next count for fallback (in-memory counter)
-     */
     private int getNextCount() {
-        // Simple in-memory counter - resets per instance
-        return (int)(System.currentTimeMillis() % 10000) + 1;
+        return (int)(System.currentTimeMillis() % 1000) + 1;
     }
     
     // ============================================================
-    // SEQUENCE MANAGEMENT (MySQL)
+    // SEQUENCE GENERATION
     // ============================================================
     
-    /**
-     * Get next sequence number for a counter type
-     */
     private synchronized String getNextSequence(String counterType) {
-        if (connection == null) {
-            // Fallback for when connection is not available
-            return String.format("%04d", (int)(System.currentTimeMillis() % 10000));
+        if (useDatabase && connection != null) {
+            try {
+                return getSequenceFromDatabase(counterType);
+            } catch (SQLException e) {
+                System.out.println("⚠️ Database sequence failed, using in-memory counter");
+                return getSequenceFromMemory(counterType);
+            }
+        }
+        return getSequenceFromMemory(counterType);
+    }
+    
+    private String getSequenceFromDatabase(String counterType) throws SQLException {
+        // Get current sequence
+        String selectSql = "SELECT last_sequence FROM id_counter WHERE id_type = ?";
+        int currentSequence = -1;
+        
+        try (PreparedStatement stmt = connection.prepareStatement(selectSql)) {
+            stmt.setString(1, counterType);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                currentSequence = rs.getInt("last_sequence");
+            }
         }
         
-        try {
-            // Use transaction to ensure atomicity
-            connection.setAutoCommit(false);
-            
-            // Try to get and update in one operation using MySQL's INSERT ... ON DUPLICATE KEY
-            String upsertSql = """
-                INSERT INTO id_counter (id_type, last_sequence) 
-                VALUES (?, 1) 
-                ON DUPLICATE KEY UPDATE 
-                    last_sequence = last_sequence + 1
-            """;
-            
-            try (PreparedStatement stmt = connection.prepareStatement(upsertSql)) {
+        // If no record exists, insert with 0
+        if (currentSequence == -1) {
+            String insertSql = "INSERT INTO id_counter (id_type, last_sequence) VALUES (?, 0)";
+            try (PreparedStatement stmt = connection.prepareStatement(insertSql)) {
                 stmt.setString(1, counterType);
                 stmt.executeUpdate();
             }
-            
-            // Get the updated value
-            String selectSql = "SELECT last_sequence FROM id_counter WHERE id_type = ?";
-            int sequence = 0;
-            try (PreparedStatement stmt = connection.prepareStatement(selectSql)) {
-                stmt.setString(1, counterType);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    sequence = rs.getInt("last_sequence");
-                }
-            }
-            
-            connection.commit();
-            
-            // Wrap around if exceeds 9999
-            if (sequence > 9999) {
-                sequence = 1;
-                // Reset the counter
-                String resetSql = "UPDATE id_counter SET last_sequence = 1 WHERE id_type = ?";
-                try (PreparedStatement stmt = connection.prepareStatement(resetSql)) {
-                    stmt.setString(1, counterType);
-                    stmt.executeUpdate();
-                }
-                connection.commit();
-            }
-            
-            return String.format("%04d", sequence);
-            
-        } catch (SQLException e) {
-            System.err.println("❌ Error getting sequence for " + counterType + ": " + e.getMessage());
+            currentSequence = 0;
+        }
+        
+        // Increment
+        int newSequence = currentSequence + 1;
+        
+        // Update sequence
+        String updateSql = "UPDATE id_counter SET last_sequence = ? WHERE id_type = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(updateSql)) {
+            stmt.setInt(1, newSequence);
+            stmt.setString(2, counterType);
+            stmt.executeUpdate();
+        }
+        
+        // Return formatted counter using the NEW value
+        return formatCounter(newSequence);
+    }
+    
+    private synchronized String getSequenceFromMemory(String counterType) {
+        int sequence = getMemoryCounter(counterType);
+        sequence++;
+        setMemoryCounter(counterType, sequence);
+        return formatCounter(sequence);
+    }
+    
+    private int getMemoryCounter(String counterType) {
+        switch (counterType) {
+            case COUNTER_PROFILE: return profileCounter;
+            case COUNTER_MEMBERSHIP: return membershipCounter;
+            case COUNTER_CLASS: return classCounter;
+            case COUNTER_SESSION: return sessionCounter;
+            case COUNTER_BOOKING: return bookingCounter;
+            case COUNTER_ATTENDANCE: return attendanceCounter;
+            case COUNTER_PAYMENT: return paymentCounter;
+            default: return 0;
+        }
+    }
+    
+    private void setMemoryCounter(String counterType, int value) {
+        switch (counterType) {
+            case COUNTER_PROFILE: profileCounter = value; break;
+            case COUNTER_MEMBERSHIP: membershipCounter = value; break;
+            case COUNTER_CLASS: classCounter = value; break;
+            case COUNTER_SESSION: sessionCounter = value; break;
+            case COUNTER_BOOKING: bookingCounter = value; break;
+            case COUNTER_ATTENDANCE: attendanceCounter = value; break;
+            case COUNTER_PAYMENT: paymentCounter = value; break;
+        }
+    }
+    
+    // ============================================================
+    // COUNTER FORMATTING (3 characters)
+    // ============================================================
+    
+    /**
+     * Format a counter value to 3-character format:
+     * 0-999 → 000 to 999
+     * 1000 → A00, 1001 → A01, ..., 1099 → A99
+     * 1100 → B00, ..., 2599 → Z99
+     */
+    private String formatCounter(int value) {
+        if (value < 0) {
+            return "000";
+        }
+        
+        // 0-999: Direct numbers
+        if (value <= 999) {
+            return String.format("%03d", value);
+        }
+        
+        // 1000+: Letter + 2 digits
+        int adjusted = value - 1000;
+        int letterIndex = adjusted / 100;
+        int digitPart = adjusted % 100;
+        
+        // If we exceed Z99, wrap around
+        if (letterIndex > 25) {
+            // Wrap to 000
+            return "000";
+        }
+        
+        char letter = (char) ('A' + letterIndex);
+        return letter + String.format("%02d", digitPart);
+    }
+    
+    /**
+     * Parse a formatted counter back to its numeric value
+     */
+    public int parseCounter(String formattedCounter) {
+        if (formattedCounter == null || formattedCounter.length() != 3) {
+            return -1;
+        }
+        
+        char first = formattedCounter.charAt(0);
+        String rest = formattedCounter.substring(1);
+        
+        // Check if it's numeric (000-999)
+        if (Character.isDigit(first)) {
             try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                System.err.println("❌ Rollback failed: " + ex.getMessage());
-            }
-            // Fallback: use timestamp-based ID
-            return String.format("%04d", System.currentTimeMillis() % 10000);
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                System.err.println("❌ Failed to reset auto-commit: " + e.getMessage());
+                return Integer.parseInt(formattedCounter);
+            } catch (NumberFormatException e) {
+                return -1;
             }
         }
+        
+        // It's a letter (A-Z)
+        if (first >= 'A' && first <= 'Z') {
+            int letterIndex = first - 'A';
+            int digitPart;
+            try {
+                digitPart = Integer.parseInt(rest);
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+            return 1000 + (letterIndex * 100) + digitPart;
+        }
+        
+        return -1;
+    }
+    
+    // ============================================================
+    // DATE FORMATTING
+    // ============================================================
+    
+    private String formatDate(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern("yyMMdd"));
     }
     
     // ============================================================
     // UTILITY METHODS
     // ============================================================
     
-    /**
-     * Format date as YYMMDD
-     */
-    private String formatDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern("yyMMdd"));
-    }
-    
-    /**
-     * Extract role from ID
-     */
     public String getRoleFromId(String id) {
-        if (id == null || id.length() < 10) {
+        if (id == null || id.length() < 11) {
             return "UNKNOWN";
         }
-        String roleCode = id.substring(8, 10);
+        String roleCode = id.substring(9, 11);
         switch (roleCode) {
             case "00": return "ADMIN";
             case "11": return "TRAINER";
@@ -326,42 +409,34 @@ public class IdGenerator {
         }
     }
     
-    /**
-     * Extract date from ID
-     */
     public String getDateFromId(String id) {
-        if (id == null || id.length() < 10) {
+        if (id == null || id.length() < 11) {
             return "UNKNOWN";
         }
-        String yymmdd = id.substring(4, 10);
+        String yymmdd = id.substring(3, 9);
         return "20" + yymmdd.substring(0, 2) + "-" + 
                yymmdd.substring(2, 4) + "-" + 
                yymmdd.substring(4, 6);
     }
     
-    /**
-     * Validate if an ID matches the expected format
-     */
+    public String getCounterFromId(String id) {
+        if (id == null || id.length() < 11) {
+            return "UNKNOWN";
+        }
+        return id.substring(0, 3);
+    }
+    
     public boolean isValidFormat(String id) {
-        if (id == null || id.length() != 10) {
+        if (id == null || id.length() != 11) {
             return false;
         }
-        // Check first 8 characters are digits
-        for (int i = 0; i < 8; i++) {
-            if (!Character.isDigit(id.charAt(i))) {
-                return false;
-            }
-        }
-        // Check last 2 characters are valid role codes
-        String role = id.substring(8, 10);
+        // Check that the role code is valid
+        String role = id.substring(9, 11);
         return role.equals("00") || role.equals("11") || role.equals("22") ||
                role.equals("33") || role.equals("44") || role.equals("55") ||
                role.equals("66") || role.equals("77") || role.equals("88");
     }
     
-    /**
-     * Reset a specific counter (for testing/administration)
-     */
     public void resetCounter(String counterType) {
         if (connection == null) return;
         String sql = "UPDATE id_counter SET last_sequence = 0 WHERE id_type = ?";
@@ -374,9 +449,6 @@ public class IdGenerator {
         }
     }
     
-    /**
-     * Get current sequence value (for monitoring)
-     */
     public int getCurrentSequence(String counterType) {
         if (connection == null) return 0;
         String sql = "SELECT last_sequence FROM id_counter WHERE id_type = ?";
