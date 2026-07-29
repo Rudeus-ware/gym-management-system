@@ -347,6 +347,14 @@ public Profile createProfile(String name, String email, String phone, String add
             savePaymentToDatabase(payment);
         }
     }
+
+    public void addBooking(Booking booking) {
+        if (booking != null) {
+            if (bookings == null) bookings = new ArrayList<>();
+            bookings.add(booking);
+            saveBookingToDatabase(booking);
+        }
+    }
     
     // ============================================================
     // UPDATE METHODS
