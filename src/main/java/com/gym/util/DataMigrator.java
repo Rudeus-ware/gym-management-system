@@ -3,7 +3,6 @@ package com.gym.util;
 import com.gym.database.DatabaseManager;
 import com.gym.persistence.JsonDataManager;
 import com.gym.model.Profile;
-import com.gym.model.Payment;
 import com.gym.model.membership.Membership;
 import com.gym.model.classes.GymClass;
 import com.gym.model.booking.Booking;
@@ -12,6 +11,7 @@ import com.gym.model.booking.Attendance;
 import com.gym.model.user.Trainer;
 import com.gym.model.user.Admin;
 import com.gym.database.DatabaseConnection;
+import com.gym.model.payment.Payment;
 
 import java.sql.Connection;
 import java.time.LocalDate;

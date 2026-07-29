@@ -112,11 +112,7 @@ public class DatabaseManager {
     public List<Payment> getPayments() { 
         return payments != null ? payments : new ArrayList<>(); 
     }
-    public void addPayment(com.gym.model.Payment payment) {
-    // ...
-}
 
-    
     
     // ============================================================
     // FIND METHODS
